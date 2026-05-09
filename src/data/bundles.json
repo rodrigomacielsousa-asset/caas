@@ -1,0 +1,21 @@
+[
+  {
+    "id": "kit-fechamento",
+    "name": "Combo Fechamento Contábil",
+    "slug": "kit-fechamento",
+    "area": "Contábil",
+    "status": "beta",
+    "type": "bundle",
+    "bundleItems": ["fechamento-pro", "memoriais-contabeis"],
+    "description": "O kit essencial para o encerramento do exercício.",
+    "longDescription": "Garanta o Fechamento Pro e o Memoriais Contábeis com desconto progressivo. Tudo que você precisa para Notas Explicativas e Audit.",
+    "features": ["Desconto de 20%", "Sucesso Garantido", "Suporte VIP"],
+    "pricingModel": "subscription",
+    "price": 119.90,
+    "priceLabel": "R$ 119,90/mês",
+    "checkoutUrl": "https://buy.stripe.com/mock-combo-fechamento",
+    "statusBadge": "Econômico",
+    "tags": ["combo", "fechamento", "desconto"],
+    "lastUpdated": "2024-05-01"
+  }
+]
