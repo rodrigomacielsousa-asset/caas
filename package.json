@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist -c www.microcaas.com.br",
+    "deploy": "gh-pages -d dist -c microcaas.com.br",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
