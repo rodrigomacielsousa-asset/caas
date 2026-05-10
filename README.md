@@ -35,7 +35,10 @@ O projeto já inclui um workflow de GitHub Actions em `.github/workflows/deploy.
    - Aponte os registros **A** para os IPs do GitHub Pages (185.199.108.153, etc).
    - Crie um registro **CNAME** para `www` apontando para `seu-usuario.github.io`.
 2. **GitHub Settings:** 
-   - Vá em Settings > Pages e insira `microcaas.com.br`.
+   - Vá em Settings > Pages.
+   - **Build and deployment > Source**: Selecione **"GitHub Actions"** (Obrigatório para que o deploy funcione via workflow).
+   - **Custom domain**: Insira `microcaas.com.br`.
+3. **Roteamento SPA**: O build gera um arquivo `404.html` (cópia do `index.html`) para permitir que rotas diretas funcionem corretamente sem Erro 404 do GitHub.
 
 ## 📂 Estrutura de Conteúdo
 - `src/data/solucoes.json`: Soluções Oficiais controladas pelo time CaaS.
