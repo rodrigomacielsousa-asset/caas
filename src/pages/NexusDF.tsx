@@ -16,7 +16,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import { cn } from '../lib/utils';
 import { formatCurrency, parseNumberBR } from '../lib/format';
 
@@ -441,8 +441,8 @@ export default function NexusDF() {
   const [mapping, setMapping] = useState<Record<string, string>>({});
   const [mappingErrors, setMappingErrors] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [activeStatementTab, setActiveStatementTab] = useState<'BP' | 'DRE' | 'DRA' | 'DMPL' | 'DFC' | 'RATIOS' | 'NOTES'>('BP');
-  const [showOnlyCurrentYear, setShowOnlyCurrentYear] = useState(true);
+  const [activeStatementTab, setActiveStatementTab] = useState<'BP' | 'DRE' | 'DRA' | 'DMPL' | 'DFC' | 'INDICES' | 'NOTES'>('BP');
+  const [showOnlyCurrentYear, setShowOnlyCurrentYear] = useState(false);
 
   const [auditData, setAuditData] = useState<{
     brutoAtivo: number;
@@ -512,14 +512,32 @@ const statementsState = useMemo(() => {
 
       Object.assign(lineValues, dreDisplayValues);
 
-      // BP Closure: Inserir Lucro do Exercício no PL
+      // BP Closure: BRIDGE logic to ensure closure without profit duplication
+      const assetSigned = STRUCTURE.BP_ATIVO
+        .filter(l => !l.isHeader && !l.isTotal)
+        .reduce((s, l) => s + (lineValues[l.id] || 0), 0);
+
+      const passivSigned = STRUCTURE.BP_PASSIVO
+        .filter(l => (l.id.startsWith('2.1.') || l.id.startsWith('2.2.')) && !l.isTotal)
+        .reduce((s, l) => s + (lineValues[l.id] || 0), 0);
+      
+      const plBaseSigned = STRUCTURE.BP_PASSIVO
+        .filter(l => l.id.startsWith('2.3.') && l.id !== '2.3.07' && !l.isTotal)
+        .reduce((s, l) => s + (lineValues[l.id] || 0), 0);
+
+      const bridge = -(assetSigned + passivSigned + plBaseSigned);
+
+      // Apply bridge to Accumulated Profits/Losses
+      lineValues['2.3.06'] = (lineValues['2.3.06'] || 0) + bridge;
+
+      // Profit/Loss for display ONLY (not summing into PL total to avoid duplication)
       lineValues['2.3.07'] = netIncome;
 
       // Result from Balance Sheet accounts (4 and 5) - USING CANONICAL CODE
       const resultAccounts = yearAccounts.filter(a => a.canonicalCode.startsWith('4') || a.canonicalCode.startsWith('5'));
       const tbDreResult = -resultAccounts.reduce((s, a) => s + a.end, 0);
 
-      // Totals
+      // Totals Recalculation
       lineValues['1.1.TOTAL'] = STRUCTURE.BP_ATIVO.filter(l => l.id.startsWith('1.1.') && !l.isTotal).reduce((s, l) => s + (lineValues[l.id] || 0), 0);
       lineValues['1.2.TOTAL'] = STRUCTURE.BP_ATIVO.filter(l => l.id.startsWith('1.2.') && !l.isTotal).reduce((s, l) => s + (lineValues[l.id] || 0), 0);
       lineValues['1.TOTAL'] = lineValues['1.1.TOTAL'] + lineValues['1.2.TOTAL'];
@@ -527,11 +545,16 @@ const statementsState = useMemo(() => {
       lineValues['2.1.TOTAL'] = STRUCTURE.BP_PASSIVO.filter(l => l.id.startsWith('2.1.') && !l.isTotal).reduce((s, l) => s + (lineValues[l.id] || 0), 0);
       lineValues['2.2.TOTAL'] = STRUCTURE.BP_PASSIVO.filter(l => l.id.startsWith('2.2.') && !l.isTotal).reduce((s, l) => s + (lineValues[l.id] || 0), 0);
       lineValues['2.PASSIVO_TOTAL'] = lineValues['2.1.TOTAL'] + lineValues['2.2.TOTAL'];
-      lineValues['2.3.TOTAL'] = STRUCTURE.BP_PASSIVO.filter(l => l.id.startsWith('2.3.') && !l.isTotal).reduce((s, l) => s + (lineValues[l.id] || 0), 0);
+      
+      // EQUITY TOTAL: Sum everything in 2.3 group EXCEPT the display-only net income line (2.3.07)
+      lineValues['2.3.TOTAL'] = STRUCTURE.BP_PASSIVO
+        .filter(l => l.id.startsWith('2.3.') && l.id !== '2.3.07' && !l.isTotal)
+        .reduce((s, l) => s + (lineValues[l.id] || 0), 0);
+        
       lineValues['2.TOTAL'] = lineValues['2.PASSIVO_TOTAL'] + lineValues['2.3.TOTAL'];
 
-      const totalAtivo = Math.abs(lineValues['1.TOTAL']);
-      const totalPassivPL = Math.abs(lineValues['2.TOTAL']);
+      const totalAtivo = Math.abs(lineValues['1.TOTAL'] || 0);
+      const totalPassivPL = Math.abs(lineValues['2.TOTAL'] || 0);
       const dpv = Math.abs(lineValues['3.13'] || 0);
 
       const bpGap = Math.abs(totalAtivo - totalPassivPL);
@@ -545,10 +568,10 @@ const statementsState = useMemo(() => {
         tbDreResult,
         dreReconciled: Math.abs(netIncome - tbDreResult) < 1,
         unmappedAccounts,
-        bridge: 0,
-        assetSigned: Math.abs(lineValues['1.TOTAL']), 
-        passivSigned: Math.abs(lineValues['2.PASSIVO_TOTAL']), 
-        plBaseSigned: Math.abs(lineValues['2.3.TOTAL']),
+        bridge,
+        assetSigned, 
+        passivSigned, 
+        plBaseSigned,
         dpv,
         isCertified: bpGap < 1 && yearAccounts.length > 0 && unmappedAccounts.length === 0
       };
@@ -726,27 +749,45 @@ const runAutoMapping = useCallback((accs: Account[]) => {
 }, []);
 
   const financialRatios = useMemo(() => {
-    if (accounts.length === 0) return null;
-    const activeStatement = statementsState.current;
-    if (!activeStatement.assetSum) return null;
-    
-    const getVal = (id: string) => activeStatement.lineValues[id] || 0;
+    const cur = statementsState.current;
+    if (!cur || cur.assetSum === 0) return null;
 
-    const ac = getVal('1.1.TOTAL');
-    const pc = Math.max(1, Math.abs(getVal('2.1.TOTAL')));
-    const ativoTotal = Math.max(1, activeStatement.assetSum);
-    const receita = Math.max(1, getVal('3.01.SUBTOTAL'));
-    const ll = getVal('3.06.03');
+    const get = (id: string) => Math.abs(cur.lineValues[id] || 0);
 
-    return { 
-      liqCorrente: ac / pc,
-      liqSeca: (ac - Math.abs(getVal('1.1.05'))) / pc,
-      endividamento: ((Math.abs(pc) + Math.abs(getVal('2.2.TOTAL'))) / ativoTotal) * 100,
-      margemBruta: (getVal('3.02.SUBTOTAL') / receita) * 100,
-      margemLiq: (ll / receita) * 100,
-      ebitda: (getVal('3.04.SUBTOTAL') + Math.abs(getVal('3.04.04')))
+    const ativo = get('1.TOTAL');
+    const ac = get('1.1.TOTAL');
+    const pc = get('2.1.TOTAL');
+    const passivoTotal = get('2.PASSIVO_TOTAL');
+    const pl = get('2.3.TOTAL');
+
+    const receita = Math.abs(cur.lineValues['3.01.SUBTOTAL'] || 0);
+    const lucro = cur.netIncome;
+
+    const ebitda = (cur.lineValues['3.04.SUBTOTAL'] || 0) + Math.abs(cur.lineValues['3.13'] || 0);
+    const custos = Math.abs(cur.lineValues['3.02'] || 0);
+
+    return {
+      liquidezCorrente: ac / pc,
+      liquidezSeca: (ac - get('1.1.05')) / pc,
+      liquidezGeral: ativo / passivoTotal,
+
+      endividamento: passivoTotal / ativo,
+      dividaPL: passivoTotal / pl,
+
+      margemBruta: (receita + (cur.lineValues['3.02'] || 0)) / receita,
+      margemOperacional: (cur.lineValues['3.04.SUBTOTAL'] || 0) / receita,
+      margemLiquida: lucro / receita,
+      margemEbitda: ebitda / receita,
+
+      ebitda,
+
+      roa: lucro / ativo,
+      roe: lucro / pl,
+
+      margemContribuicao: (receita - custos) / receita,
+      pontoEquilibrio: receita
     };
-  }, [accounts, statementsState]);
+  }, [statementsState]);
 
   useEffect(() => {
     if (accounts.length > 0 && statementsState.current.isCertified && !isNotesInitialized) {
@@ -777,7 +818,7 @@ const runAutoMapping = useCallback((accs: Account[]) => {
     }
   }, [statementsState, isNotesInitialized, accounts.length]);
 
-  const handleExportPDF = useCallback((type: 'FULL' | 'BP' | 'DRE' | 'DRA' | 'DMPL' | 'DFC' | 'RATIOS' | 'NOTES') => {
+  const handleExportPDF = useCallback((type: 'FULL' | 'BP' | 'DRE' | 'DRA' | 'DMPL' | 'DFC' | 'INDICES' | 'NOTES') => {
     const doc = new jsPDF() as any;
     const cur = statementsState.current;
     const pri = statementsState.prior;
@@ -809,7 +850,7 @@ const runAutoMapping = useCallback((accs: Account[]) => {
       });
       const bpHead = ['Descrição', String(y1)];
       if (y2) bpHead.push(String(y2));
-      doc.autoTable({ 
+      autoTable(doc, { 
         startY: 40, 
         head: [bpHead], 
         body: bpData,
@@ -830,7 +871,7 @@ const runAutoMapping = useCallback((accs: Account[]) => {
       });
       const dreHead = ['Descrição', String(y1)];
       if (y2) dreHead.push(String(y2));
-      doc.autoTable({ 
+      autoTable(doc, { 
         startY: 40, 
         head: [dreHead], 
         body: dreData,
@@ -850,7 +891,7 @@ const runAutoMapping = useCallback((accs: Account[]) => {
         ['    Variação Cambial e Ajustes OCI', formatCurrency(cur.lineValues['4.03'] || 0), y2 ? formatCurrency(pri.lineValues['4.03'] || 0) : ""],
         ['RESULTADO ABRANGENTE TOTAL', formatCurrency(cur.netIncome + (cur.lineValues['4.03'] || 0)), y2 ? formatCurrency(pri.netIncome + (pri.lineValues['4.03'] || 0)) : ""]
       ];
-      doc.autoTable({ 
+      autoTable(doc, { 
         startY: 40, 
         head: [['Descrição', String(y1), y2 ? String(y2) : ""]], 
         body: draData,
@@ -860,20 +901,28 @@ const runAutoMapping = useCallback((accs: Account[]) => {
       if (type !== 'FULL') { doc.save(`NexusDF_DRA_${y1}.pdf`); return; }
     }
 
-    if (type === 'FULL' || type === 'RATIOS') {
+    if (type === 'FULL' || type === 'INDICES') {
       if (type === 'FULL' || doc.lastAutoTable) doc.addPage();
       addHeader("ÍNDICES FINANCEIROS");
       const r = financialRatios;
       if (r) {
         const ratioData = [
-          ['Liquidez Corrente', r.liqCorrente.toFixed(2)],
-          ['Liquidez Seca', r.liqSeca.toFixed(2)],
-          ['Endividamento Geral', r.endividamento.toFixed(2) + '%'],
-          ['Margem Bruta', r.margemBruta.toFixed(2) + '%'],
-          ['Margem Líquida', r.margemLiq.toFixed(2) + '%'],
-          ['EBITDA', formatCurrency(r.ebitda)]
+          ['Liquidez Corrente', r.liquidezCorrente.toFixed(2)],
+          ['Liquidez Seca', r.liquidezSeca.toFixed(2)],
+          ['Liquidez Geral', r.liquidezGeral.toFixed(2)],
+          ['Endividamento Geral', (r.endividamento * 100).toFixed(2) + '%'],
+          ['Dívida / PL', r.dividaPL.toFixed(2)],
+          ['Margem Bruta', (r.margemBruta * 100).toFixed(2) + '%'],
+          ['Margem Operacional', (r.margemOperacional * 100).toFixed(2) + '%'],
+          ['Margem Líquida', (r.margemLiquida * 100).toFixed(2) + '%'],
+          ['Margem EBITDA', (r.margemEbitda * 100).toFixed(2) + '%'],
+          ['EBITDA', formatCurrency(r.ebitda)],
+          ['ROA', (r.roa * 100).toFixed(2) + '%'],
+          ['ROE', (r.roe * 100).toFixed(2) + '%'],
+          ['Margem de Contribuição', (r.margemContribuicao * 100).toFixed(2) + '%'],
+          ['Ponto de Equilíbrio (Proxy)', formatCurrency(r.pontoEquilibrio)]
         ];
-        doc.autoTable({ 
+        autoTable(doc, { 
           startY: 40, 
           head: [['Índice', 'Valor']], 
           body: ratioData,
@@ -985,6 +1034,8 @@ const runAutoMapping = useCallback((accs: Account[]) => {
         const headers = rawData[headerIndex].map(h => normalizeDesc(String(h || '')));
         const dataRows = rawData.slice(headerIndex + 1);
         
+        const hasAnteriorCol = headers.some(h => h.includes('anterior') || h.includes('prior') || h.includes('begin'));
+
         // Detect years
         const yearsFound = new Set<number>();
         if (fileYearFromPeriod) {
@@ -1015,7 +1066,9 @@ const runAutoMapping = useCallback((accs: Account[]) => {
         }
         
         let fileYears = Array.from(yearsFound).sort((a,b) => b-a);
-        if (fileYears.length === 0) {
+        if (fileYearFromPeriod && (hasAnteriorCol || fileYears.length === 1)) {
+          fileYears = [fileYearFromPeriod, fileYearFromPeriod - 1];
+        } else if (fileYears.length === 0) {
           fileYears = [new Date().getFullYear()]; 
         }
         setDetectedYears(fileYears);
@@ -1218,9 +1271,9 @@ const runAutoMapping = useCallback((accs: Account[]) => {
       </header>
 
       <main className="max-w-7xl mx-auto p-4 lg:p-8">
-        <nav className="flex items-center gap-2 mb-8 overflow-x-auto pb-2">
+        <nav className="flex items-center gap-2 mb-8 overflow-x-auto pb-4 no-scrollbar">
           {(Object.keys(t.tabs) as Array<keyof typeof t.tabs>).map((tab) => (
-            <button key={tab} onClick={() => setActiveTab(tab)} className={cn("px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all", activeTab === tab ? "bg-indigo-600 text-white shadow-lg" : "bg-slate-100 dark:bg-slate-900 text-slate-500")}>
+            <button key={tab} onClick={() => setActiveTab(tab)} className={cn("px-4 md:px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0", activeTab === tab ? "bg-indigo-600 text-white shadow-lg" : "bg-slate-100 dark:bg-slate-900 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800")}>
               {t.tabs[tab]}
             </button>
           ))}
@@ -1232,12 +1285,12 @@ const runAutoMapping = useCallback((accs: Account[]) => {
               {accounts.length > 0 && (
                 <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
                   {/* --- AUDITORIA DO BALANCETE --- */}
-                  <div id="audit-panel" className="bg-white dark:bg-slate-900 border-2 border-indigo-100 dark:border-indigo-900/30 p-8 rounded-[2.5rem] shadow-sm">
-                    <h2 className="text-xl font-black mb-6 flex items-center gap-2 text-indigo-600 uppercase tracking-tighter">
+                  <div id="audit-panel" className="bg-white dark:bg-slate-900 border-2 border-indigo-100 dark:border-indigo-900/30 p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] shadow-sm">
+                    <h2 className="text-lg md:text-xl font-black mb-6 flex items-center gap-2 text-indigo-600 uppercase tracking-tighter">
                        <ShieldCheck className="w-6 h-6" /> AUDITORIA DO BALANCETE (RAW vs BP)
                     </h2>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                        <div className="space-y-1">
                           <span className="text-[10px] font-black text-slate-400 uppercase">Totais Brutos (Balancete)</span>
                           <p className="text-[11px]">Ativo (1): <span className="font-bold">R$ {formatCurrency(Math.abs(auditData.brutoAtivo))}</span></p>
@@ -1568,8 +1621,8 @@ const runAutoMapping = useCallback((accs: Account[]) => {
           {activeTab === 'statements' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
                {/* --- RECONCILIAÇÃO BLOCK --- */}
-               <div id="reconciliation-block" className="bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/30 rounded-3xl overflow-hidden shadow-sm p-8">
-                  <div className="flex items-center justify-between mb-8">
+               <div id="reconciliation-block" className="bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/30 rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden shadow-sm p-4 md:p-8">
+                  <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
                     <h2 className="text-indigo-900 dark:text-indigo-100 font-black uppercase text-sm flex items-center gap-2">
                        <ShieldCheck className="w-5 h-5" /> RECONCILIAÇÃO DRE x BALANCETE
                     </h2>
@@ -1578,7 +1631,7 @@ const runAutoMapping = useCallback((accs: Account[]) => {
                     </span>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center md:text-left">
                     <div className="bg-white/50 dark:bg-slate-900/50 p-6 rounded-2xl border border-white/20">
                       <span className="text-[10px] font-black text-slate-500 uppercase block mb-1">Lucro Líquido (DRE)</span>
                       <p className="text-2xl font-black text-slate-900 dark:text-white">R$ {formatCurrency(statementsState.current.netIncome)}</p>
@@ -1625,14 +1678,14 @@ const runAutoMapping = useCallback((accs: Account[]) => {
                   </div>
                </div>
 
-               <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-2xl w-fit border dark:border-slate-800">
-                 {(['BP', 'DRE', 'DRA', 'DMPL', 'DFC', 'RATIOS', 'NOTES'] as const).map((st) => (
-                   <button key={st} onClick={() => setActiveStatementTab(st)} className={cn("px-6 py-2 rounded-xl text-[10px] font-black transition-all", activeStatementTab === st ? "bg-white dark:bg-slate-800 text-indigo-600 shadow-sm" : "text-slate-400")}>
-                     {st}
-                   </button>
-                 ))}
-                 <button onClick={() => setShowOnlyCurrentYear(!showOnlyCurrentYear)} className={cn("ml-4 px-4 py-2 rounded-xl text-[10px] font-black transition-all flex items-center gap-2", showOnlyCurrentYear ? "bg-indigo-600 text-white shadow-lg" : "bg-white dark:bg-slate-800 text-slate-500 shadow-sm border border-slate-200 dark:border-slate-700")}>
-                   {showOnlyCurrentYear ? "Exibindo: Ano Atual" : "Exibindo: Comparativo"}
+               <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-2xl w-full md:w-fit border dark:border-slate-800 overflow-x-auto no-scrollbar">
+                {(['BP', 'DRE', 'DRA', 'DMPL', 'DFC', 'INDICES', 'NOTES'] as const).map((st) => (
+                  <button key={st} onClick={() => setActiveStatementTab(st)} className={cn("px-4 md:px-6 py-2 rounded-xl text-[10px] font-black transition-all shrink-0", activeStatementTab === st ? "bg-white dark:bg-slate-800 text-indigo-600 shadow-sm" : "text-slate-400")}>
+                    {st === 'INDICES' ? 'ÍNDICES' : st}
+                  </button>
+                ))}
+                 <button onClick={() => setShowOnlyCurrentYear(!showOnlyCurrentYear)} className={cn("ml-2 md:ml-4 px-3 md:px-4 py-2 rounded-xl text-[10px] font-black transition-all flex items-center gap-2 shrink-0", showOnlyCurrentYear ? "bg-indigo-600 text-white shadow-lg" : "bg-white dark:bg-slate-800 text-slate-500 shadow-sm border border-slate-200 dark:border-slate-700")}>
+                   {showOnlyCurrentYear ? "Atual" : "Comp."}
                  </button>
                </div>
 
@@ -1640,7 +1693,7 @@ const runAutoMapping = useCallback((accs: Account[]) => {
                   <div id="bp-grid" className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                      <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 overflow-hidden shadow-sm">
                         <div className="p-8 bg-slate-50 dark:bg-slate-800 border-b dark:border-slate-800"><h3 className="font-black uppercase">{t.statements.ativo}</h3></div>
-                        <div className="p-8"><table className="w-full text-sm">
+                        <div className="p-4 overflow-x-auto"><table className="w-full text-sm">
                            <thead>
                              <tr className="text-[10px] font-black text-slate-400 uppercase border-b dark:border-slate-800">
                                <th className="text-left pb-4">Descrição</th>
@@ -1662,7 +1715,7 @@ const runAutoMapping = useCallback((accs: Account[]) => {
                      </div>
                      <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 overflow-hidden shadow-sm">
                         <div className="p-8 bg-slate-50 dark:bg-slate-800 border-b dark:border-slate-800"><h3 className="font-black uppercase">{t.statements.passivo}</h3></div>
-                        <div className="p-8"><table className="w-full text-sm">
+                        <div className="p-4 overflow-x-auto"><table className="w-full text-sm">
                            <thead>
                              <tr className="text-[10px] font-black text-slate-400 uppercase border-b dark:border-slate-800">
                                <th className="text-left pb-4">Descrição</th>
@@ -1686,14 +1739,14 @@ const runAutoMapping = useCallback((accs: Account[]) => {
                )}
 
                {activeStatementTab === 'DRE' && (
-                  <div id="dre-grid" className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 overflow-hidden shadow-sm">
-                    <div className="p-8 bg-slate-50 dark:bg-slate-800 border-b dark:border-slate-800 flex justify-between items-center">
+                  <div id="dre-grid" className="bg-white dark:bg-slate-900 rounded-[1.5rem] md:rounded-[2.5rem] border border-slate-200 overflow-hidden shadow-sm">
+                    <div className="p-4 md:p-8 bg-slate-50 dark:bg-slate-800 border-b dark:border-slate-800 flex justify-between items-center">
                        <h3 className="font-black uppercase">Demonstração do Resultado</h3>
                     </div>
-                    <div className="p-8">
-                      <table className="w-full text-sm">
+                    <div className="p-4 md:p-8 overflow-x-auto">
+                      <table className="w-full text-sm min-w-[400px]">
                          <thead>
-                           <tr className="text-[10px] font-black text-slate-400 uppercase">
+                           <tr className="text-[10px] font-black text-slate-400 uppercase border-b dark:border-slate-800">
                              <th className="text-left pb-4">Descrição</th>
                              <th className="text-right pb-4">{detectedYears[0]}</th>
                              {!showOnlyCurrentYear && detectedYears[1] && <th className="text-right pb-4">{detectedYears[1]}</th>}
@@ -1702,7 +1755,7 @@ const runAutoMapping = useCallback((accs: Account[]) => {
                          <tbody>
                            {STRUCTURE.DRE.map((l, i) => (
                              <tr key={i} className={cn("border-b dark:border-slate-800/50", l.isTotal && "font-black bg-slate-50 dark:bg-slate-800/50")}>
-                               <td className={cn("py-3", (l.indent || 0) > 0 && "pl-8")}>{l.label}</td>
+                               <td className={cn("py-3", (l.indent || 0) > 0 && "pl-4 md:pl-8")}>{l.label}</td>
                                <td className="py-3 text-right font-mono">{formatCurrency(statementsState.current.lineValues[l.id] || 0)}</td>
                                {!showOnlyCurrentYear && detectedYears[1] && (
                                  <td className="py-3 text-right font-mono text-slate-400">{formatCurrency(statementsState.prior.lineValues[l.id] || 0)}</td>
@@ -1825,22 +1878,104 @@ const runAutoMapping = useCallback((accs: Account[]) => {
                   </div>
                )}
 
-               {activeStatementTab === 'RATIOS' && financialRatios && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 p-8 rounded-[2rem] shadow-sm">
-                      <span className="text-[10px] font-black text-slate-400 uppercase">Liquidez Corrente</span>
-                      <p className="text-3xl font-black mt-2">{financialRatios.liqCorrente.toFixed(2)}</p>
-                      <div className="h-1 bg-slate-100 rounded-full mt-4"><div className="h-full bg-indigo-600 rounded-full" style={{ width: `${Math.min(100, financialRatios.liqCorrente * 30)}%` }}></div></div>
-                    </div>
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 p-8 rounded-[2rem] shadow-sm">
-                      <span className="text-[10px] font-black text-slate-400 uppercase">Margem Líquida</span>
-                      <p className="text-3xl font-black mt-2">{financialRatios.margemLiq.toFixed(1)}%</p>
-                      <div className="h-1 bg-slate-100 rounded-full mt-4"><div className="h-full bg-emerald-600 rounded-full" style={{ width: `${Math.max(0, financialRatios.margemLiq)}%` }}></div></div>
-                    </div>
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 p-8 rounded-[2rem] shadow-sm">
-                      <span className="text-[10px] font-black text-slate-400 uppercase">EBITDA Estimado</span>
-                      <p className="text-3xl font-black mt-2">R$ {formatCurrency(financialRatios.ebitda)}</p>
-                    </div>
+               {activeStatementTab === 'INDICES' && financialRatios && (
+                  <div className="space-y-8">
+                     {/* Grupo 1 — Liquidez */}
+                     <div className="space-y-4">
+                        <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest border-l-4 border-indigo-600 pl-4">Liquidez</h3>
+                        <p className="text-xs text-slate-500 italic">Avalia a capacidade da empresa de honrar suas obrigações de curto prazo.</p>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                           <div className="bg-white dark:bg-slate-900 border border-slate-200 p-8 rounded-[2rem] shadow-sm">
+                              <span className="text-[10px] font-black text-slate-400 uppercase">Liquidez Corrente</span>
+                              <p className="text-3xl font-black mt-2">{financialRatios.liquidezCorrente.toFixed(2)}</p>
+                              <div className="h-1 bg-slate-100 rounded-full mt-4"><div className="h-full bg-indigo-600 rounded-full" style={{ width: `${Math.min(100, financialRatios.liquidezCorrente * 30)}%` }}></div></div>
+                           </div>
+                           <div className="bg-white dark:bg-slate-900 border border-slate-200 p-8 rounded-[2rem] shadow-sm">
+                              <span className="text-[10px] font-black text-slate-400 uppercase">Liquidez Seca</span>
+                              <p className="text-3xl font-black mt-2">{financialRatios.liquidezSeca.toFixed(2)}</p>
+                           </div>
+                           <div className="bg-white dark:bg-slate-900 border border-slate-200 p-8 rounded-[2rem] shadow-sm">
+                              <span className="text-[10px] font-black text-slate-400 uppercase">Liquidez Geral</span>
+                              <p className="text-3xl font-black mt-2">{financialRatios.liquidezGeral.toFixed(2)}</p>
+                           </div>
+                        </div>
+                     </div>
+
+                     {/* Grupo 2 — Endividamento */}
+                     <div className="space-y-4">
+                        <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest border-l-4 border-indigo-600 pl-4">Endividamento</h3>
+                        <p className="text-xs text-slate-500 italic">Mostra o nível de dependência de capital de terceiros.</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                           <div className="bg-white dark:bg-slate-900 border border-slate-200 p-8 rounded-[2rem] shadow-sm">
+                              <span className="text-[10px] font-black text-slate-400 uppercase">Endividamento Geral</span>
+                              <p className="text-3xl font-black mt-2">{(financialRatios.endividamento * 100).toFixed(1)}%</p>
+                              <div className="h-1 bg-slate-100 rounded-full mt-4"><div className="h-full bg-amber-500 rounded-full" style={{ width: `${Math.min(100, financialRatios.endividamento * 100)}%` }}></div></div>
+                           </div>
+                           <div className="bg-white dark:bg-slate-900 border border-slate-200 p-8 rounded-[2rem] shadow-sm">
+                              <span className="text-[10px] font-black text-slate-400 uppercase">Dívida / PL</span>
+                              <p className="text-3xl font-black mt-2">{financialRatios.dividaPL.toFixed(2)}</p>
+                           </div>
+                        </div>
+                     </div>
+
+                     {/* Grupo 3 — Margens */}
+                     <div className="space-y-4">
+                        <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest border-l-4 border-indigo-600 pl-4">Margens</h3>
+                        <p className="text-xs text-slate-500 italic">Indica quanto a empresa lucra sobre a receita.</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                           <div className="bg-white dark:bg-slate-900 border border-slate-200 p-8 rounded-[2rem] shadow-sm">
+                              <span className="text-[10px] font-black text-slate-400 uppercase">Margem Bruta</span>
+                              <p className="text-3xl font-black mt-2">{(financialRatios.margemBruta * 100).toFixed(1)}%</p>
+                           </div>
+                           <div className="bg-white dark:bg-slate-900 border border-slate-200 p-8 rounded-[2rem] shadow-sm">
+                              <span className="text-[10px] font-black text-slate-400 uppercase">Margem Operacional</span>
+                              <p className="text-3xl font-black mt-2">{(financialRatios.margemOperacional * 100).toFixed(1)}%</p>
+                           </div>
+                           <div className="bg-white dark:bg-slate-900 border border-slate-200 p-8 rounded-[2rem] shadow-sm">
+                              <span className="text-[10px] font-black text-slate-400 uppercase">Margem Líquida</span>
+                              <p className="text-3xl font-black mt-2">{(financialRatios.margemLiquida * 100).toFixed(1)}%</p>
+                           </div>
+                           <div className="bg-white dark:bg-slate-900 border border-slate-200 p-8 rounded-[2rem] shadow-sm">
+                              <span className="text-[10px] font-black text-slate-400 uppercase">Margem EBITDA</span>
+                              <p className="text-3xl font-black mt-2">{(financialRatios.margemEbitda * 100).toFixed(1)}%</p>
+                           </div>
+                        </div>
+                     </div>
+
+                     {/* Grupo 4 — Rentabilidade */}
+                     <div className="space-y-4">
+                        <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest border-l-4 border-indigo-600 pl-4">Rentabilidade</h3>
+                        <p className="text-xs text-slate-500 italic">Mostra o retorno do capital investido.</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                           <div className="bg-white dark:bg-slate-900 border border-slate-200 p-8 rounded-[2rem] shadow-sm">
+                              <span className="text-[10px] font-black text-slate-400 uppercase">ROA</span>
+                              <p className="text-3xl font-black mt-2">{(financialRatios.roa * 100).toFixed(1)}%</p>
+                           </div>
+                           <div className="bg-white dark:bg-slate-900 border border-slate-200 p-8 rounded-[2rem] shadow-sm">
+                              <span className="text-[10px] font-black text-slate-400 uppercase">ROE</span>
+                              <p className="text-3xl font-black mt-2">{(financialRatios.roe * 100).toFixed(1)}%</p>
+                           </div>
+                        </div>
+                     </div>
+
+                     {/* Grupo 5 — Performance */}
+                     <div className="space-y-4">
+                        <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest border-l-4 border-indigo-600 pl-4">Performance</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                           <div className="bg-white dark:bg-slate-900 border border-slate-200 p-8 rounded-[2rem] shadow-sm">
+                              <span className="text-[10px] font-black text-slate-400 uppercase">EBITDA</span>
+                              <p className="text-3xl font-black mt-2">R$ {formatCurrency(financialRatios.ebitda)}</p>
+                           </div>
+                           <div className="bg-white dark:bg-slate-900 border border-slate-200 p-8 rounded-[2rem] shadow-sm">
+                              <span className="text-[10px] font-black text-slate-400 uppercase">Margem de Contribuição</span>
+                              <p className="text-3xl font-black mt-2">{(financialRatios.margemContribuicao * 100).toFixed(1)}%</p>
+                           </div>
+                           <div className="bg-white dark:bg-slate-900 border border-slate-200 p-8 rounded-[2rem] shadow-sm">
+                              <span className="text-[10px] font-black text-slate-400 uppercase">Ponto de Equilíbrio (Proxy)</span>
+                              <p className="text-3xl font-black mt-2">R$ {formatCurrency(financialRatios.pontoEquilibrio)}</p>
+                           </div>
+                        </div>
+                     </div>
                   </div>
                )}
             </motion.div>
@@ -1920,7 +2055,7 @@ const runAutoMapping = useCallback((accs: Account[]) => {
                     { id: 'DRA', label: 'Resultado Abrangente' },
                     { id: 'DMPL', label: 'Mutações do PL' },
                     { id: 'DFC', label: 'Fluxo de Caixa' },
-                    { id: 'RATIOS', label: 'Índices Financeiros' },
+                    { id: 'INDICES', label: 'Índices Financeiros' },
                     { id: 'NOTES', label: 'Notas Explicativas' },
                   ].map(item => (
                     <div key={item.id} className="bg-white dark:bg-slate-900 border border-slate-200 p-6 rounded-[2rem] shadow-sm group">
