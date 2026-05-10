@@ -596,37 +596,92 @@ const statementsState = useMemo(() => {
   }, [accounts, mapping, allLines]);
 
   // --- UTILS ---
+const fixSpacedName = (str: string): string => {
+  if (!str) return '';
+  const raw = str.trim();
+  const tokens = raw.split(/\s+/);
+  const singleChars = tokens.filter(t => t.length === 1);
+  if (tokens.length > 3 && singleChars.length / tokens.length > 0.5) {
+    // If highly fragmented, remove spaces between single letters
+    // "R e c e i t a   E x p o r t a c a o" -> "Receita Exportacao"
+    return raw.replace(/(\b\w) (?=\w\b)/g, '$1').replace(/\s+/g, ' ').trim();
+  }
+  return raw;
+};
+
 const normalizeDesc = (str: string): string => {
   if (!str) return '';
-  return str
+  
+  // 1. Lowercase, normalize NFD (accents)
+  let res = str
     .trim()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^\w\s]/g, ' ')
+    .toLowerCase();
+
+  // 2. FUNDAMENTAL EXTRA RULE: Fix spaced-out letters (e.g. "r e c e i t a")
+  const tokens = res.split(/\s+/);
+  const singleCharTokens = tokens.filter(t => t.length === 1);
+  if (tokens.length > 3 && singleCharTokens.length / tokens.length > 0.5) {
+    // Collapse all spaces between letters
+    res = res.replace(/\s+/g, '');
+  }
+
+  // 3. Normalize punctuation and spaces
+  res = res
+    .replace(/[-/()]/g, ' ') 
+    .replace(/[^\w\s]/g, '') 
     .replace(/\s+/g, ' ')
     .trim();
+
+  // 4. Fix words stuck together (Common in some Excel exports)
+  const stuckFixes: Record<string, string> = {
+    'receitaexportacao': 'receita exportacao',
+    'receitamercado': 'receita mercado',
+    'cmvmercadorias': 'cmv mercadorias',
+    'ativobiologico': 'ativo biologico',
+    'imobilizadobruto': 'imobilizado bruto',
+    'intangivelbruto': 'intangivel bruto',
+    'provisaoperdas': 'provisao perdas',
+    'icmsarecuperar': 'icms a recuperar',
+    'pisarecuperar': 'pis a recuperar',
+    'cofinsarecuperar': 'cofins a recuperar',
+    'amortizacaoacumulada': 'amortizacao acumulada',
+    'depreciacaoacumulada': 'depreciacao acumulada'
+  };
+
+  Object.entries(stuckFixes).forEach(([stuck, fixed]) => {
+    if (res === stuck) res = fixed;
+    else if (res.includes(stuck)) res = res.replace(new RegExp(stuck, 'g'), fixed);
+  });
+
+  return res;
 };
 
 const normalizeCode = (raw: any, desc: string): string => {
-  const codeStr = String(raw || '').trim();
-  const codeRegex = /^\d+(\.\d+){1,4}$/;
   const normD = normalizeDesc(desc);
+  const recovered = DESC_TO_CODE[normD];
+
+  // PRIORITY 1: Closed dictionary by description (deterministic recovery)
+  if (recovered) return recovered;
+
+  // PRIORITY 2: Raw code if it looks valid
+  let codeStr = String(raw || '').trim();
   
-  // Rule A: Valid format
-  if (codeRegex.test(codeStr)) {
-    // Rule C: Truncated fix for Depreciation
-    if (codeStr === '5.1' && normD.includes('depreciacao e amortizacao')) {
-      return '5.10';
-    }
+  // If it's a date string like "3/31/02", we should ignore it as it's likely a mangled code
+  const isDateMangled = codeStr.includes('/') || codeStr.includes('-');
+  const isFloatMangled = /^\d+\.\d{5,}$/.test(codeStr); // e.g. 37346.99977
+
+  const codeRegex = /^\d+(\.\d+){1,4}$/;
+  
+  if (!isDateMangled && !isFloatMangled && codeRegex.test(codeStr)) {
+    // Special case for truncated depreciation (5.1 -> 5.10) if not recovered by dictionary
+    if (codeStr === '5.1' && normD.includes('depreciacao e amortizacao')) return '5.10';
     return codeStr;
   }
 
-  // Rule B: Recover from description dictionary (deterministic)
-  const recovered = DESC_TO_CODE[normD];
-  if (recovered) return recovered;
-
-  return codeStr;
+  // FALLBACK: Could not find code
+  return 'descricao_sem_codigo';
 };
 
 const fixEncoding = (str: string): string => {
@@ -895,15 +950,9 @@ const runAutoMapping = useCallback((accs: Account[]) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setIsProcessing(true);
-    
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      try {
-        const data = evt.target?.result;
-        const wb = XLSX.read(data, { type: 'array' });
-        const ws = wb.Sheets[wb.SheetNames[0]];
-        const rawData = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false }) as any[][];
 
+    const processRawData = (rawData: any[][]) => {
+      try {
         // Find header row and detect PERIODO year
         let headerIndex = -1;
         let fileYearFromPeriod: number | null = null;
@@ -914,11 +963,12 @@ const runAutoMapping = useCallback((accs: Account[]) => {
           if (!row) continue;
           
           const rowStr = row.join(' ').toUpperCase();
-          // Priority to PERIODO and exclude strings like "GERADO EM"
-          if ((rowStr.includes('PERIODO') || rowStr.includes('PERÍODO')) && !rowStr.includes('GERADO')) {
+          // Priority to PERIODO and exclude strings like "GERADO EM" or other metadata dates
+          if ((rowStr.includes('PERIODO') || rowStr.includes('PERÍODO')) && !rowStr.includes('GERADO EM')) {
             const matches = rowStr.match(/\d{2}\/\d{2}\/(\d{4})/) || rowStr.match(/\d{4}/);
             if (matches) {
-              fileYearFromPeriod = parseInt(matches[0].length === 4 ? matches[0] : matches[0].split('/')[2]);
+              const matchedStr = matches[0];
+              fileYearFromPeriod = parseInt(matchedStr.length === 4 ? matchedStr : matchedStr.split('/')[2]);
             }
           }
 
@@ -935,21 +985,20 @@ const runAutoMapping = useCallback((accs: Account[]) => {
         const headers = rawData[headerIndex].map(h => normalizeDesc(String(h || '')));
         const dataRows = rawData.slice(headerIndex + 1);
         
-        // Detect years - Strict 2025 focus as per instruction
+        // Detect years
         const yearsFound = new Set<number>();
         if (fileYearFromPeriod) {
           yearsFound.add(fileYearFromPeriod);
         }
 
-        // Only look for years in headers if they don't conflict with period
+        // Only look for years in headers if they don't conflict with period (no 2026)
         headers.forEach(h => {
           const matches = h.match(/\d{4}/g);
           if (matches) {
             matches.forEach(m => {
               const y = parseInt(m);
-              // Avoid picking up year 2026 if it looks like a generation date (usually > current/period year)
               if (fileYearFromPeriod && y > fileYearFromPeriod) return;
-              yearsFound.add(y);
+              if (y >= 2000 && y <= 2100) yearsFound.add(y);
             });
           }
         });
@@ -976,9 +1025,9 @@ const runAutoMapping = useCallback((accs: Account[]) => {
         let brutoPassivo = 0;
         let brutoPL = 0;
         let brutoDRE = 0;
-        let linesWithBalance = 0;
+        let linesWithBalanceCount = 0;
         
-        dataRows.forEach((row, rowIdx) => {
+        dataRows.forEach((row) => {
           const acc: any = { code: '', name: '', canonicalCode: '' };
           let currentEnd = 0;
           let priorEnd = 0;
@@ -990,7 +1039,7 @@ const runAutoMapping = useCallback((accs: Account[]) => {
               acc.code = String(val || '').trim();
             }
             else if (h.includes('descricao') || h.includes('description') || h === 'nome' || h === 'name') {
-              acc.name = fixEncoding(String(val || '').trim());
+              acc.name = fixSpacedName(fixEncoding(String(val || '').trim()));
             }
             else if (h.includes('atual') || h.includes('saldo') || (fileYears[0] && h.includes(String(fileYears[0]))) || h === 'saldo_atual') {
               if (h.includes('anterior') || (fileYears[1] && h.includes(String(fileYears[1]))) || h === 'saldo_anterior') {
@@ -1009,39 +1058,36 @@ const runAutoMapping = useCallback((accs: Account[]) => {
           // PASSO 1 — NORMALIZAÇÃO DO CÓDIGO
           acc.canonicalCode = normalizeCode(acc.code, acc.name);
 
-          if (acc.canonicalCode && acc.name) {
-            const firstDigit = acc.canonicalCode[0];
+          // Classification logic using canonicalCode
+          const firstDigit = acc.canonicalCode[0];
+          if (firstDigit === '1') brutoAtivo += currentEnd;
+          else if (firstDigit === '2') brutoPassivo += currentEnd;
+          else if (firstDigit === '3') brutoPL += currentEnd;
+          else if (firstDigit === '4' || firstDigit === '5') brutoDRE += currentEnd;
 
-            // BP: 1, 2, 3 | DRE: 4, 5
-            if (firstDigit === '1') brutoAtivo += currentEnd;
-            else if (firstDigit === '2') brutoPassivo += currentEnd;
-            else if (firstDigit === '3') brutoPL += currentEnd;
-            else if (firstDigit === '4' || firstDigit === '5') brutoDRE += currentEnd;
+          if (currentEnd !== 0 || priorEnd !== 0) linesWithBalanceCount++;
 
-            if (currentEnd !== 0 || priorEnd !== 0) linesWithBalance++;
-
-            if (fileYears[0]) {
-              newAccounts.push({ 
-                ...acc, 
-                end: currentEnd, 
-                year: fileYears[0], 
-                multiplier: 1,
-                begin: 0,
-                debit: 0,
-                credit: 0
-              });
-            }
-            if (hasPriorValue && fileYears[1]) {
-              newAccounts.push({ 
-                ...acc, 
-                end: priorEnd, 
-                year: fileYears[1], 
-                multiplier: 1,
-                begin: 0,
-                debit: 0,
-                credit: 0
-              });
-            }
+          if (fileYears[0]) {
+            newAccounts.push({ 
+              ...acc, 
+              end: currentEnd, 
+              year: fileYears[0], 
+              multiplier: 1,
+              begin: 0,
+              debit: 0,
+              credit: 0
+            });
+          }
+          if (hasPriorValue && fileYears[1]) {
+            newAccounts.push({ 
+              ...acc, 
+              end: priorEnd, 
+              year: fileYears[1], 
+              multiplier: 1,
+              begin: 0,
+              debit: 0,
+              credit: 0
+            });
           }
         });
 
@@ -1055,7 +1101,7 @@ const runAutoMapping = useCallback((accs: Account[]) => {
           brutoPL,
           brutoDRE,
           totalLines: dataRows.length,
-          linesWithBalance
+          linesWithBalance: linesWithBalanceCount
         });
         setAccounts(newAccounts);
         runAutoMapping(newAccounts);
@@ -1067,7 +1113,31 @@ const runAutoMapping = useCallback((accs: Account[]) => {
         setIsProcessing(false);
       }
     };
-    reader.readAsArrayBuffer(file);
+
+    if (file.name.toLowerCase().endsWith('.csv')) {
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const text = evt.target?.result as string;
+        Papa.parse(text, {
+          header: false,
+          skipEmptyLines: true,
+          complete: (results) => {
+            processRawData(results.data as any[][]);
+          }
+        });
+      };
+      reader.readAsText(file);
+    } else {
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const data = evt.target?.result;
+        const wb = XLSX.read(data, { type: 'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const rawData = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false }) as any[][];
+        processRawData(rawData);
+      };
+      reader.readAsArrayBuffer(file);
+    }
   }, [runAutoMapping]);
 
   const pendingIssues = useMemo(() => {
@@ -1264,6 +1334,48 @@ const runAutoMapping = useCallback((accs: Account[]) => {
                                 </tbody>
                              </table>
                           </div>
+
+                          {/* --- NO CODE ACCOUNTS --- */}
+                          {statementsState.current.unmappedAccounts.some(a => a.canonicalCode === 'descricao_sem_codigo') && (
+                            <div className="mt-4 pt-6 border-t border-dashed dark:border-slate-800">
+                               <div className="flex items-center justify-between mb-4">
+                                  <div className="space-y-1">
+                                     <h3 className="text-sm font-black text-rose-600 uppercase flex items-center gap-2">
+                                        <AlertCircle className="w-4 h-4" /> CONTAS SEM IDENTIFICAÇÃO (CRÍTICO)
+                                     </h3>
+                                     <p className="text-[10px] text-slate-400 font-bold uppercase">
+                                        Essas contas não foram reconhecidas pelo dicionário nem possuem código válido no arquivo.
+                                     </p>
+                                  </div>
+                               </div>
+                               <div className="overflow-x-auto mb-8">
+                                  <table className="w-full text-left text-xs border-collapse">
+                                     <thead>
+                                        <tr className="bg-rose-50 dark:bg-rose-950/20 text-[10px] font-black uppercase text-rose-600">
+                                           <th className="p-3">Descrição no Arquivo</th>
+                                           <th className="p-3">Código Original</th>
+                                           <th className="p-3 text-right">Saldo</th>
+                                           <th className="p-3 text-right">Ação</th>
+                                        </tr>
+                                     </thead>
+                                     <tbody>
+                                        {statementsState.current.unmappedAccounts
+                                          .filter(acc => acc.canonicalCode === 'descricao_sem_codigo')
+                                          .map((acc, i) => (
+                                          <tr key={i} className="border-b dark:border-slate-800 hover:bg-rose-50/10 transition-colors">
+                                             <td className="p-3 font-bold">{acc.name}</td>
+                                             <td className="p-3 font-mono text-slate-400">{acc.code}</td>
+                                             <td className="p-3 text-right font-black">R$ {formatCurrency(acc.end)}</td>
+                                             <td className="p-3 text-right">
+                                                <button onClick={() => { setActiveTab('mapping'); setTimeout(() => document.getElementById(`acc-${acc.canonicalCode}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100); }} className="text-[10px] font-black uppercase text-indigo-600 hover:underline">Mapear Manualmente</button>
+                                             </td>
+                                          </tr>
+                                        ))}
+                                     </tbody>
+                                  </table>
+                               </div>
+                            </div>
+                          )}
 
                           {/* --- DRE UNMAPPED --- */}
                           {statementsState.current.unmappedAccounts.some(a => ['4', '5'].includes(a.canonicalCode[0])) && (
