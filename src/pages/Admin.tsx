@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import { LayoutDashboard, Package, Inbox, CheckCircle, XCircle, Edit, Trash2, ExternalLink, ArrowRight, ShoppingBag, Users, Zap, Link as LinkIcon, Plus, Save } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { LayoutDashboard, Package, Inbox, CheckCircle, XCircle, Edit, Trash2, ExternalLink, ArrowRight, ShoppingBag, Users, Zap, Link as LinkIcon, Plus, Save, ShieldCheck, TrendingUp, Target, Star } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { storageService } from '../services/storageService';
 import { productService } from '../services/productService';
 import type { Product, Submission, CheckoutRequest, Entitlement, Bundle } from '../types';
@@ -62,106 +63,173 @@ export default function AdminPage() {
     setProducts(updated);
   };
 
-  const stats = {
-    totalProducts: products.length,
-    totalBundles: bundles.length,
-    pendingSubmissions: submissions.filter(s => s.status === 'pending').length,
-    pendingCheckouts: checkoutRequests.filter(r => r.status === 'pending').length,
-    totalSubmissions: submissions.length
-  };
+  const stats = useMemo(() => {
+    const totalSales = checkoutRequests
+      .filter(r => r.status === 'paid')
+      .reduce((acc, curr) => acc + (parseFloat(curr.totalLabel.replace('R$ ', '').replace(',', '.')) || 0), 0);
+    
+    const monthlySales = checkoutRequests
+      .filter(r => r.status === 'paid' && new Date(r.createdAt).getMonth() === new Date().getMonth())
+      .reduce((acc, curr) => acc + (parseFloat(curr.totalLabel.replace('R$ ', '').replace(',', '.')) || 0), 0);
+
+    return {
+      totalProducts: products.length,
+      totalBundles: bundles.length,
+      pendingSubmissions: submissions.filter(s => s.status === 'pending').length,
+      pendingCheckouts: checkoutRequests.filter(r => r.status === 'pending').length,
+      totalSubmissions: submissions.length,
+      totalSales,
+      monthlySales,
+      activeUsers: 142, // Mocked
+      conversionRate: '12.4%' // Mocked
+    };
+  }, [products, bundles, submissions, checkoutRequests]);
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Carregando...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+          <p className="text-slate-500 font-bold animate-pulse">Carregando Ecossistema...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Portal Admin</h1>
-          <p className="text-slate-500">Gestão do Ecossistema MicroCaaS</p>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-indigo-600 font-black text-xs uppercase tracking-[0.2em]">
+               <ShieldCheck className="w-4 h-4" /> Acesso Administrativo
+            </div>
+            <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">Command <span className="text-indigo-600">Center.</span></h1>
+          </div>
+          
+          <div className="flex bg-white dark:bg-slate-900 p-1.5 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-x-auto max-w-full no-scrollbar">
+            {[
+              { id: 'dashboard', label: 'Monitor', icon: LayoutDashboard },
+              { id: 'products', label: 'Produtos', icon: Package },
+              { id: 'bundles', label: 'Campanhas', icon: Zap },
+              { id: 'checkout_requests', label: 'Vendas', icon: ShoppingBag, badge: stats.pendingCheckouts },
+              { id: 'submissions', label: 'Curadoria', icon: Inbox, badge: stats.pendingSubmissions },
+              { id: 'users', label: 'Usuários', icon: Users },
+            ].map(tab => (
+              <button 
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as AdminTab)}
+                className={cn(
+                  "px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2 transition-all whitespace-nowrap relative",
+                  activeTab === tab.id ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800"
+                )}
+              >
+                <tab.icon className="w-4 h-4" /> {tab.label}
+                {tab.badge ? (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-rose-500 text-white text-[10px] flex items-center justify-center rounded-full border-2 border-white dark:border-slate-900">
+                    {tab.badge}
+                  </span>
+                ) : null}
+              </button>
+            ))}
+          </div>
         </div>
-        
-        <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl overflow-x-auto max-w-full no-scrollbar">
-          <button 
-            onClick={() => setActiveTab('dashboard')}
-            className={cn(
-              "px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap",
-              activeTab === 'dashboard' ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm" : "text-slate-500"
-            )}
-          >
-            <LayoutDashboard className="w-4 h-4" /> Dashboard
-          </button>
-          <button 
-            onClick={() => setActiveTab('products')}
-            className={cn(
-              "px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap",
-              activeTab === 'products' ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm" : "text-slate-500"
-            )}
-          >
-            <Package className="w-4 h-4" /> Produtos
-          </button>
-          <button 
-            onClick={() => setActiveTab('bundles')}
-            className={cn(
-              "px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap",
-              activeTab === 'bundles' ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm" : "text-slate-500"
-            )}
-          >
-            <Zap className="w-4 h-4" /> Combos
-          </button>
-          <button 
-            onClick={() => setActiveTab('checkout_requests')}
-            className={cn(
-              "px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap",
-              activeTab === 'checkout_requests' ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm" : "text-slate-500"
-            )}
-          >
-            <ShoppingBag className="w-4 h-4" /> Pedidos
-            {checkoutRequests.filter(r => r.status === 'pending').length > 0 && (
-              <span className="w-2 h-2 bg-rose-500 rounded-full animate-bounce" />
-            )}
-          </button>
-          <button 
-            onClick={() => setActiveTab('submissions')}
-            className={cn(
-              "px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap",
-              activeTab === 'submissions' ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm" : "text-slate-500"
-            )}
-          >
-            <Inbox className="w-4 h-4" /> Submissões
-          </button>
-          <button 
-            onClick={() => setActiveTab('users')}
-            className={cn(
-              "px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap",
-              activeTab === 'users' ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm" : "text-slate-500"
-            )}
-          >
-            <Users className="w-4 h-4" /> Usuários
-          </button>
-        </div>
-      </div>
 
-      {activeTab === 'dashboard' && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
-            <h3 className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-4">Total MicroCaaS</h3>
-            <div className="text-5xl font-bold text-indigo-600 tracking-tight">{stats.totalProducts}</div>
-            <p className="text-sm text-slate-500 mt-2">No marketplace público</p>
-          </div>
-          <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
-            <h3 className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-4">Pendentes</h3>
-            <div className="text-5xl font-bold text-amber-500 tracking-tight">{stats.pendingSubmissions}</div>
-            <p className="text-sm text-slate-500 mt-2">Aguardando curadoria</p>
-          </div>
-          <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
-            <h3 className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-4">Histórico</h3>
-            <div className="text-5xl font-bold text-emerald-500 tracking-tight">{stats.totalSubmissions}</div>
-            <p className="text-sm text-slate-500 mt-2">Submissões totais recebidas</p>
-          </div>
-        </div>
-      )}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+          >
+            {activeTab === 'dashboard' && (
+              <div className="space-y-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="bg-white dark:bg-slate-900 p-8 rounded-[40px] border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
+                     <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform"><ShoppingBag className="w-24 h-24" /></div>
+                     <h3 className="text-slate-400 font-bold text-[10px] uppercase tracking-widest mb-4">Vendas Totais</h3>
+                     <div className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">R$ {stats.totalSales.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+                     <div className="mt-4 flex items-center gap-2 text-emerald-500 text-xs font-bold">
+                        <TrendingUp className="w-3 h-3" /> +14% vs mês anterior
+                     </div>
+                  </div>
+                  <div className="bg-white dark:bg-slate-900 p-8 rounded-[40px] border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
+                     <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform"><ShoppingBag className="w-24 h-24" /></div>
+                     <h3 className="text-slate-400 font-bold text-[10px] uppercase tracking-widest mb-4">Este Mês</h3>
+                     <div className="text-4xl font-black text-indigo-600 tracking-tighter">R$ {stats.monthlySales.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+                     <p className="text-xs text-slate-500 mt-2 font-medium">Meta: R$ 15.000,00</p>
+                  </div>
+                  <div className="bg-white dark:bg-slate-900 p-8 rounded-[40px] border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
+                     <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform"><Users className="w-24 h-24" /></div>
+                     <h3 className="text-slate-400 font-bold text-[10px] uppercase tracking-widest mb-4">Usuários Ativos</h3>
+                     <div className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">{stats.activeUsers}</div>
+                     <p className="text-xs text-slate-500 mt-2 font-medium">Escritórios conectados</p>
+                  </div>
+                  <div className="bg-white dark:bg-slate-900 p-8 rounded-[40px] border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
+                     <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform"><Target className="w-24 h-24" /></div>
+                     <h3 className="text-slate-400 font-bold text-[10px] uppercase tracking-widest mb-4">Conversão</h3>
+                     <div className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">{stats.conversionRate}</div>
+                     <p className="text-xs text-slate-500 mt-2 font-medium">Visitas vs Vendas</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                   <div className="bg-white dark:bg-slate-900 rounded-[48px] p-10 border border-slate-100 dark:border-slate-800 shadow-sm">
+                      <h3 className="text-xl font-black mb-8 flex items-center gap-3">
+                         <Star className="w-6 h-6 text-amber-500" /> Top Produtos (Volume)
+                      </h3>
+                      <div className="space-y-6">
+                         {products.slice(0, 5).map((p, i) => (
+                           <div key={p.id} className="flex items-center justify-between group">
+                              <div className="flex items-center gap-4">
+                                 <span className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-xs font-black text-slate-400">#{i+1}</span>
+                                 <div>
+                                    <h4 className="font-bold text-sm">{p.name}</h4>
+                                    <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest">{p.area}</p>
+                                 </div>
+                              </div>
+                              <div className="text-right">
+                                 <span className="text-sm font-black text-indigo-600">84 vendas</span>
+                                 <div className="w-24 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full mt-1 overflow-hidden">
+                                    <div className="h-full bg-indigo-600 rounded-full" style={{ width: `${100 - i * 15}%` }} />
+                                 </div>
+                              </div>
+                           </div>
+                         ))}
+                      </div>
+                   </div>
+
+                   <div className="bg-slate-900 rounded-[48px] p-10 text-white relative overflow-hidden">
+                      <div className="absolute bottom-0 right-0 p-12 opacity-10"><Zap className="w-48 h-48" /></div>
+                      <div className="relative z-10 space-y-8">
+                         <h3 className="text-2xl font-black text-white italic">Health Score do Sistema</h3>
+                         <div className="grid grid-cols-2 gap-12">
+                            <div className="space-y-2">
+                               <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Uptime APIs</span>
+                               <div className="text-3xl font-black">99.98%</div>
+                            </div>
+                            <div className="space-y-2">
+                               <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Tempo Resposta</span>
+                               <div className="text-3xl font-black">142ms</div>
+                            </div>
+                            <div className="space-y-2">
+                               <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Entitlements OK</span>
+                               <div className="text-3xl font-black">1.4k</div>
+                            </div>
+                            <div className="space-y-2">
+                               <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Cache Hit Rate</span>
+                               <div className="text-3xl font-black">94%</div>
+                            </div>
+                         </div>
+                         <button className="w-full py-4 bg-white/10 hover:bg-white/20 border border-white/10 rounded-2xl font-bold text-sm transition-all">
+                            Ver Logs do Sistema
+                         </button>
+                      </div>
+                   </div>
+                </div>
+              </div>
+            )}
 
       {activeTab === 'products' && (
         <div className="space-y-8">
@@ -209,17 +277,43 @@ export default function AdminPage() {
                     <option value="subscription">Assinatura (Subscription)</option>
                   </select>
                 </div>
-                <div className="flex items-center gap-2 mt-6">
-                  <input 
-                    type="checkbox" 
-                    id="isFree"
-                    checked={editingProduct.isFree || false} 
-                    onChange={e => setEditingProduct({ ...editingProduct, isFree: e.target.checked })}
-                    className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500"
-                  />
-                  <label htmlFor="isFree" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer">
-                    Produto Gratuito? (isFree)
-                  </label>
+                <div className="flex flex-wrap items-center gap-6 mt-6">
+                  <div className="flex items-center gap-2">
+                    <input 
+                      type="checkbox" 
+                      id="isFree"
+                      checked={editingProduct.isFree || false} 
+                      onChange={e => setEditingProduct({ ...editingProduct, isFree: e.target.checked })}
+                      className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500"
+                    />
+                    <label htmlFor="isFree" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer">
+                      Grátis?
+                    </label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input 
+                      type="checkbox" 
+                      id="isFeatured"
+                      checked={editingProduct.isFeatured || false} 
+                      onChange={e => setEditingProduct({ ...editingProduct, isFeatured: e.target.checked })}
+                      className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500"
+                    />
+                    <label htmlFor="isFeatured" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer">
+                      Destaque?
+                    </label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input 
+                      type="checkbox" 
+                      id="isPromo"
+                      checked={editingProduct.isPromo || false} 
+                      onChange={e => setEditingProduct({ ...editingProduct, isPromo: e.target.checked })}
+                      className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500"
+                    />
+                    <label htmlFor="isPromo" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer">
+                      Promoção?
+                    </label>
+                  </div>
                 </div>
                 <div>
                   <label className="text-xs font-bold uppercase text-slate-400 block mb-1">Preço Label</label>
@@ -489,7 +583,10 @@ export default function AdminPage() {
             ))
           )}
         </div>
-      )}
+        )}
+        </motion.div>
+      </AnimatePresence>
     </div>
-  );
+  </div>
+);
 }

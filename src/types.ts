@@ -22,6 +22,8 @@ export interface Product {
   features: string[];
   version?: string;
   isFree?: boolean; // Adicionado para gerenciar o estado gratuito vs pago
+  isFeatured?: boolean;
+  isPromo?: boolean;
 }
 
 export interface Bundle extends Product {

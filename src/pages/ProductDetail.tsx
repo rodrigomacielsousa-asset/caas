@@ -11,7 +11,8 @@ import {
   ChevronRight,
   Globe,
   Sparkles,
-  ArrowRight
+  ArrowRight,
+  Play
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useCart } from '../contexts/CartContext';
@@ -103,12 +104,21 @@ export default function ProductDetail() {
                        </ul>
                     </div>
 
-                    <button 
-                      onClick={handleAddToCart}
-                      className="w-full bg-white text-slate-900 py-6 rounded-[28px] font-black text-xl flex items-center justify-center gap-3 hover:bg-slate-100 transition-all shadow-xl"
-                    >
-                       <ShoppingCart className="w-6 h-6" /> Adicionar à Carteira
-                    </button>
+                    {product.liveUrl?.startsWith('/') ? (
+                        <Link 
+                           to={product.liveUrl}
+                           className="w-full bg-white text-slate-900 py-6 rounded-[28px] font-black text-xl flex items-center justify-center gap-3 hover:bg-slate-100 transition-all shadow-xl"
+                        >
+                           <Play className="w-6 h-6 fill-current" /> Testar agora (Grátis)
+                        </Link>
+                    ) : (
+                        <button 
+                           onClick={handleAddToCart}
+                           className="w-full bg-white text-slate-900 py-6 rounded-[28px] font-black text-xl flex items-center justify-center gap-3 hover:bg-slate-100 transition-all shadow-xl"
+                        >
+                           <ShoppingCart className="w-6 h-6" /> Adicionar à Carteira
+                        </button>
+                    )}
                     
                     <button className="w-full text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors">Solicitar Demonstração Live</button>
                  </div>

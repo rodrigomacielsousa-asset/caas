@@ -78,31 +78,12 @@ export const ProductCard: React.FC<CardProps> = ({ product, item, type = 'soluca
 
     return (
       <div className="flex items-center gap-2">
-        <button 
-          disabled={isInCart}
-          onClick={handleAddToCart}
-          className={cn(
-            "p-2 rounded-lg transition-all flex items-center justify-center",
-            isInCart 
-            ? "bg-indigo-600 text-white" 
-            : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100"
-          )}
-          title={isInCart ? "Ir para o carrinho" : "Adicionar ao carrinho"}
+        <Link 
+          to={finalPath}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 active:scale-95 shadow-sm"
         >
-          {isInCart ? <ShoppingCart className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-        </button>
-        <button 
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (!isInCart) handleAddToCart(e);
-            navigate('/checkout');
-          }}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap active:scale-95 shadow-sm hover:shadow-md"
-        >
-          {finalProduct.pricingModel === 'subscription' ? <Zap className="w-3 h-3 fill-current" /> : <CreditCard className="w-3 h-3" />}
-          {finalProduct.pricingModel === 'subscription' ? 'Assinar' : 'Comprar'}
-        </button>
+          <Play className="w-3 h-3 fill-current" /> Testar Grátis
+        </Link>
       </div>
     );
   };

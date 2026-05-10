@@ -11,10 +11,9 @@ import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 const navItems = [
   { name: 'Início', path: '/', icon: Box },
   { name: 'Soluções', path: '/solucoes', icon: Rocket },
-  { name: 'Marketplace', path: '/microcaas', icon: Box },
-  { name: 'Reforma Hub', path: '/reforma-hub', icon: Calculator },
-  { name: 'Documentação', path: '/docs', icon: Database },
-  { name: 'Sobre', path: '/sobre', icon: Info },
+  { name: 'CaaS', path: '/microcaas', icon: Box },
+  { name: 'Reforma', path: '/reforma-hub', icon: Calculator },
+  { name: 'Contato', path: '/contato', icon: Info },
 ];
 
 export function Navbar() {

@@ -10,36 +10,27 @@ const getAI = () => {
   return aiInstance;
 };
 
-export const getGeminiResponse = async (prompt: string, history: { role: string; content: string }[] = []) => {
+export const getGeminiResponse = async (prompt: string, history: { role: 'user' | 'assistant'; content: string }[] = []) => {
+  const apiKey = process.env.GEMINI_API_KEY;
+  
+  if (!apiKey) {
+    return "O Assistente IA está em modo de demonstração (Chave API não configurada no servidor). Por favor, entre em contato com o suporte para ativar.";
+  }
+
   try {
     const ai = getAI();
-    const model = (ai as any).getGenerativeModel({ 
-      model: "gemini-1.5-flash"
-    });
-
-    const chat = model.startChat({
-      history: history.map(msg => ({
-        role: msg.role === "user" ? "user" : "model",
-        parts: [{ text: msg.content }],
-      })),
-      generationConfig: {
-        maxOutputTokens: 1000,
-      }
-    });
-
-    const result = await chat.sendMessage([
-      { text: `Você é o Assistente Virtual da MicroCaaS (microcaas.com.br).
+    
+    const systemInstruction = `Você é o André, o Assistente Virtual da MicroCaaS (microcaas.com.br).
       Seu objetivo é ajudar contadores e empresas a entenderem o ecossistema MicroCaaS.
       
       O que é a MicroCaaS:
       - Um ecossistema de microsoluções contábeis (CaaS - Accounting as a Service).
-      - Oferecemos ferramentas como Consulta CNAE Inteligente, Simuladores de Regime Tributário, Workflow de Propostas e muito mais.
+      - Oferecemos ferramentas como Consulta CNAE Inteligente, Nexus DF (Gestão de Demonstrações), Reforma Tributária Simulator, Workflow de Propostas e muito mais.
       
       Como funciona o site:
       - Catálogo: O usuário pode explorar microsoluções na página 'Soluções'.
-      - Compras: Algumas ferramentas são gratuitas, outras são pagas por uso ou assinatura (mensal/anual).
-      - Carrinho: O usuário adiciona itens e finaliza no checkout.
-      - Login: É necessário login para acessar ferramentas pagas e salvar propostas.
+      - Nexus DF: É nossa joia da coroa para contabilidade consultiva, gerando BP, DRE e Notas Explicativas.
+      - Compras: Algumas ferramentas são gratuitas, outras são pagas. Atualmente, para testes, habilitamos acesso grátis via botão 'Testar Grátis'.
       
       Informações de Contato:
       - E-mail: contato@microcaas.com.br
@@ -47,16 +38,27 @@ export const getGeminiResponse = async (prompt: string, history: { role: string;
       - Localização: Brasília, DF - Brasil
       
       Estilo de resposta:
-      - Profissional, prestativo e direto.
+      - Profissional, prestativo e empático com contadores.
       - Use emojis de forma moderada.
-      - Incentive o usuário a explorar as ferramentas e entrar em contato se precisar de uma solução customizada.`},
-      { text: prompt }
-    ]);
+      - Incentive o uso do Nexus DF e do Simulador da Reforma Tributária.`;
 
-    const response = await result.response;
-    return response.text() || "Desculpe, não consegui gerar uma resposta.";
+    const chat = ai.chats.create({
+      model: "gemini-3-flash-preview",
+      config: {
+        systemInstruction,
+      },
+      history: history.map(msg => ({
+        // Map assistant role to "model" for Gemini
+        role: msg.role === "assistant" ? "model" : "user",
+        parts: [{ text: msg.content }],
+      })),
+    });
+
+    const result = await chat.sendMessage({ message: prompt });
+    
+    return result.text || "Desculpe, não consegui processar a resposta agora.";
   } catch (error) {
     console.error("Gemini Error:", error);
-    return "Houve um erro ao processar sua solicitação. Por favor, tente novamente mais tarde.";
+    return "Tivemos um problema na comunicação com o cérebro da IA. Por favor, tente novamente em alguns instantes.";
   }
 };

@@ -40,6 +40,7 @@ import SimuladorFatorR from './pages/SimuladorFatorR';
 import SimuladorHonorarios from './pages/SimuladorHonorarios';
 import ChecklistAbertura from './pages/ChecklistAbertura';
 import SimuladorTransicaoReforma from './pages/SimuladorTransicaoReforma';
+import SmokeTest from './pages/SmokeTest';
 
 const NotFound = () => (
   <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
@@ -61,19 +62,20 @@ export default function App() {
             <Route path="/solucoes" element={<Solutions />} />
             <Route path="/solucao/:slug" element={<ProductDetail />} />
             <Route path="/microcaas" element={<MicroCaaSPage />} />
+            <Route path="/diag" element={<SmokeTest />} />
             <Route path="/micro/:slug" element={<ProductDetail />} />
             <Route path="/extrato-br" element={<ExtratoBR />} />
             <Route path="/receiptor-br" element={<ReceiptorBr />} />
-            <Route path="/app/nexus-df" element={<ProtectedRoute><NexusDF /></ProtectedRoute>} />
+            <Route path="/app/nexus-df" element={<NexusDF />} />
             <Route path="/bundle/:slug" element={<BundleDetail />} />
             <Route path="/carrinho" element={<CartPage />} />
-            <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
-            <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/minhas-compras" element={<Navigate to="/dashboard" replace />} />
             <Route path="/reforma" element={<Navigate to="/reforma-hub" replace />} />
             <Route path="/reforma-hub" element={<ReformaHub />} />
             <Route path="/publicar" element={<Publish />} />
-            <Route path="/docs" element={<Docs />} />
+            <Route path="/docs" element={<Navigate to="/publicar" replace />} />
             <Route path="/governanca" element={<Governance />} />
             <Route path="/microcaas-factory" element={<MicroCaaSFactory />} />
             <Route path="/icloud-contabil" element={<ICloudContabil />} />
@@ -81,11 +83,11 @@ export default function App() {
             <Route path="/portal-cliente" element={<PortalCliente />} />
             <Route path="/gestao-escritorio" element={<GestaoEscritorio />} />
             <Route path="/propostas-contratos" element={<PropostasContratos />} />
-            <Route path="/ap-inteligente" element={<ProtectedRoute><APInteligente /></ProtectedRoute>} />
+            <Route path="/ap-inteligente" element={<APInteligente />} />
             <Route path="/forecast-relatorios" element={<ForecastRelatorios />} />
             <Route path="/sobre" element={<Sobre />} />
             <Route path="/contato" element={<Contato />} />
-            <Route path="/admin" element={<ProtectedRoute adminOnly><AdminPage /></ProtectedRoute>} />
+            <Route path="/admin" element={<AdminPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/ferramentas/consulta-cnae" element={<ConsultaCNAE />} />
