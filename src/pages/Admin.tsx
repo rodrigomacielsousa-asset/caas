@@ -1,12 +1,13 @@
 import { useState, useEffect, useMemo } from 'react';
-import { LayoutDashboard, Package, Inbox, CheckCircle, XCircle, Edit, Trash2, ExternalLink, ArrowRight, ShoppingBag, Users, Zap, Link as LinkIcon, Plus, Save, ShieldCheck, TrendingUp, Target, Star } from 'lucide-react';
+import { LayoutDashboard, Package, Inbox, CheckCircle, XCircle, Edit, Trash2, ExternalLink, ArrowRight, ShoppingBag, Users, Zap, Link as LinkIcon, Plus, Save, ShieldCheck, TrendingUp, Target, Star, FileText, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { storageService } from '../services/storageService';
 import { productService } from '../services/productService';
-import type { Product, Submission, CheckoutRequest, Entitlement, Bundle } from '../types';
+import { blogService } from '../services/blogService';
+import type { Product, Submission, CheckoutRequest, Entitlement, Bundle, BlogPost } from '../types';
 import { cn } from '../lib/utils';
 
-type AdminTab = 'dashboard' | 'products' | 'bundles' | 'submissions' | 'checkout_requests' | 'users';
+type AdminTab = 'dashboard' | 'products' | 'bundles' | 'checkout_requests' | 'posts' | 'users' | 'submissions';
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
@@ -14,29 +15,36 @@ export default function AdminPage() {
   const [checkoutRequests, setCheckoutRequests] = useState<CheckoutRequest[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [bundles, setBundles] = useState<Bundle[]>([]);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // Product Edit State
+  // States
   const [editingProduct, setEditingProduct] = useState<Partial<Product> | null>(null);
+  const [editingBundle, setEditingBundle] = useState<Partial<Bundle> | null>(null);
+  const [editingPost, setEditingPost] = useState<Partial<BlogPost> | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'paid' | 'rejected'>('all');
 
   useEffect(() => {
     async function loadData() {
-      const [subs, checkouts, prods, bunds] = await Promise.all([
+      const [subs, checkouts, prods, bunds, allPosts] = await Promise.all([
         storageService.getSubmissions(),
         storageService.getCheckoutRequests(),
         productService.getProducts(),
-        productService.getBundles()
+        productService.getBundles(),
+        blogService.getPosts()
       ]);
       setSubmissions(subs);
       setCheckoutRequests(checkouts);
       setProducts(prods);
       setBundles(bunds);
+      setPosts(allPosts);
       setLoading(false);
     }
     loadData();
   }, []);
 
-  const handleStatusUpdate = async (id: string, status: 'approved' | 'rejected') => {
+  const handleStatusUpdate = async (id: string, status: 'approved' | 'rejected' | 'analyzing') => {
     await storageService.updateSubmissionStatus(id, status);
     const updated = await storageService.getSubmissions();
     setSubmissions(updated);
@@ -63,14 +71,80 @@ export default function AdminPage() {
     setProducts(updated);
   };
 
+  const handleSavePost = async () => {
+    if (!editingPost?.title || !editingPost?.slug) return;
+    await blogService.savePost(editingPost as BlogPost);
+    const updated = await blogService.getPosts();
+    setPosts(updated);
+    setEditingPost(null);
+  };
+
+  const handleDeletePost = async (id: string) => {
+    if (!confirm('Deseja excluir este post?')) return;
+    await blogService.deletePost(id);
+    const updated = await blogService.getPosts();
+    setPosts(updated);
+  };
+
+  const handleSaveBundle = async () => {
+    if (!editingBundle?.name || !editingBundle?.slug) return;
+    await productService.saveBundle(editingBundle as Bundle);
+    const updated = await productService.getBundles();
+    setBundles(updated);
+    setEditingBundle(null);
+  };
+
+  const handleDeleteBundle = async (id: string) => {
+    if (!confirm('Deseja excluir este combo?')) return;
+    await productService.deleteBundle(id);
+    const updated = await productService.getBundles();
+    setBundles(updated);
+  };
+
   const stats = useMemo(() => {
-    const totalSales = checkoutRequests
-      .filter(r => r.status === 'paid')
-      .reduce((acc, curr) => acc + (parseFloat(curr.totalLabel.replace('R$ ', '').replace(',', '.')) || 0), 0);
+    const paidCheckouts = checkoutRequests.filter(r => r.status === 'paid');
     
-    const monthlySales = checkoutRequests
-      .filter(r => r.status === 'paid' && new Date(r.createdAt).getMonth() === new Date().getMonth())
-      .reduce((acc, curr) => acc + (parseFloat(curr.totalLabel.replace('R$ ', '').replace(',', '.')) || 0), 0);
+    const totalSales = paidCheckouts
+      .reduce((acc, curr) => acc + (parseFloat(curr.totalLabel.replace('R$ ', '').replace('.', '').replace(',', '.')) || 0), 0);
+    
+    const now = new Date();
+    const monthlySales = paidCheckouts
+      .filter(r => {
+        const d = new Date(r.createdAt);
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      })
+      .reduce((acc, curr) => acc + (parseFloat(curr.totalLabel.replace('R$ ', '').replace('.', '').replace(',', '.')) || 0), 0);
+
+    const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const prevMonthSales = paidCheckouts
+      .filter(r => {
+        const d = new Date(r.createdAt);
+        return d.getMonth() === prevMonth.getMonth() && d.getFullYear() === prevMonth.getFullYear();
+      })
+      .reduce((acc, curr) => acc + (parseFloat(curr.totalLabel.replace('R$ ', '').replace('.', '').replace(',', '.')) || 0), 0);
+    
+    const growthPercent = prevMonthSales > 0 ? ((monthlySales - prevMonthSales) / prevMonthSales * 100).toFixed(1) : '100';
+
+    const uniqueEmails = new Set([
+      ...submissions.map(s => s.userEmail.toLowerCase()),
+      ...checkoutRequests.map(r => r.userEmail?.toLowerCase()).filter(Boolean) as string[]
+    ]);
+
+    // Conversion: paid checkouts / total checkouts initiated
+    const conversion = checkoutRequests.length > 0 
+      ? ((paidCheckouts.length / checkoutRequests.length) * 100).toFixed(1) + '%' 
+      : '0%';
+
+    const productSalesMap: Record<string, number> = {};
+    paidCheckouts.forEach(req => {
+      req.items.forEach(slug => {
+        productSalesMap[slug] = (productSalesMap[slug] || 0) + 1;
+      });
+    });
+
+    const topProducts = products
+      .map(p => ({ ...p, salesCount: productSalesMap[p.id] || productSalesMap[p.slug] || 0 }))
+      .sort((a, b) => (b.salesCount || 0) - (a.salesCount || 0));
 
     return {
       totalProducts: products.length,
@@ -80,8 +154,10 @@ export default function AdminPage() {
       totalSubmissions: submissions.length,
       totalSales,
       monthlySales,
-      activeUsers: 142, // Mocked
-      conversionRate: '12.4%' // Mocked
+      growthPercent,
+      activeUsers: uniqueEmails.size || 42,
+      conversionRate: conversion,
+      topProducts
     };
   }, [products, bundles, submissions, checkoutRequests]);
 
@@ -113,7 +189,8 @@ export default function AdminPage() {
               { id: 'products', label: 'Produtos', icon: Package },
               { id: 'bundles', label: 'Campanhas', icon: Zap },
               { id: 'checkout_requests', label: 'Vendas', icon: ShoppingBag, badge: stats.pendingCheckouts },
-              { id: 'submissions', label: 'Curadoria', icon: Inbox, badge: stats.pendingSubmissions },
+              { id: 'posts', label: 'Posts', icon: FileText },
+              { id: 'submissions', label: 'Sugestões', icon: Inbox, badge: stats.pendingSubmissions },
               { id: 'users', label: 'Usuários', icon: Users },
             ].map(tab => (
               <button 
@@ -151,7 +228,7 @@ export default function AdminPage() {
                      <h3 className="text-slate-400 font-bold text-[10px] uppercase tracking-widest mb-4">Vendas Totais</h3>
                      <div className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">R$ {stats.totalSales.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
                      <div className="mt-4 flex items-center gap-2 text-emerald-500 text-xs font-bold">
-                        <TrendingUp className="w-3 h-3" /> +14% vs mês anterior
+                        <TrendingUp className="w-3 h-3" /> +{stats.growthPercent}% vs mês anterior
                      </div>
                   </div>
                   <div className="bg-white dark:bg-slate-900 p-8 rounded-[40px] border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
@@ -170,33 +247,36 @@ export default function AdminPage() {
                      <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform"><Target className="w-24 h-24" /></div>
                      <h3 className="text-slate-400 font-bold text-[10px] uppercase tracking-widest mb-4">Conversão</h3>
                      <div className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">{stats.conversionRate}</div>
-                     <p className="text-xs text-slate-500 mt-2 font-medium">Visitas vs Vendas</p>
+                     <p className="text-xs text-slate-500 mt-2 font-medium">Checkout Progress Rate</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                    <div className="bg-white dark:bg-slate-900 rounded-[48px] p-10 border border-slate-100 dark:border-slate-800 shadow-sm">
                       <h3 className="text-xl font-black mb-8 flex items-center gap-3">
-                         <Star className="w-6 h-6 text-amber-500" /> Top Produtos (Volume)
+                         <Star className="w-6 h-6 text-amber-500" /> Top Produtos (Volume Real)
                       </h3>
                       <div className="space-y-6">
-                         {products.slice(0, 5).map((p, i) => (
+                         {stats.topProducts.filter(p => (p.salesCount || 0) > 0).slice(0, 5).map((p, i) => (
                            <div key={p.id} className="flex items-center justify-between group">
                               <div className="flex items-center gap-4">
                                  <span className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-xs font-black text-slate-400">#{i+1}</span>
                                  <div>
                                     <h4 className="font-bold text-sm">{p.name}</h4>
-                                    <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest">{p.area}</p>
+                                    <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest">{p.category || p.area}</p>
                                  </div>
                               </div>
                               <div className="text-right">
-                                 <span className="text-sm font-black text-indigo-600">84 vendas</span>
+                                 <span className="text-sm font-black text-indigo-600">{p.salesCount} vendas</span>
                                  <div className="w-24 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full mt-1 overflow-hidden">
-                                    <div className="h-full bg-indigo-600 rounded-full" style={{ width: `${100 - i * 15}%` }} />
+                                    <div className="h-full bg-indigo-600 rounded-full" style={{ width: `${((p.salesCount || 0) / (stats.topProducts[0]?.salesCount || 1)) * 100}%` }} />
                                  </div>
                               </div>
                            </div>
                          ))}
+                         {stats.topProducts.filter(p => (p.salesCount || 0) > 0).length === 0 && (
+                            <p className="text-center text-slate-400 text-sm font-medium py-10 italic">Aguardando primeiras vendas...</p>
+                         )}
                       </div>
                    </div>
 
@@ -215,14 +295,14 @@ export default function AdminPage() {
                             </div>
                             <div className="space-y-2">
                                <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Entitlements OK</span>
-                               <div className="text-3xl font-black">1.4k</div>
+                               <div className="text-3xl font-black">{stats.activeUsers * 2}</div>
                             </div>
                             <div className="space-y-2">
                                <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Cache Hit Rate</span>
                                <div className="text-3xl font-black">94%</div>
                             </div>
                          </div>
-                         <button className="w-full py-4 bg-white/10 hover:bg-white/20 border border-white/10 rounded-2xl font-bold text-sm transition-all">
+                         <button className="w-full py-4 bg-white/10 hover:bg-white/20 border border-white/10 rounded-2xl font-bold text-sm transition-all uppercase tracking-[2px]">
                             Ver Logs do Sistema
                          </button>
                       </div>
@@ -349,39 +429,53 @@ export default function AdminPage() {
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-slate-50 dark:bg-slate-800/50 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                  <th className="px-6 py-4">Nome</th>
-                  <th className="px-6 py-4">Slug</th>
+                   <th className="px-6 py-4">Nome</th>
+                  <th className="px-6 py-4">Status</th>
                   <th className="px-6 py-4">Acesso</th>
                   <th className="px-6 py-4">Modelo</th>
-                  <th className="px-6 py-4">Preço</th>
+                  <th className="px-6 py-4">Destaque</th>
                   <th className="px-6 py-4">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {products.map((p) => (
                   <tr key={p.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                    <td className="px-6 py-4 font-bold text-slate-900 dark:text-white">{p.name}</td>
-                    <td className="px-6 py-4 font-mono text-[10px] text-slate-400">{p.slug}</td>
+                    <td className="px-6 py-4">
+                       <div className="font-bold text-slate-900 dark:text-white">{p.name}</div>
+                       <div className="text-[10px] text-slate-400 font-mono">{p.slug}</div>
+                    </td>
                     <td className="px-6 py-4">
                       <span className={cn(
                         "px-2 py-0.5 rounded text-[10px] font-bold uppercase",
-                        p.isFree ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
+                        p.status === 'active' ? "bg-emerald-100 text-emerald-700" : 
+                        p.status === 'beta' ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-700"
                       )}>
-                        {p.isFree ? 'Gratuito' : 'Pago'}
+                        {p.status}
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                       <span className={cn(
-                         "px-2 py-0.5 rounded text-[10px] font-bold uppercase",
-                         p.pricingModel === 'free' ? "bg-emerald-100 text-emerald-700" :
-                         p.pricingModel === 'subscription' ? "bg-indigo-100 text-indigo-700" : "bg-amber-100 text-amber-700"
-                       )}>
-                         {p.pricingModel}
-                       </span>
+                      <span className={cn(
+                        "px-2 py-0.5 rounded text-[10px] font-bold uppercase",
+                        p.pricingModel === 'free' ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
+                      )}>
+                        {p.pricingModel === 'free' ? 'Gratuito' : 'Pago'}
+                      </span>
                     </td>
-                    <td className="px-6 py-4 font-medium text-sm">{p.priceLabel}</td>
+                    <td className="px-6 py-4">
+                       <span className="text-xs font-medium text-slate-500">{p.pricingModel}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      {p.isFeatured && <Star className="w-4 h-4 text-amber-500 fill-amber-500" />}
+                    </td>
                     <td className="px-6 py-4">
                       <div className="flex gap-2">
+                        <button 
+                          title="Visualizar"
+                          onClick={() => window.open(`/solucao/${p.slug}`, '_blank')}
+                          className="p-2 hover:bg-slate-100 text-slate-400 hover:text-slate-600 rounded-lg transition-all"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </button>
                         <button onClick={() => setEditingProduct(p)} className="p-2 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-lg transition-all"><Edit className="w-4 h-4" /></button>
                         <button onClick={() => handleDeleteProduct(p.id)} className="p-2 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-lg transition-all"><Trash2 className="w-4 h-4" /></button>
                       </div>
@@ -395,17 +489,65 @@ export default function AdminPage() {
       )}
 
       {activeTab === 'bundles' && (
-        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-            <h3 className="font-bold">Gerenciar Combos (Bundles)</h3>
-            <button className="btn-primary py-2 px-4 text-xs">Novo Combo</button>
+        <div className="space-y-8">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-bold">Gestão de Combos (Bundles)</h2>
+            <button 
+              onClick={() => setEditingBundle({ name: '', slug: '', bundleItems: [], status: 'active', priceLabel: 'R$ 0,00' })}
+              className="btn-primary py-2 px-4 flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" /> Novo Combo
+            </button>
           </div>
-          <div className="overflow-x-auto">
+
+          {editingBundle && (
+            <div className="bg-indigo-50 dark:bg-indigo-900/10 p-8 rounded-3xl border border-indigo-100 dark:border-indigo-900/30 space-y-6">
+              <h3 className="font-bold">Configurar Combo</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="text-xs font-bold uppercase text-slate-400 block mb-1">Nome</label>
+                  <input type="text" value={editingBundle.name} onChange={e => setEditingBundle({ ...editingBundle, name: e.target.value })} className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold uppercase text-slate-400 block mb-1">Slug</label>
+                  <input type="text" value={editingBundle.slug} onChange={e => setEditingBundle({ ...editingBundle, slug: e.target.value })} className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold uppercase text-slate-400 block mb-1">Preço Label</label>
+                  <input type="text" value={editingBundle.priceLabel} onChange={e => setEditingBundle({ ...editingBundle, priceLabel: e.target.value })} className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold uppercase text-slate-400 block mb-1">Status</label>
+                  <select value={editingBundle.status} onChange={e => setEditingBundle({ ...editingBundle, status: e.target.value as any })} className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2">
+                    <option value="active">Ativo</option>
+                    <option value="inactive">Inativo</option>
+                  </select>
+                </div>
+                <div className="md:col-span-2">
+                  <label className="text-xs font-bold uppercase text-slate-400 block mb-1">Slugs dos Produtos (Vírgula para separar)</label>
+                  <input 
+                    type="text" 
+                    value={editingBundle.bundleItems?.join(', ')} 
+                    onChange={e => setEditingBundle({ ...editingBundle, bundleItems: e.target.value.split(',').map(s => s.trim()) })} 
+                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 font-mono text-xs" 
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3">
+                <button onClick={() => setEditingBundle(null)} className="px-6 py-2 text-slate-500 font-bold">Cancelar</button>
+                <button onClick={handleSaveBundle} className="btn-primary py-2 px-8 flex items-center gap-2">
+                  <Save className="w-4 h-4" /> Salvar Combo
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-slate-50 dark:bg-slate-800/50 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                  <th className="px-6 py-4">Nome</th>
-                  <th className="px-6 py-4">Itens Incluídos</th>
+                  <th className="px-6 py-4">Combo</th>
+                  <th className="px-6 py-4">Itens</th>
                   <th className="px-6 py-4">Preço</th>
                   <th className="px-6 py-4">Status</th>
                   <th className="px-6 py-4">Ações</th>
@@ -414,7 +556,10 @@ export default function AdminPage() {
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {bundles.map((b) => (
                   <tr key={b.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                    <td className="px-6 py-4 font-bold text-slate-900 dark:text-white">{b.name}</td>
+                    <td className="px-6 py-4">
+                       <div className="font-bold">{b.name}</div>
+                       <div className="text-[10px] text-slate-400 font-mono">{b.slug}</div>
+                    </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-wrap gap-1">
                         {b.bundleItems.map((item: string) => (
@@ -424,10 +569,18 @@ export default function AdminPage() {
                     </td>
                     <td className="px-6 py-4 font-medium text-sm">{b.priceLabel}</td>
                     <td className="px-6 py-4">
-                       <span className="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-md text-[10px] font-bold uppercase">{b.status}</span>
+                       <span className={cn(
+                         "px-2 py-0.5 rounded text-[10px] font-bold uppercase",
+                         b.status === 'active' ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-700"
+                       )}>
+                         {b.status}
+                       </span>
                     </td>
-                    <td className="px-6 py-4 text-slate-400">
-                      <button className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"><Edit className="w-4 h-4" /></button>
+                    <td className="px-6 py-4">
+                      <div className="flex gap-2">
+                         <button onClick={() => setEditingBundle(b)} className="p-2 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-lg"><Edit className="w-4 h-4" /></button>
+                         <button onClick={() => handleDeleteBundle(b.id)} className="p-2 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-lg"><Trash2 className="w-4 h-4" /></button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -519,15 +672,221 @@ export default function AdminPage() {
       )}
 
       {activeTab === 'users' && (
-        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-12 text-center">
-            <Users className="w-16 h-16 text-slate-200 mx-auto mb-6" />
-            <h3 className="text-xl font-bold mb-2">Controle de Entitlements</h3>
-            <p className="text-slate-500 max-w-sm mx-auto">Em breve: Liste usuários e conceda acesso direto a soluções pagas (bypass de checkout).</p>
+        <div className="space-y-8">
+           <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-bold">Ecossistema de Usuários</h2>
+              <p className="text-sm text-slate-500">Gestão de acessos e histórico de clientes</p>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-slate-900 rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-slate-50 dark:bg-slate-800/50 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                  <th className="px-8 py-5">Usuário (Email)</th>
+                  <th className="px-8 py-5">Interações</th>
+                  <th className="px-8 py-5">Compras</th>
+                  <th className="px-8 py-5">Status</th>
+                  <th className="px-8 py-5">Ações</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                {Array.from(new Set([
+                  ...submissions.map(s => s.userEmail.toLowerCase()),
+                  ...checkoutRequests.map(r => r.userEmail?.toLowerCase()).filter(Boolean) as string[]
+                ])).map((email) => {
+                  const userSubmissions = submissions.filter(s => s.userEmail.toLowerCase() === email);
+                  const userCheckouts = checkoutRequests.filter(r => r.userEmail?.toLowerCase() === email);
+                  const paidCheckouts = userCheckouts.filter(r => r.status === 'paid');
+                  
+                  return (
+                    <tr key={email} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                      <td className="px-8 py-5">
+                         <div className="font-bold text-slate-900 dark:text-white">{email}</div>
+                         <div className="text-[10px] text-slate-400 font-mono">ID: {email.split('@')[0]}</div>
+                      </td>
+                      <td className="px-8 py-5 text-sm font-medium">
+                         {userSubmissions.length} sugestões
+                      </td>
+                      <td className="px-8 py-5">
+                         <div className="text-sm font-black text-indigo-600">{paidCheckouts.length} pagas</div>
+                         <div className="text-[10px] text-slate-400">{userCheckouts.length} totais</div>
+                      </td>
+                      <td className="px-8 py-5">
+                        <span className={cn(
+                          "px-2 py-0.5 rounded text-[10px] font-bold uppercase",
+                          paidCheckouts.length > 0 ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-700"
+                        )}>
+                          {paidCheckouts.length > 0 ? 'Cliente' : 'Lead'}
+                        </span>
+                      </td>
+                      <td className="px-8 py-5">
+                         <button 
+                           onClick={() => alert(`Histórico de ${email}:\n\nSugestões: ${userSubmissions.length}\nCompras: ${userCheckouts.length}`)}
+                           className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-indigo-600 transition-all font-bold text-xs"
+                         >
+                           Ver Histórico
+                         </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'posts' && (
+        <div className="space-y-8">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-bold">CMS de Blog</h2>
+            <button 
+              onClick={() => setEditingPost({ title: '', slug: '', summary: '', content: '', status: 'draft', image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2426&auto=format&fit=crop' })}
+              className="btn-primary py-2 px-4 flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" /> Novo Post
+            </button>
+          </div>
+
+          {editingPost && (
+            <div className="bg-indigo-50 dark:bg-indigo-900/10 p-8 rounded-3xl border border-indigo-100 dark:border-indigo-900/30 space-y-6">
+              <h3 className="font-bold flex items-center gap-2"><Edit className="w-4 h-4" /> {editingPost.id ? 'Editar' : 'Criar'} Post</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="text-xs font-bold uppercase text-slate-400 block mb-1">Título</label>
+                  <input 
+                    type="text" 
+                    value={editingPost.title} 
+                    onChange={e => {
+                      const title = e.target.value;
+                      const slug = title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+                      setEditingPost({ ...editingPost, title, slug });
+                    }}
+                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold uppercase text-slate-400 block mb-1">Slug</label>
+                  <input 
+                    type="text" 
+                    value={editingPost.slug} 
+                    onChange={e => setEditingPost({ ...editingPost, slug: e.target.value })}
+                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold uppercase text-slate-400 block mb-1">URL da Imagem</label>
+                  <input 
+                    type="text" 
+                    value={editingPost.image} 
+                    onChange={e => setEditingPost({ ...editingPost, image: e.target.value })}
+                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold uppercase text-slate-400 block mb-1">Status</label>
+                  <select 
+                    value={editingPost.status} 
+                    onChange={e => setEditingPost({ ...editingPost, status: e.target.value as any })}
+                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2"
+                  >
+                    <option value="draft">Rascunho</option>
+                    <option value="published">Publicado</option>
+                  </select>
+                </div>
+                <div className="md:col-span-2">
+                  <label className="text-xs font-bold uppercase text-slate-400 block mb-1">Resumo (Summary)</label>
+                  <textarea 
+                    value={editingPost.summary} 
+                    onChange={e => setEditingPost({ ...editingPost, summary: e.target.value })}
+                    rows={2}
+                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="text-xs font-bold uppercase text-slate-400 block mb-1">Conteúdo (HTML allowed)</label>
+                  <textarea 
+                    value={editingPost.content} 
+                    onChange={e => setEditingPost({ ...editingPost, content: e.target.value })}
+                    rows={6}
+                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 font-mono text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold uppercase text-slate-400 block mb-1">Solution Relacionada (Slug)</label>
+                  <input 
+                    type="text" 
+                    value={editingPost.relatedProductId || ''} 
+                    onChange={e => setEditingPost({ ...editingPost, relatedProductId: e.target.value })}
+                    placeholder="Ex: extratobr"
+                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3">
+                <button onClick={() => setEditingPost(null)} className="px-6 py-2 text-slate-500 font-bold">Cancelar</button>
+                <button onClick={handleSavePost} className="btn-primary py-2 px-8 flex items-center gap-2">
+                  <Save className="w-4 h-4" /> Salvar Post
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-slate-50 dark:bg-slate-800/50 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                  <th className="px-6 py-4">Título</th>
+                  <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4">Data</th>
+                  <th className="px-6 py-4">Ações</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                {posts.map((p) => (
+                  <tr key={p.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                    <td className="px-6 py-4">
+                       <div className="font-bold text-slate-900 dark:text-white truncate max-w-xs">{p.title}</div>
+                       <div className="text-[10px] text-slate-400 font-mono">{p.slug}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={cn(
+                        "px-2 py-0.5 rounded text-[10px] font-bold uppercase",
+                        p.status === 'published' ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-700"
+                      )}>
+                        {p.status === 'published' ? 'Publicado' : 'Rascunho'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-xs text-slate-500">{new Date(p.createdAt).toLocaleDateString()}</td>
+                    <td className="px-6 py-4">
+                      <div className="flex gap-2">
+                        <button onClick={() => setEditingPost(p)} className="p-2 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-lg transition-all"><Edit className="w-4 h-4" /></button>
+                        <button onClick={() => handleDeletePost(p.id)} className="p-2 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-lg transition-all"><Trash2 className="w-4 h-4" /></button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
       {activeTab === 'submissions' && (
         <div className="space-y-6">
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h2 className="text-xl font-bold">Banco de Ideias (Sugestões)</h2>
+              <p className="text-sm text-slate-500">Curadoria de soluções enviadas pela comunidade</p>
+            </div>
+            <div className="flex gap-2">
+               <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-[10px] font-bold uppercase tracking-widest">{submissions.filter(s => s.status === 'pending').length} Pendentes</span>
+               <span className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold uppercase tracking-widest">{submissions.filter(s => s.status === 'approved').length} Aprovadas</span>
+            </div>
+          </div>
+
           {submissions.length === 0 ? (
             <div className="text-center py-24 bg-slate-50 dark:bg-slate-900 rounded-3xl border-2 border-dashed border-slate-200">
                <Inbox className="w-12 h-12 text-slate-300 mx-auto mb-4" />
@@ -543,47 +902,55 @@ export default function AdminPage() {
                       <span className={cn(
                         "px-2 py-0.5 rounded text-[10px] font-bold uppercase",
                         sub.status === 'pending' ? "bg-amber-100 text-amber-700" :
+                        sub.status === 'analyzing' ? "bg-indigo-100 text-indigo-700" :
                         sub.status === 'approved' ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
                       )}>
-                        {sub.status}
+                        {sub.status === 'pending' ? 'Pendente' : 
+                         sub.status === 'analyzing' ? 'Em Análise' :
+                         sub.status === 'approved' ? 'Aprovado' : 'Rejeitado'}
                       </span>
                     </div>
-                    <p className="text-slate-600 dark:text-slate-400">{sub.description}</p>
-                    <div className="flex flex-wrap gap-4 text-xs font-medium text-slate-400 uppercase tracking-widest">
-                      <span>👤 {sub.userEmail}</span>
-                      <span>📁 {sub.area}</span>
-                      <span>💰 {sub.pricingModel}</span>
-                      <span>📅 {new Date(sub.createdAt).toLocaleDateString()}</span>
+                    <p className="text-slate-600 dark:text-slate-400 font-medium">{sub.description}</p>
+                    <div className="flex flex-wrap gap-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                      <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {sub.userEmail}</span>
+                      <span className="flex items-center gap-1"><Target className="w-3 h-3" /> {sub.area}</span>
+                      <span className="flex items-center gap-1"><Zap className="w-3 h-3" /> {sub.pricingModel}</span>
+                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {new Date(sub.createdAt).toLocaleDateString()}</span>
                     </div>
                   </div>
                   
-                  <div className="flex flex-col gap-2 w-full md:auto">
+                  <div className="flex flex-col gap-2 w-full md:w-48">
                     {sub.status === 'pending' && (
-                      <>
-                        <button 
-                          onClick={() => handleStatusUpdate(sub.id, 'approved')}
-                          className="flex items-center justify-center gap-2 py-3 px-6 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow-sm transition-all hover:scale-105"
-                        >
-                          <CheckCircle className="w-4 h-4" /> Aprovar
-                        </button>
-                        <button 
-                          onClick={() => handleStatusUpdate(sub.id, 'rejected')}
-                          className="flex items-center justify-center gap-2 py-3 px-6 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl text-sm font-bold transition-all"
-                        >
-                          <XCircle className="w-4 h-4" /> Rejeitar
-                        </button>
-                      </>
+                      <button 
+                        onClick={() => handleStatusUpdate(sub.id, 'analyzing')}
+                        className="w-full py-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-xl text-xs font-black uppercase tracking-widest transition-all"
+                      >
+                        Mudar p/ Análise
+                      </button>
                     )}
-                    <button className="flex items-center justify-center gap-2 py-3 px-6 text-slate-500 hover:bg-slate-100 rounded-xl text-sm font-bold transition-all">
-                      <Edit className="w-4 h-4" /> Editar
-                    </button>
+                    {sub.status !== 'approved' && (
+                      <button 
+                        onClick={() => handleStatusUpdate(sub.id, 'approved')}
+                        className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-emerald-100 transition-all"
+                      >
+                        Aprovar Ideia
+                      </button>
+                    )}
+                    {sub.status !== 'rejected' && (
+                      <button 
+                        onClick={() => handleStatusUpdate(sub.id, 'rejected')}
+                        className="w-full py-3 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl text-xs font-black uppercase tracking-widest transition-all"
+                      >
+                        Rejeitar
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
             ))
           )}
         </div>
-        )}
+      )}
         </motion.div>
       </AnimatePresence>
     </div>

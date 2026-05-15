@@ -1,6 +1,6 @@
 {
-  "name": "MicroCaaS",
-  "description": "Uma plataforma SaaS completa para micro-serviços com dashboard, carrinho e gestão, incluindo o Nexus DF para auditoria e demonstrações financeiras.",
+  "name": "MicroCaaS Hub",
+  "description": "MicroCaaS Hub — Automatize tarefas contábeis em minutos com micro-soluções cirúrgicas para fiscal, contábil e financeiro.",
   "requestFramePermissions": [],
-  "majorCapabilities": []
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

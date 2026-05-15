@@ -19,6 +19,9 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { cn } from '../lib/utils';
 import { formatCurrency, parseNumberBR } from '../lib/format';
+import { ShareButtons } from '../components/ShareButtons';
+import { auth } from '../lib/firebase';
+import { onAuthStateChanged, User } from 'firebase/auth';
 
 // --- I18N DICTIONARY & GLOSSARY ---
 const TRANSLATIONS = {
@@ -456,6 +459,12 @@ export default function NexusDF() {
   const [missingAccountsByYear, setMissingAccountsByYear] = useState<Record<number, Account[]>>({});
   const [notesContent, setNotesContent] = useState<Record<string, string>>({});
   const [isNotesInitialized, setIsNotesInitialized] = useState(false);
+  const [user, setUser] = useState<User | null>(auth.currentUser);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (u) => setUser(u));
+    return () => unsubscribe();
+  }, []);
 
   const t = TRANSLATIONS[lang];
 
@@ -1266,7 +1275,10 @@ const runAutoMapping = useCallback((accs: Account[]) => {
               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{t.subtitle}</p>
             </div>
           </div>
-          <button onClick={() => setLang(l => l === 'pt' ? 'en' : 'pt')} className="text-xs font-bold bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg">{t.lang}</button>
+          <div className="flex items-center gap-4">
+            <ShareButtons />
+            <button onClick={() => setLang(l => l === 'pt' ? 'en' : 'pt')} className="text-xs font-bold bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg">{t.lang}</button>
+          </div>
         </div>
       </header>
 
@@ -2035,48 +2047,79 @@ const runAutoMapping = useCallback((accs: Account[]) => {
                   </div>
                 )}
 
-                <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 p-12 text-center shadow-sm">
-                  <Sparkles className="w-12 h-12 text-indigo-600 mx-auto mb-4" />
-                  <h2 className="text-2xl font-black mb-2">Central de Exportação</h2>
-                  <p className="text-slate-500 mb-8 max-w-lg mx-auto">Selecione as demonstrações que deseja exportar. Todos os documentos seguem os padrões contábeis vigentes.</p>
-                  
-                  <button 
-                    onClick={() => handleExportPDF('FULL')}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-black px-12 py-4 rounded-2xl flex items-center justify-center gap-2 mx-auto transition-all shadow-lg"
-                  >
-                    <Download className="w-5 h-5" /> Exportar Relatório Completo (PDF)
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {[
-                    { id: 'BP', label: 'Balanço Patrimonial' },
-                    { id: 'DRE', label: 'Demonstração do Resultado' },
-                    { id: 'DRA', label: 'Resultado Abrangente' },
-                    { id: 'DMPL', label: 'Mutações do PL' },
-                    { id: 'DFC', label: 'Fluxo de Caixa' },
-                    { id: 'INDICES', label: 'Índices Financeiros' },
-                    { id: 'NOTES', label: 'Notas Explicativas' },
-                  ].map(item => (
-                    <div key={item.id} className="bg-white dark:bg-slate-900 border border-slate-200 p-6 rounded-[2rem] shadow-sm group">
-                      <h3 className="font-black text-sm uppercase tracking-tight mb-4 group-hover:text-indigo-600 transition-colors">{item.label}</h3>
-                      <div className="grid grid-cols-2 gap-2">
-                        <button 
-                          onClick={() => handleExportPDF(item.id as any)}
-                          className="px-4 py-2 bg-slate-50 dark:bg-slate-800 rounded-xl text-[10px] font-black uppercase hover:bg-indigo-50 border border-transparent hover:border-indigo-100 transition-all"
-                        >
-                          PDF
-                        </button>
-                        <button 
-                          onClick={() => handleExportXLSX(item.id)}
-                          className="px-4 py-2 bg-slate-50 dark:bg-slate-800 rounded-xl text-[10px] font-black uppercase hover:bg-emerald-50 border border-transparent hover:border-emerald-100 transition-all"
-                        >
-                          Excel
-                        </button>
+                  <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 p-12 text-center shadow-sm relative overflow-hidden">
+                    {!user && (
+                      <div className="absolute inset-0 bg-white/60 dark:bg-slate-950/60 backdrop-blur-sm z-10 flex flex-col items-center justify-center p-6 text-center">
+                        <div className="bg-white dark:bg-slate-900 p-8 rounded-[3rem] shadow-2xl border border-slate-200 dark:border-slate-800 max-w-sm">
+                           <Lock className="w-12 h-12 text-indigo-600 mb-6 mx-auto" />
+                           <h3 className="text-2xl font-black mb-2">Funcionalidade Premium</h3>
+                           <p className="text-slate-600 dark:text-slate-400 mb-8 text-sm">
+                             O uso das ferramentas é gratuito, mas a <b>exportação de relatórios</b> e o <b>salvamento em nuvem</b> são recursos exclusivos para assinantes.
+                           </p>
+                           <div className="space-y-3">
+                              <Link 
+                                to="/login"
+                                className="w-full block bg-indigo-600 hover:bg-indigo-700 text-white font-black px-8 py-3 rounded-xl transition-all shadow-lg"
+                              >
+                                Login / Criar Conta
+                              </Link>
+                              <Link 
+                                to="/pricing"
+                                className="w-full block bg-white dark:bg-slate-800 border border-indigo-100 text-indigo-600 font-bold px-8 py-3 rounded-xl transition-all"
+                              >
+                                Ver Planos
+                              </Link>
+                           </div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    )}
+                    <Sparkles className="w-12 h-12 text-indigo-600 mx-auto mb-4" />
+                    <h2 className="text-2xl font-black mb-2">Central de Exportação</h2>
+                    <p className="text-slate-500 mb-8 max-w-lg mx-auto">Selecione as demonstrações que deseja exportar. Todos os documentos seguem os padrões contábeis vigentes.</p>
+                    
+                    <button 
+                      onClick={() => handleExportPDF('FULL')}
+                      disabled={!user}
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white font-black px-12 py-4 rounded-2xl flex items-center justify-center gap-2 mx-auto transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Download className="w-5 h-5" /> Exportar Relatório Completo (PDF)
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative">
+                    {!user && (
+                      <div className="absolute inset-0 z-10" />
+                    )}
+                    {[
+                      { id: 'BP', label: 'Balanço Patrimonial' },
+                      { id: 'DRE', label: 'Demonstração do Resultado' },
+                      { id: 'DRA', label: 'Resultado Abrangente' },
+                      { id: 'DMPL', label: 'Mutações do PL' },
+                      { id: 'DFC', label: 'Fluxo de Caixa' },
+                      { id: 'INDICES', label: 'Índices Financeiros' },
+                      { id: 'NOTES', label: 'Notas Explicativas' },
+                    ].map(item => (
+                      <div key={item.id} className="bg-white dark:bg-slate-900 border border-slate-200 p-6 rounded-[2rem] shadow-sm group">
+                        <h3 className="font-black text-sm uppercase tracking-tight mb-4 group-hover:text-indigo-600 transition-colors">{item.label}</h3>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button 
+                            onClick={() => handleExportPDF(item.id as any)}
+                            disabled={!user}
+                            className="px-4 py-2 bg-slate-50 dark:bg-slate-800 rounded-xl text-[10px] font-black uppercase hover:bg-indigo-50 border border-transparent hover:border-indigo-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            PDF
+                          </button>
+                          <button 
+                            onClick={() => handleExportXLSX(item.id)}
+                            disabled={!user}
+                            className="px-4 py-2 bg-slate-50 dark:bg-slate-800 rounded-xl text-[10px] font-black uppercase hover:bg-emerald-50 border border-transparent hover:border-emerald-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Excel
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
              </div>
           )}
         </AnimatePresence>

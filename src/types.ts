@@ -1,34 +1,49 @@
-export type PricingModel = 'free' | 'one_time' | 'subscription';
-export type ProductStatus = 'beta' | 'active' | 'em_breve';
+export type PricingModel = 'free' | 'subscription' | 'one_time' | 'quote' | 'usage';
+export type ProductStatus = 'active' | 'inactive' | 'beta' | 'coming_soon';
 
 export interface Product {
+  id: string; // Ex: "pc-ai"
+  name: string; // Headline: DOR RESOLVIDA (Ex: "Elimine a digitação manual de vez")
+  subtitle?: string; // Nome do produto (Ex: "Pré-Contábil AI")
+  impactPhrase?: string; // Ancoragem de valor (Ex: "Economize até 12h/mês")
+  slug: string; // URL canônica
+  legacyNames?: string[];
+  legacySlugs?: string[];
+  category: "Fiscal" | "Contábil" | "Financeiro" | "Automação" | "Gestão" | "Compliance" | "Simulação";
+  badges: string[]; // ["Destaque", "Novo", "Beta"]
+  modelBadge?: "ASSINATURA" | "PAGAMENTO ÚNICO" | "GRATUITO" | "DEMO" | "PRO";
+  usageImpact?: string; // "Configuração em 2 min" / "Resultado em 30s"
+  integrationInfo?: string; // "Sem instalação" / "Importação via XML"
+  dors?: string[]; // Tags de dor (Ex: ["NF-e/XML", "Conciliação", "Fechamento"])
+  shortDescription: string;
+  longDescription: string;
+  howToUse: string[]; // Lista passo a passo
+  inputs: string[]; // Lista (campos/arquivos)
+  outputs: string[]; // Lista (entregáveis)
+  pricingModel: PricingModel;
+  pricing: {
+    priceLabel: string; // Ex: "R$ 59/mês", "Grátis", "R$ 497,00"
+    priceValue?: number;
+    currency: string; // "BRL"
+    trialDays?: number;
+    includes: string[];
+    ctaText: string; // "Testar agora", "Saiba mais", "Comprar"
+    ctaAction: 'open_app' | 'checkout' | 'contact' | 'coming_soon';
+  };
+  status: ProductStatus;
+  isFeatured?: boolean;
+  liveUrl?: string;
+  relatedProducts: string[]; // Slugs
+  faq?: { q: string; a: string }[];
+}
+
+export interface Bundle extends Partial<Product> {
   id: string;
   name: string;
   slug: string;
-  description: string;
-  longDescription?: string;
-  area: string;
-  status: ProductStatus;
-  statusBadge: string;
-  pricingModel: PricingModel;
-  price?: number;
-  priceLabel: string; // Ex: "R$ 49,90", "R$ 19/mês", "Grátis"
-  checkoutUrl?: string; // Link externo para pagamento (Stripe/MP)
-  paymentProvider?: 'mercadopago';
-  paymentStatus?: 'mock' | 'real';
-  liveUrl?: string;     // Link para acessar o sistema (especialmente para free)
-  tags: string[];
-  lastUpdated: string;
-  features: string[];
-  version?: string;
-  isFree?: boolean; // Adicionado para gerenciar o estado gratuito vs pago
-  isFeatured?: boolean;
-  isPromo?: boolean;
-}
-
-export interface Bundle extends Product {
   type: 'bundle';
   bundleItems: string[]; // Slugs dos produtos individuais
+  status: 'active' | 'inactive';
 }
 
 export type MicroCaaS = Product;
@@ -53,7 +68,7 @@ export interface Submission {
   area: string;
   pricingModel: PricingModel;
   price?: number;
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'approved' | 'rejected' | 'analyzing';
   createdAt: string;
   manifestJson?: string;
 }
@@ -77,3 +92,17 @@ export interface Entitlement {
   expiresAt?: string;
   status: 'active' | 'revoked';
 }
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  image: string;
+  summary: string;
+  relatedProductId?: string; // Link opcional para solução (slug do produto)
+  status: 'draft' | 'published';
+  createdAt: string;
+  updatedAt: string;
+}
+

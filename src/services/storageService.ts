@@ -23,7 +23,7 @@ export const storageService = {
     localStorage.setItem(SUBMISSIONS_KEY, JSON.stringify([newSub, ...subs]));
   },
 
-  async updateSubmissionStatus(id: string, status: 'approved' | 'rejected'): Promise<void> {
+  async updateSubmissionStatus(id: string, status: 'approved' | 'rejected' | 'analyzing'): Promise<void> {
     const subs = await this.getSubmissions();
     const updated = subs.map(s => s.id === id ? { ...s, status } : s);
     localStorage.setItem(SUBMISSIONS_KEY, JSON.stringify(updated));

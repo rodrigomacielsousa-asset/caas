@@ -1,49 +1,54 @@
 {
   "entities": {
     "User": {
-      "title": "User",
-      "description": "User profile data",
+      "title": "User Profile",
+      "description": "Premium user account data",
       "type": "object",
       "properties": {
         "uid": { "type": "string" },
-        "email": { "type": "string" },
-        "displayName": { "type": "string" },
-        "lastLogin": { "type": "string", "format": "date-time" }
+        "email": { "type": "string", "format": "email" },
+        "plano": { "type": "string", "enum": ["free", "pro", "advanced", "enterprise"] },
+        "status": { "type": "string" }
       },
       "required": ["uid", "email"]
     },
-    "CartItem": {
-      "title": "Cart Item",
-      "description": "An item in the user's cart",
+    "Document": {
+      "title": "Document (NF-e/XML)",
+      "description": "Captured or consulted NF-e data",
       "type": "object",
       "properties": {
-        "productId": { "type": "string" },
-        "quantity": { "type": "number" },
-        "priceAtAddition": { "type": "number" },
-        "name": { "type": "string" }
+        "ownerId": { "type": "string" },
+        "chave": { "type": "string" },
+        "type": { "type": "string" },
+        "emitente": { "type": "string" },
+        "valor": { "type": "number" },
+        "xml": { "type": "string" }
       }
     },
-    "Order": {
-      "title": "Order",
-      "description": "A completed purchase order",
+    "MonitoredClient": {
+      "title": "Monitored Client",
+      "description": "CNPJ registered for automatic monitoring",
       "type": "object",
       "properties": {
-        "userId": { "type": "string" },
-        "items": { "type": "array", "items": { "$ref": "#/entities/CartItem" } },
-        "total": { "type": "number" },
-        "status": { "type": "string", "enum": ["pending", "completed", "cancelled"] },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "ownerId": { "type": "string" },
+        "cnpj": { "type": "string" },
+        "nome": { "type": "string" },
+        "ultNSU": { "type": "string" }
       }
     }
   },
   "firestore": {
     "/users/{userId}": {
       "schema": "User",
-      "description": "User profiles"
+      "description": "Public and private user profile data"
     },
-    "/orders/{orderId}": {
-      "schema": "Order",
-      "description": "Purchase orders"
+    "/documents/{docId}": {
+      "schema": "Document",
+      "description": "Individual documents (NF-e) per user"
+    },
+    "/nfeMonitoredClients/{clientId}": {
+      "schema": "MonitoredClient",
+      "description": "Clients registered for SEFAZ monitoring"
     }
   }
 }

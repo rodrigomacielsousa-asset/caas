@@ -15,6 +15,9 @@ export function Layout({ children }: LayoutProps) {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    // Force Light Mode and clear any dark mode class
+    document.documentElement.classList.remove('dark');
+    localStorage.setItem('theme', 'light');
   }, [pathname]);
 
   return (

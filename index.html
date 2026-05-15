@@ -22,7 +22,12 @@
       }(window.location))
     </script>
   </head>
-  <body>
+  <body class="light">
+    <script>
+      // Force light mode for testing as requested
+      document.documentElement.classList.remove('dark');
+      document.documentElement.style.colorScheme = 'light';
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

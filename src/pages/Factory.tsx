@@ -1,4 +1,4 @@
-import { Target, Zap, Settings, Rocket, Package, FileText, ArrowRight, ShieldCheck, Sparkles, Code, Users } from 'lucide-react';
+import { Target, Zap, Settings, Rocket, Package, FileText, ArrowRight, ShieldCheck, Sparkles, Code, Users, Database, Server } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export default function Factory() {
@@ -124,5 +124,3 @@ export default function Factory() {
     </div>
   );
 }
-
-import { Database, Server } from 'lucide-react';

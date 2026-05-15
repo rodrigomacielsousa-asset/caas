@@ -2,42 +2,91 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Default Deny
+    // 0. Default Deny
     match /{document=**} {
       allow read, write: if false;
     }
 
     // Helper functions
-    function isSignedIn() {
-      return request.auth != null;
+    function isSignedIn() { return request.auth != null; }
+    function isEmailVerified() { return isSignedIn() && request.auth.token.email_verified == true; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    function isAdmin() { return isSignedIn() && request.auth.token.email == 'rodrigomaciel.sousa@gmail.com' && isEmailVerified(); }
+    
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    
+    function isValidId(id) { 
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); 
     }
 
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
+    // --- Entity Validations ---
+
+    function isValidDocument(data) {
+      return data.keys().hasAll(['ownerId', 'chave', 'type']) &&
+             data.ownerId == request.auth.uid &&
+             data.chave is string && data.chave.size() <= 44 &&
+             data.get('valor', 0) is number;
     }
 
-    function isValidId(id) {
-      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    function isValidMonitoredClient(data) {
+      return data.keys().hasAll(['ownerId', 'cnpj', 'nome']) &&
+             data.ownerId == request.auth.uid &&
+             data.cnpj is string && data.cnpj.size() <= 18;
     }
 
-    // User Profile Rules
+    // --- Access Rules ---
+
     match /users/{userId} {
-      allow get: if isOwner(userId);
-      allow create: if isOwner(userId) 
-        && request.resource.data.keys().hasAll(['uid', 'email'])
-        && request.resource.data.uid == userId;
-      allow update: if isOwner(userId)
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'lastLogin']);
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) && (
+        incoming().diff(existing()).affectedKeys().hasOnly(['name', 'photoURL', 'updatedAt'])
+      ) || isAdmin();
     }
 
-    // Order Rules
-    match /orders/{orderId} {
-      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow create: if isSignedIn() 
-        && request.resource.data.userId == request.auth.uid
-        && request.resource.data.keys().hasAll(['userId', 'items', 'total', 'status', 'createdAt'])
-        && request.resource.data.status == 'pending';
+    match /documents/{docId} {
+      allow get: if isSignedIn() && (existing().ownerId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.ownerId == request.auth.uid || isAdmin());
+      allow create: if isEmailVerified() && isValidDocument(incoming());
+      allow delete: if isEmailVerified() && existing().ownerId == request.auth.uid;
+    }
+
+    match /nfeMonitoredClients/{clientId} {
+      allow get: if isSignedIn() && (existing().ownerId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.ownerId == request.auth.uid || isAdmin());
+      allow create: if isEmailVerified() && isValidMonitoredClient(incoming());
+      allow update: if isEmailVerified() && (
+        existing().ownerId == request.auth.uid && 
+        incoming().ownerId == existing().ownerId &&
+        (
+          incoming().diff(existing()).affectedKeys().hasOnly(['nome', 'status', 'ultNSU', 'lastSync'])
+        )
+      ) || isAdmin();
+      allow delete: if isEmailVerified() && existing().ownerId == request.auth.uid;
+    }
+
+    match /trackingEvents/{eventId} {
+      allow create: if true; // Allow anonymous and users to track events
+      allow read: if isAdmin();
+    }
+
+    match /userMetrics/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      // Write handled by server side or automated logic (mocked)
+    }
+
+    match /userPlans/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+    }
+
+    match /nfeUsage/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+    }
+    
+    match /nfeEvents/{eventId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && incoming().userId == request.auth.uid;
     }
   }
 }
