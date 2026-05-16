@@ -54,7 +54,7 @@ export default function GrowthDashboard() {
         <Users className="w-16 h-16 text-slate-200 mx-auto" />
         <h2 className="text-2xl font-black italic uppercase tracking-tighter">Acesso Restrito</h2>
         <p className="text-xs font-bold text-slate-400 uppercase tracking-widest max-w-xs mx-auto">Área exclusiva para administradores e estrategistas do ecossistema.</p>
-        <Link to="/login" className="inline-block px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-900 transition-all">Fazer Login</Link>
+        <Link to="/login" className="inline-block px-8 py-4 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-900 transition-all">Fazer Login</Link>
       </div>
     </div>
   );
@@ -64,7 +64,7 @@ export default function GrowthDashboard() {
       <div className="max-w-7xl mx-auto space-y-12">
         <div className="flex justify-between items-center bg-white dark:bg-slate-900 p-10 rounded-[48px] border border-slate-100 dark:border-slate-800 shadow-xl">
            <div className="flex items-center gap-6">
-              <div className="w-16 h-16 bg-indigo-600 rounded-3xl flex items-center justify-center text-white shadow-xl shadow-indigo-100">
+              <div className="w-16 h-16 bg-blue-600 rounded-3xl flex items-center justify-center text-white shadow-xl shadow-blue-100">
                  <TrendingUp className="w-8 h-8" />
               </div>
               <div>
@@ -76,7 +76,7 @@ export default function GrowthDashboard() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
            {[
-             { label: 'Total Usuários', val: totalUsers, icon: Users, color: 'text-indigo-600' },
+             { label: 'Total Usuários', val: totalUsers, icon: Users, color: 'text-blue-600' },
              { label: 'Usuários Ativos', val: activeUsers, icon: Zap, color: 'text-amber-500' },
              { label: 'MRR Projetado', val: `R$ ${(funnelStats.paying * 199).toLocaleString()}`, icon: TrendingUp, color: 'text-emerald-500' },
              { label: 'Taxa de Conversão', val: `${Math.round((funnelStats.paying / totalUsers) * 100 || 0)}%`, icon: Target, color: 'text-rose-500' }
@@ -95,13 +95,13 @@ export default function GrowthDashboard() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
            <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-[56px] p-10 border border-slate-100 dark:border-slate-800 shadow-sm space-y-8">
-              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic flex items-center gap-2 underline decoration-indigo-600/30 underline-offset-4">Funil de Conversão</h3>
+              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic flex items-center gap-2 underline decoration-blue-600/30 underline-offset-4">Funil de Conversão</h3>
               <div className="space-y-4">
                  {[
                    { label: 'Visualizaram', count: totalUsers, color: 'bg-slate-100', width: '100%' },
-                   { label: 'Cadastrados (Free)', count: funnelStats.free, color: 'bg-indigo-100', width: `${(funnelStats.free / totalUsers) * 100}%` },
-                   { label: 'Ativos', count: funnelStats.active, color: 'bg-indigo-300', width: `${((funnelStats.active) / totalUsers) * 100}%` },
-                   { label: 'Pagantes', count: funnelStats.paying, color: 'bg-indigo-600', width: `${(funnelStats.paying / totalUsers) * 100}%`, text: 'text-white' }
+                   { label: 'Cadastrados (Free)', count: funnelStats.free, color: 'bg-blue-100', width: `${(funnelStats.free / totalUsers) * 100}%` },
+                   { label: 'Ativos', count: funnelStats.active, color: 'bg-blue-300', width: `${((funnelStats.active) / totalUsers) * 100}%` },
+                   { label: 'Pagantes', count: funnelStats.paying, color: 'bg-blue-600', width: `${(funnelStats.paying / totalUsers) * 100}%`, text: 'text-white' }
                  ].map(f => (
                    <div key={f.label} className="relative h-16 bg-slate-50 dark:bg-slate-800 rounded-2xl overflow-hidden group">
                       <div className={cn("absolute inset-y-0 left-0 transition-all duration-1000", f.color)} style={{ width: f.width }} />
@@ -115,8 +115,8 @@ export default function GrowthDashboard() {
            </div>
 
            <div className="bg-slate-900 rounded-[48px] p-10 text-white space-y-8 relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-12 opacity-10 rotate-12 scale-150"><BarChart3 className="w-64 h-64 text-indigo-400" /></div>
-              <h3 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest italic relative z-10">Produtos Populares</h3>
+              <div className="absolute top-0 right-0 p-12 opacity-10 rotate-12 scale-150"><BarChart3 className="w-64 h-64 text-blue-400" /></div>
+              <h3 className="text-[10px] font-black text-blue-400 uppercase tracking-widest italic relative z-10">Produtos Populares</h3>
               <div className="space-y-6 relative z-10">
                  {[
                    { name: 'ExtratoBR', usage: '82%' },
@@ -127,10 +127,10 @@ export default function GrowthDashboard() {
                    <div key={p.name} className="space-y-2">
                       <div className="flex justify-between items-end">
                          <span className="text-xs font-black uppercase italic italic">{p.name}</span>
-                         <span className="text-[10px] font-mono text-indigo-400">{p.usage}</span>
+                         <span className="text-[10px] font-mono text-blue-400">{p.usage}</span>
                       </div>
                       <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                         <div className="h-full bg-indigo-500 rounded-full" style={{ width: p.usage }} />
+                         <div className="h-full bg-blue-500 rounded-full" style={{ width: p.usage }} />
                       </div>
                    </div>
                  ))}

@@ -26,7 +26,7 @@ export function SmartSuggestions({ userId }: { userId: string }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="w-full bg-gradient-to-r from-indigo-600 to-violet-700 rounded-[32px] p-8 text-white relative overflow-hidden shadow-2xl shadow-indigo-200 dark:shadow-none"
+        className="w-full bg-gradient-to-r from-blue-600 to-violet-700 rounded-[32px] p-8 text-white relative overflow-hidden shadow-2xl shadow-blue-200 dark:shadow-none"
       >
         <div className="absolute top-0 right-0 p-8 opacity-10 rotate-12"><Sparkles className="w-40 h-40" /></div>
         
@@ -42,7 +42,7 @@ export function SmartSuggestions({ userId }: { userId: string }) {
            <div className="flex items-center gap-4">
               <Link 
                 to={current.link}
-                className="px-8 py-4 bg-white text-indigo-600 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all flex items-center gap-2 group"
+                className="px-8 py-4 bg-white text-blue-600 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all flex items-center gap-2 group"
               >
                 {current.cta} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>

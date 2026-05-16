@@ -175,12 +175,7 @@ export default function FechamentoContabilPro() {
   const handleCreatePeriod = async () => {
     if (!user || !profile) return;
     
-    // Paywall
-    if (profile.plan === 'free' && periods.length >= 1) {
-       alert("No plano FREE você pode ter apenas 1 período de fechamento ativo. Faça o upgrade!");
-       return;
-    }
-
+    // O usuário solicitou remover limites compulsórios de plano free
     setIsProcessing(true);
     try {
       // 1. Create Period
@@ -255,7 +250,7 @@ export default function FechamentoContabilPro() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col">
        {/* Premium Sub-Header */}
-       <div className="bg-indigo-600 px-6 py-2 flex justify-between items-center text-white border-b border-indigo-500 shadow-sm z-30">
+       <div className="bg-blue-600 px-6 py-2 flex justify-between items-center text-white border-b border-blue-500 shadow-sm z-30">
           <div className="flex items-center gap-3">
              <div className="flex items-center gap-1 bg-white/20 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest">
                 <Crown className="w-3 h-3" /> {profile?.plan === 'pro' ? 'Assinante Pro' : 'Plano Free'}
@@ -264,14 +259,9 @@ export default function FechamentoContabilPro() {
           </div>
           <div className="flex items-center gap-4">
              <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest">
-                <span className="opacity-70">Capacidade:</span>
-                <span className="bg-white text-indigo-600 px-3 py-1 rounded-full shadow-lg">{profile?.plan === 'pro' ? 'Ilimitado' : `${periods.length}/1 Ativo`}</span>
+                <span className="opacity-70">Operacional:</span>
+                <span className="bg-white text-blue-600 px-3 py-1 rounded-full shadow-lg">Multi-Empresa Ativo</span>
              </div>
-             {profile?.plan === 'free' && (
-               <button className="bg-emerald-500 hover:bg-emerald-400 px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-md">
-                  Upgrade para PRO
-               </button>
-             )}
           </div>
        </div>
 
@@ -279,7 +269,7 @@ export default function FechamentoContabilPro() {
        <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-8 pt-10 sticky top-0 z-20 shadow-sm">
           <div className="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-center gap-8">
             <div className="flex items-center gap-4">
-               <div className="w-14 h-14 bg-indigo-600 rounded-3xl flex items-center justify-center text-white shadow-xl shadow-indigo-100 dark:shadow-none"><ClipboardCheck className="w-7 h-7" /></div>
+               <div className="w-14 h-14 bg-blue-600 rounded-3xl flex items-center justify-center text-white shadow-xl shadow-blue-100 dark:shadow-none"><ClipboardCheck className="w-7 h-7" /></div>
                <div>
                   <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter italic leading-none">Fechamento.PRO</h1>
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">Gestão de Checklists & Evidências de Auditoria</p>
@@ -289,7 +279,7 @@ export default function FechamentoContabilPro() {
             <div className="flex flex-wrap items-center gap-4">
                <div className="flex bg-slate-50 dark:bg-slate-800 p-1 rounded-2xl border border-slate-100 dark:border-slate-700">
                   <div className="flex items-center gap-2 px-4 py-2 border-r border-slate-200 dark:border-slate-700">
-                     <Calendar className="w-4 h-4 text-indigo-600" />
+                     <Calendar className="w-4 h-4 text-blue-600" />
                      <input 
                        type="month" 
                        value={selectedPeriod} 
@@ -298,7 +288,7 @@ export default function FechamentoContabilPro() {
                      />
                   </div>
                   <div className="flex items-center gap-2 px-4 py-2">
-                     <Building2 className="w-4 h-4 text-indigo-600" />
+                     <Building2 className="w-4 h-4 text-blue-600" />
                      <select 
                        value={selectedClientId}
                        onChange={(e) => setSelectedClientId(e.target.value)}
@@ -314,7 +304,7 @@ export default function FechamentoContabilPro() {
                  <button 
                    onClick={handleCreatePeriod}
                    disabled={isProcessing}
-                   className="px-8 py-3 bg-indigo-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-indigo-100 hover:bg-slate-900 transition-all flex items-center gap-2"
+                   className="px-8 py-3 bg-blue-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-100 hover:bg-slate-900 transition-all flex items-center gap-2"
                  >
                    {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                    Criar Fechamento
@@ -323,10 +313,10 @@ export default function FechamentoContabilPro() {
                  <div className="flex items-center gap-4">
                     <div className="text-right">
                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Status do Período</p>
-                       <p className="text-xs font-black text-indigo-600 uppercase leading-none">{currentPeriodData.status.replace('_', ' ')}</p>
+                       <p className="text-xs font-black text-blue-600 uppercase leading-none">{currentPeriodData.status.replace('_', ' ')}</p>
                     </div>
                     <div className="w-24 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                       <div className="h-full bg-indigo-600 transition-all duration-1000" style={{ width: `${stats.progress}%` }} />
+                       <div className="h-full bg-blue-600 transition-all duration-1000" style={{ width: `${stats.progress}%` }} />
                     </div>
                     <span className="text-sm font-black text-slate-900 dark:text-white italic">{stats.progress}%</span>
                  </div>
@@ -340,7 +330,7 @@ export default function FechamentoContabilPro() {
           {/* Dashboard Quick Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
              {[
-               { label: 'Total Tarefas', val: stats.total, icon: Layers, color: 'text-indigo-600' },
+               { label: 'Total Tarefas', val: stats.total, icon: Layers, color: 'text-blue-600' },
                { label: 'Aprovadas', val: stats.done, icon: CheckCircle2, color: 'text-emerald-500' },
                { label: 'Aguar. Revisão', val: stats.waiting, icon: Clock, color: 'text-amber-500' },
                { label: 'Atrasadas', val: stats.late, icon: AlertTriangle, color: 'text-rose-500' }
@@ -373,8 +363,8 @@ export default function FechamentoContabilPro() {
                        className={cn(
                          "flex items-center gap-3 px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all",
                          activeTab === t.id 
-                           ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100" 
-                           : "text-slate-400 hover:text-indigo-600 hover:bg-indigo-50"
+                           ? "bg-blue-600 text-white shadow-lg shadow-blue-100" 
+                           : "text-slate-400 hover:text-blue-600 hover:bg-blue-50"
                        )}
                      >
                         <t.icon className="w-4 h-4" /> {t.label}
@@ -405,7 +395,7 @@ export default function FechamentoContabilPro() {
                                             "w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-all",
                                             task.status === 'aprovado' 
                                               ? "bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-200" 
-                                              : "border-slate-200 hover:border-indigo-400"
+                                              : "border-slate-200 hover:border-blue-400"
                                           )}
                                         >
                                            {task.status === 'aprovado' && <Check className="w-5 h-5" />}
@@ -413,7 +403,7 @@ export default function FechamentoContabilPro() {
                                         <div className="space-y-1">
                                            <div className="flex items-center gap-3">
                                               <p className="text-sm font-black text-slate-900 dark:text-white uppercase italic tracking-tight">{task.title}</p>
-                                              <span className="text-[8px] font-black text-indigo-400 uppercase tracking-widest bg-indigo-50 px-2 py-0.5 rounded-full">{task.tags[0]}</span>
+                                              <span className="text-[8px] font-black text-blue-400 uppercase tracking-widest bg-blue-50 px-2 py-0.5 rounded-full">{task.tags[0]}</span>
                                            </div>
                                            <div className="flex items-center gap-4 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
                                               <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {task.dueDate}</span>
@@ -430,11 +420,11 @@ export default function FechamentoContabilPro() {
                                             const url = prompt("Cole o link da evidência (Google Drive, Portal, etc):");
                                             if (url) addEvidence(task.id, "Link de Auditoria", url);
                                           }}
-                                          className="p-3 bg-white border border-slate-100 rounded-xl text-slate-400 hover:text-indigo-600 hover:shadow-md transition-all shadow-sm"
+                                          className="p-3 bg-white border border-slate-100 rounded-xl text-slate-400 hover:text-blue-600 hover:shadow-md transition-all shadow-sm"
                                         >
                                            <LinkIcon className="w-4 h-4" />
                                         </button>
-                                        <button className="p-3 bg-white border border-slate-100 rounded-xl text-slate-400 hover:text-indigo-600 hover:shadow-md transition-all shadow-sm"><MoreVertical className="w-4 h-4" /></button>
+                                        <button className="p-3 bg-white border border-slate-100 rounded-xl text-slate-400 hover:text-blue-600 hover:shadow-md transition-all shadow-sm"><MoreVertical className="w-4 h-4" /></button>
                                      </div>
                                   </div>
                                 ))}
@@ -447,7 +437,7 @@ export default function FechamentoContabilPro() {
                                   <div key={t.id} className="p-8 bg-slate-50 dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-800 space-y-6 relative overflow-hidden">
                                      <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none"><FileText className="w-24 h-24" /></div>
                                      <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600"><FileText className="w-5 h-5" /></div>
+                                        <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600"><FileText className="w-5 h-5" /></div>
                                         <div className="space-y-0.5">
                                            <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase italic">{t.title}</h4>
                                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{t.evidence?.length} Arquivos Anexados</p>
@@ -455,13 +445,13 @@ export default function FechamentoContabilPro() {
                                      </div>
                                      <div className="space-y-3">
                                         {t.evidence?.map((ev, idx) => (
-                                          <a key={idx} href={ev.value} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 bg-white dark:bg-slate-700 rounded-2xl border border-slate-100 dark:border-slate-600 hover:border-indigo-400 transition-all shadow-sm group">
+                                          <a key={idx} href={ev.value} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 bg-white dark:bg-slate-700 rounded-2xl border border-slate-100 dark:border-slate-600 hover:border-blue-400 transition-all shadow-sm group">
                                              <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600"><CheckCircle2 className="w-4 h-4" /></div>
                                              <div className="flex-1">
                                                 <p className="text-[10px] font-black text-slate-900 dark:text-white uppercase">{ev.name}</p>
                                                 <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{ev.uploadedAt.split('T')[0]}</p>
                                              </div>
-                                             <ArrowUpRight className="w-4 h-4 text-slate-200 group-hover:text-indigo-600" />
+                                             <ArrowUpRight className="w-4 h-4 text-slate-200 group-hover:text-blue-600" />
                                           </a>
                                         ))}
                                      </div>
@@ -472,8 +462,8 @@ export default function FechamentoContabilPro() {
 
                            {activeTab === 'aprovacoes' && (
                              <div className="space-y-6">
-                                <div className="text-center p-10 bg-indigo-50/50 dark:bg-indigo-900/10 rounded-[40px] border border-indigo-100 dark:border-indigo-800 mb-8">
-                                   <h4 className="text-xl font-black text-indigo-600 italic uppercase underline decoration-indigo-200 underline-offset-8">Fluxo Preparador & Revisor.</h4>
+                                <div className="text-center p-10 bg-blue-50/50 dark:bg-blue-900/10 rounded-[40px] border border-blue-100 dark:border-blue-800 mb-8">
+                                   <h4 className="text-xl font-black text-blue-600 italic uppercase underline decoration-blue-200 underline-offset-8">Fluxo Preparador & Revisor.</h4>
                                    <p className="text-sm text-slate-500 font-medium mt-4">Tarefas finalizadas que aguardam seu carimbo de revisão final.</p>
                                 </div>
                                 <div className="space-y-4">
@@ -527,13 +517,13 @@ export default function FechamentoContabilPro() {
                                 </div>
                                 <div className="space-y-8">
                                    <div className="flex items-center gap-3">
-                                      <div className="p-3 bg-indigo-50 rounded-xl text-indigo-500"><BarChart2 className="w-6 h-6" /></div>
+                                      <div className="p-3 bg-blue-50 rounded-xl text-blue-500"><BarChart2 className="w-6 h-6" /></div>
                                       <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tighter italic leading-none">Timeline Prevista</h3>
                                    </div>
                                    <div className="h-64 flex items-end gap-2 px-4 pb-4 bg-slate-50 dark:bg-slate-800 rounded-[40px] border border-slate-100 dark:border-slate-800">
                                       {[40, 70, 45, 90, 65, 85, 30].map((h, i) => (
-                                        <div key={i} className="flex-1 bg-indigo-600/10 rounded-t-xl relative group">
-                                           <div className="absolute bottom-0 left-0 w-full bg-indigo-600 rounded-t-xl transition-all duration-700 group-hover:bg-indigo-400" style={{ height: `${h}%` }} />
+                                        <div key={i} className="flex-1 bg-blue-600/10 rounded-t-xl relative group">
+                                           <div className="absolute bottom-0 left-0 w-full bg-blue-600 rounded-t-xl transition-all duration-700 group-hover:bg-blue-400" style={{ height: `${h}%` }} />
                                            <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-[8px] font-black px-2 py-1 rounded select-none uppercase tracking-widest">{h}%</div>
                                         </div>
                                       ))}
@@ -558,9 +548,9 @@ export default function FechamentoContabilPro() {
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                    <div className="p-10 bg-white dark:bg-slate-800 rounded-[48px] border border-slate-100 dark:border-slate-800 hover:shadow-2xl transition-all group flex flex-col items-center text-center space-y-6">
-                                      <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 group-hover:bg-indigo-600 group-hover:text-white transition-all"><FileText className="w-8 h-8" /></div>
+                                      <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 group-hover:bg-blue-600 group-hover:text-white transition-all"><FileText className="w-8 h-8" /></div>
                                       <div className="space-y-1">
-                                         <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest underline decoration-indigo-100 italic">Checklist Detalhado</p>
+                                         <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest underline decoration-blue-100 italic">Checklist Detalhado</p>
                                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Preparador, Revisor e Datas</p>
                                       </div>
                                       <button className="w-full py-4 bg-slate-50 dark:bg-slate-700 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:bg-slate-900 hover:text-white transition-all">Download CSV</button>
@@ -585,10 +575,10 @@ export default function FechamentoContabilPro() {
              {/* Sidebar: Eco-Indicadores */}
              <div className="w-full lg:w-80 space-y-8">
                 <div className="bg-slate-900 rounded-[48px] p-8 text-white relative overflow-hidden shadow-2xl">
-                   <div className="absolute -bottom-8 -right-8 opacity-10"><Database className="w-40 h-40 text-indigo-400" /></div>
+                   <div className="absolute -bottom-8 -right-8 opacity-10"><Database className="w-40 h-40 text-blue-400" /></div>
                    <div className="relative z-10 space-y-8">
                       <div className="flex items-center gap-2">
-                         <Sparkles className="w-4 h-4 text-indigo-400" />
+                         <Sparkles className="w-4 h-4 text-blue-400" />
                          <span className="text-[10px] font-black uppercase tracking-widest italic tracking-widest">Ecossistema Conectado</span>
                       </div>
                       <div className="space-y-6">
@@ -630,13 +620,13 @@ export default function FechamentoContabilPro() {
                         <div key={m.name} className="flex items-center gap-4">
                            <div className={cn(
                              "w-10 h-10 rounded-xl flex items-center justify-center text-[10px] font-black italic",
-                             m.role === 'Automação' ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-400"
+                             m.role === 'Automação' ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-400"
                            )}>{m.initial}</div>
                            <div className="flex-1">
                               <p className="text-[11px] font-black text-slate-900 dark:text-white uppercase leading-none mb-1">{m.name}</p>
                               <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{m.role}</p>
                            </div>
-                           <span className="text-[9px] font-black text-indigo-600 italic">{m.tasks} tasks</span>
+                           <span className="text-[9px] font-black text-blue-600 italic">{m.tasks} tasks</span>
                         </div>
                       ))}
                    </div>
@@ -649,33 +639,14 @@ export default function FechamentoContabilPro() {
                 <ShieldCheck className="w-5 h-5 text-emerald-500" /> Trilha de Auditoria com Carimbo do Tempo (Imutável)
              </div>
              <div className="flex gap-8 text-[10px] font-black uppercase tracking-widest">
-                <a href="#" className="hover:text-indigo-600 transition-colors">Manual de Procedimentos</a>
-                <a href="#" className="hover:text-indigo-600 transition-colors">Segurança de Dados</a>
-                <a href="#" className="hover:text-indigo-600 transition-colors">Exportar tudo (JSON/XLSX)</a>
+                <a href="#" className="hover:text-blue-600 transition-colors">Manual de Procedimentos</a>
+                <a href="#" className="hover:text-blue-600 transition-colors">Segurança de Dados</a>
+                <a href="#" className="hover:text-blue-600 transition-colors">Exportar tudo (JSON/XLSX)</a>
              </div>
           </div>
        </div>
 
-       {/* Paywall Overlay */}
-       <AnimatePresence>
-          {profile && profile.plan === 'free' && periods.length > 0 && (
-            <div className="fixed inset-0 z-[100] pointer-events-none p-4 flex flex-col items-end justify-end">
-               <motion.div 
-                 initial={{ opacity: 0, y: 50 }}
-                 animate={{ opacity: 1, y: 0 }}
-                 className="bg-slate-900 text-white p-8 rounded-[48px] shadow-3xl max-w-sm pointer-events-auto border border-white/10 space-y-6"
-               >
-                  <div className="flex items-center gap-2">
-                     <Crown className="w-5 h-5 text-amber-500" />
-                     <span className="text-[10px] font-black uppercase tracking-widest italic tracking-widest text-amber-500">Upgrade Necessário</span>
-                  </div>
-                  <h4 className="text-xl font-black italic tracking-tighter leading-tight">Você atingiu o limite do Plano Free para Fechamentos.</h4>
-                  <p className="text-sm text-slate-400 font-medium font-serif italic italic">Desbloqueie períodos ilimitados, aprovações, dependências e relatórios para seu escritório.</p>
-                  <button className="w-full py-5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-3xl font-black text-sm tracking-widest uppercase transition-all shadow-xl shadow-indigo-900/50">Ativar Plano PRO Agora</button>
-               </motion.div>
-            </div>
-          )}
-       </AnimatePresence>
+       {/* O usuário solicitou remover o overlay de paywall */}
     </div>
   );
 }

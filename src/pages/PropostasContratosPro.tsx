@@ -113,17 +113,17 @@ export default function PropostasContratosPro() {
       {/* Header */}
       <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 pt-32 pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-           <Link to="/solucoes" className="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 hover:text-indigo-600 transition-all uppercase tracking-widest mb-12">
+           <Link to="/solucoes" className="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 hover:text-blue-600 transition-all uppercase tracking-widest mb-12">
               <ArrowLeft className="w-4 h-4" /> Catálogo de Soluções
            </Link>
            
            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-end">
               <div className="space-y-6">
-                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 rounded-full text-[10px] font-black uppercase tracking-widest">
+                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest">
                     <Sparkles className="w-3 h-3" /> Sales Enablement Tool
                  </div>
                  <h1 className="text-6xl md:text-8xl font-black text-slate-900 dark:text-white tracking-tighter leading-[0.85]">
-                    Propostas & <br /><span className="text-indigo-600 italic">Contratos.</span>
+                    Propostas & <br /><span className="text-blue-600 italic">Contratos.</span>
                  </h1>
                  <p className="text-xl text-slate-500 font-medium font-serif italic max-w-md">
                     Gere documentos profissionais em segundos e feche mais contratos com segurança jurídica e comercial.
@@ -161,19 +161,19 @@ export default function PropostasContratosPro() {
                       {/* Section 1: Client Data */}
                       <div className="space-y-6">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center text-indigo-600 font-black text-xs">01</div>
+                          <div className="w-8 h-8 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex items-center justify-center text-blue-600 font-black text-xs">01</div>
                           <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest italic">Dados do Cliente</h4>
                         </div>
                         <div className="space-y-4">
                            <div className="space-y-2">
                              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Razão Social</label>
                              <div className="relative group">
-                                <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-indigo-600" />
+                                <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-600" />
                                 <input 
                                   type="text"
                                   value={formData.companyName}
                                   onChange={(e) => setFormData({...formData, companyName: e.target.value})}
-                                  className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl pl-12 pr-4 py-4 font-bold outline-none ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-indigo-600 transition-all"
+                                  className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl pl-12 pr-4 py-4 font-bold outline-none ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-blue-600 transition-all"
                                   placeholder="Nome da Empresa"
                                 />
                              </div>
@@ -184,7 +184,7 @@ export default function PropostasContratosPro() {
                                type="text"
                                value={formData.cnpj}
                                onChange={(e) => setFormData({...formData, cnpj: e.target.value})}
-                               className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-4 py-4 font-bold outline-none ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-indigo-600 transition-all"
+                               className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-4 py-4 font-bold outline-none ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-blue-600 transition-all"
                                placeholder="00.000.000/0000-00"
                              />
                            </div>
@@ -194,19 +194,19 @@ export default function PropostasContratosPro() {
                       {/* Section 2: Responsibility */}
                       <div className="space-y-6">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center text-indigo-600 font-black text-xs">02</div>
+                          <div className="w-8 h-8 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex items-center justify-center text-blue-600 font-black text-xs">02</div>
                           <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest italic">Responsável</h4>
                         </div>
                         <div className="space-y-4">
                            <div className="space-y-2">
                              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nome Completo</label>
                              <div className="relative group">
-                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-indigo-600" />
+                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-600" />
                                 <input 
                                   type="text"
                                   value={formData.responsibleName}
                                   onChange={(e) => setFormData({...formData, responsibleName: e.target.value})}
-                                  className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl pl-12 pr-4 py-4 font-bold outline-none ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-indigo-600 transition-all"
+                                  className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl pl-12 pr-4 py-4 font-bold outline-none ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-blue-600 transition-all"
                                   placeholder="Nome do Pessoa"
                                 />
                              </div>
@@ -214,12 +214,12 @@ export default function PropostasContratosPro() {
                            <div className="space-y-2">
                              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">E-mail</label>
                              <div className="relative group">
-                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-indigo-600" />
+                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-600" />
                                 <input 
                                   type="email"
                                   value={formData.email}
                                   onChange={(e) => setFormData({...formData, email: e.target.value})}
-                                  className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl pl-12 pr-4 py-4 font-bold outline-none ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-indigo-600 transition-all"
+                                  className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl pl-12 pr-4 py-4 font-bold outline-none ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-blue-600 transition-all"
                                   placeholder="contato@empresa.com.br"
                                 />
                              </div>
@@ -230,7 +230,7 @@ export default function PropostasContratosPro() {
                       {/* Section 3: Proposal Details */}
                       <div className="space-y-6">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center text-indigo-600 font-black text-xs">03</div>
+                          <div className="w-8 h-8 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex items-center justify-center text-blue-600 font-black text-xs">03</div>
                           <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest italic">Serviço & Honorário</h4>
                         </div>
                         <div className="space-y-4">
@@ -239,7 +239,7 @@ export default function PropostasContratosPro() {
                              <select 
                                value={formData.serviceType}
                                onChange={(e) => setFormData({...formData, serviceType: e.target.value})}
-                               className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-4 py-4 font-bold outline-none ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-indigo-600 transition-all appearance-none"
+                               className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-4 py-4 font-bold outline-none ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-blue-600 transition-all appearance-none"
                              >
                                <option>Contabilidade Mensal</option>
                                <option>Consultoria Estratégica</option>
@@ -250,17 +250,17 @@ export default function PropostasContratosPro() {
                            <div className="space-y-2">
                              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Valor Mensal (R$)</label>
                              <div className="relative group">
-                                <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-indigo-600" />
+                                <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-600" />
                                 <input 
                                   type="number"
                                   value={formData.monthlyValue}
                                   onChange={(e) => setFormData({...formData, monthlyValue: e.target.value})}
-                                  className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl pl-12 pr-4 py-4 font-bold outline-none ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-indigo-600 transition-all font-mono"
+                                  className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl pl-12 pr-4 py-4 font-bold outline-none ring-1 ring-slate-200 dark:ring-slate-700 focus:ring-2 focus:ring-blue-600 transition-all font-mono"
                                   placeholder="0.00"
                                 />
                              </div>
                              {location.search.includes('fee') && (
-                               <div className="text-[9px] font-black text-indigo-600 uppercase mt-1 italic flex items-center gap-1">
+                               <div className="text-[9px] font-black text-blue-600 uppercase mt-1 italic flex items-center gap-1">
                                   <Sparkles className="w-3 h-3" /> Sincronizado do Honorários Pro
                                </div>
                              )}
@@ -273,7 +273,7 @@ export default function PropostasContratosPro() {
                       <button 
                         onClick={handleGenerate}
                         disabled={!formData.companyName || !formData.monthlyValue || isGenerating}
-                        className="w-full py-8 bg-indigo-600 text-white rounded-[32px] font-black uppercase tracking-widest text-lg shadow-2xl shadow-indigo-200 dark:shadow-none hover:bg-slate-900 transition-all flex items-center justify-center gap-4 group"
+                        className="w-full py-8 bg-blue-600 text-white rounded-[32px] font-black uppercase tracking-widest text-lg shadow-2xl shadow-blue-200 dark:shadow-none hover:bg-slate-900 transition-all flex items-center justify-center gap-4 group"
                       >
                          {isGenerating ? (
                            <Loader2 className="w-6 h-6 animate-spin" />
@@ -321,7 +321,7 @@ export default function PropostasContratosPro() {
                     <div className="flex items-center gap-4">
                        <button 
                          onClick={() => setStep(1)}
-                         className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl text-slate-400 hover:text-indigo-600 transition-colors"
+                         className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl text-slate-400 hover:text-blue-600 transition-colors"
                        >
                           <ArrowLeft className="w-5 h-5" />
                        </button>
@@ -330,13 +330,13 @@ export default function PropostasContratosPro() {
                     <div className="flex items-center gap-2">
                        <button 
                          onClick={() => copyToClipboard(activeTab === 'proposta' ? proposalContent.intro + "\n\n" + proposalContent.scope : contractContent.title)}
-                         className="px-6 py-3 bg-slate-50 dark:bg-slate-800 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 hover:bg-indigo-600 hover:text-white transition-all flex items-center gap-2"
+                         className="px-6 py-3 bg-slate-50 dark:bg-slate-800 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 hover:bg-blue-600 hover:text-white transition-all flex items-center gap-2"
                        >
                           <Copy className="w-4 h-4" /> Copiar Texto
                        </button>
                        <button 
                          onClick={() => alert("Gerando PDF Premium...")}
-                         className="px-6 py-3 bg-indigo-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-indigo-100 dark:shadow-none hover:bg-slate-900 transition-all flex items-center gap-2"
+                         className="px-6 py-3 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-100 dark:shadow-none hover:bg-slate-900 transition-all flex items-center gap-2"
                        >
                           <Download className="w-4 h-4" /> Gerar PDF
                        </button>
@@ -349,15 +349,15 @@ export default function PropostasContratosPro() {
                        {activeTab === 'proposta' ? (
                          <div className="space-y-12">
                             <div className="text-center space-y-4">
-                               <div className="w-20 h-20 bg-indigo-600 rounded-2xl mx-auto flex items-center justify-center text-white"><FileCheck className="w-10 h-10" /></div>
+                               <div className="w-20 h-20 bg-blue-600 rounded-2xl mx-auto flex items-center justify-center text-white"><FileCheck className="w-10 h-10" /></div>
                                <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase">{proposalContent.title}</h2>
-                               <div className="h-1 w-20 bg-indigo-600 mx-auto" />
+                               <div className="h-1 w-20 bg-blue-600 mx-auto" />
                             </div>
 
                             <p className="text-lg text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed">{proposalContent.intro}</p>
 
                             <div className="space-y-4">
-                               <h4 className="text-xs font-black text-indigo-600 uppercase tracking-widest">Escopo de Trabalho</h4>
+                               <h4 className="text-xs font-black text-blue-600 uppercase tracking-widest">Escopo de Trabalho</h4>
                                <p className="text-lg text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed bg-slate-50 dark:bg-slate-800/50 p-8 rounded-2xl border border-slate-100 dark:border-slate-800">{proposalContent.scope}</p>
                             </div>
 
@@ -442,7 +442,7 @@ export default function PropostasContratosPro() {
 
               {/* Action Footer */}
               <div className="flex flex-col md:flex-row items-center justify-between gap-8 p-12 bg-slate-900 rounded-[40px] text-white overflow-hidden relative shadow-2xl">
-                 <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none"><ShieldCheck className="w-64 h-64 text-indigo-500" /></div>
+                 <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none"><ShieldCheck className="w-64 h-64 text-blue-500" /></div>
                  <div className="flex items-center gap-6 relative z-10 text-center md:text-left">
                     <div className="w-16 h-16 bg-white/20 rounded-3xl flex items-center justify-center"><Download className="w-8 h-8 text-white" /></div>
                     <div>

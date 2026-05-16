@@ -45,14 +45,14 @@ export default function Register() {
            </form>
 
            <p className="text-center text-sm font-medium text-slate-500">
-              Já possui conta? <Link to="/login" className="text-indigo-600 font-bold hover:underline">Fazer login</Link>
+              Já possui conta? <Link to="/login" className="text-blue-600 font-bold hover:underline">Fazer login</Link>
            </p>
         </div>
 
         <div className="hidden lg:flex flex-col justify-between p-16 bg-slate-900 text-white relative">
            <div className="absolute top-0 right-0 p-12 opacity-10"><LayoutGrid className="w-48 h-48" /></div>
            <div className="relative z-10 space-y-6">
-              <h1 className="text-5xl font-black tracking-tighter leading-none">Benefícios de <br /><span className="text-indigo-400">Ser Parceiro.</span></h1>
+              <h1 className="text-5xl font-black tracking-tighter leading-none">Benefícios de <br /><span className="text-blue-400">Ser Parceiro.</span></h1>
               <ul className="space-y-6">
                  {[
                    "Acesso ao Marketplace CaaS",

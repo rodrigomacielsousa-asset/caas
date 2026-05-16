@@ -66,7 +66,7 @@ export const ChatAssistant = () => {
             className="w-[350px] bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden mb-4"
           >
             {/* Header */}
-            <div className="bg-indigo-600 p-4 text-white flex justify-between items-center">
+            <div className="bg-blue-600 p-4 text-white flex justify-between items-center">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
                   <Bot className="w-6 h-6" />
@@ -98,7 +98,7 @@ export const ChatAssistant = () => {
                       <div className={cn(
                         "max-w-[85%] p-3 rounded-2xl text-sm shadow-sm",
                         m.role === 'user' 
-                          ? "bg-indigo-600 text-white rounded-tr-none" 
+                          ? "bg-blue-600 text-white rounded-tr-none" 
                           : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-100 dark:border-slate-700 rounded-tl-none"
                       )}>
                         {m.content}
@@ -126,12 +126,12 @@ export const ChatAssistant = () => {
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                       placeholder="Como comprar uma solução?"
-                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 pr-12 text-sm focus:outline-none focus:border-indigo-500 transition-all dark:text-white"
+                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 pr-12 text-sm focus:outline-none focus:border-blue-500 transition-all dark:text-white"
                     />
                     <button 
                       onClick={handleSend}
                       disabled={isLoading || !input.trim()}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-all"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-all"
                     >
                       <Send className="w-4 h-4" />
                     </button>
@@ -152,7 +152,7 @@ export const ChatAssistant = () => {
         }}
         className={cn(
           "w-16 h-16 rounded-full shadow-2xl flex items-center justify-center transition-all duration-500",
-          isOpen ? "bg-white text-indigo-600 rotate-90 opacity-0 pointer-events-none" : "bg-indigo-600 text-white"
+          isOpen ? "bg-white text-blue-600 rotate-90 opacity-0 pointer-events-none" : "bg-blue-600 text-white"
         )}
       >
         <MessageCircle className="w-8 h-8" />

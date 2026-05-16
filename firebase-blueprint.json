@@ -1,5 +1,81 @@
 {
   "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "Software solution offered in the marketplace",
+      "type": "object",
+      "properties": {
+        "slug": { "type": "string" },
+        "name": { "type": "string" },
+        "priceLabel": { "type": "string" },
+        "priceValue": { "type": "number" },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "beta", "inactive", "coming_soon"] },
+        "category": { "type": "string" },
+        "features": { "type": "array" },
+        "badges": { "type": "array" },
+        "isFeatured": { "type": "boolean" },
+        "type": { "type": "string", "enum": ["free", "one_time", "subscription", "usage", "quote"] }
+      },
+      "required": ["slug", "name", "priceValue"]
+    },
+    "Submission": {
+      "title": "Partner Submission",
+      "description": "Solution submitted by a partner/contributor",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "productType": { "type": "string" },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "analyzing", "approved", "rejected"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["name", "email", "description"]
+    },
+    "CheckoutRequest": {
+      "title": "Checkout Request",
+      "description": "Order records for auditing and payment status",
+      "type": "object",
+      "properties": {
+        "userEmail": { "type": "string", "format": "email" },
+        "items": { "type": "array" },
+        "totalLabel": { "type": "string" },
+        "totalValue": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "paid", "expired", "failed"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["userEmail", "items", "totalValue"]
+    },
+    "BlogPost": {
+      "title": "Blog Post",
+      "description": "News and education articles",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "slug": { "type": "string" },
+        "summary": { "type": "string" },
+        "content": { "type": "string" },
+        "image": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["title", "slug", "content"]
+    },
+    "Entitlement": {
+      "title": "Entitlement",
+      "description": "Access grant for a specific product",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "productSlug": { "type": "string" },
+        "grantedAt": { "type": "string" },
+        "status": { "type": "string" },
+        "source": { "type": "string" }
+      },
+      "required": ["userId", "productSlug"]
+    },
     "User": {
       "title": "User Profile",
       "description": "Premium user account data",
@@ -11,44 +87,32 @@
         "status": { "type": "string" }
       },
       "required": ["uid", "email"]
-    },
-    "Document": {
-      "title": "Document (NF-e/XML)",
-      "description": "Captured or consulted NF-e data",
-      "type": "object",
-      "properties": {
-        "ownerId": { "type": "string" },
-        "chave": { "type": "string" },
-        "type": { "type": "string" },
-        "emitente": { "type": "string" },
-        "valor": { "type": "number" },
-        "xml": { "type": "string" }
-      }
-    },
-    "MonitoredClient": {
-      "title": "Monitored Client",
-      "description": "CNPJ registered for automatic monitoring",
-      "type": "object",
-      "properties": {
-        "ownerId": { "type": "string" },
-        "cnpj": { "type": "string" },
-        "nome": { "type": "string" },
-        "ultNSU": { "type": "string" }
-      }
     }
   },
   "firestore": {
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Marketplace items"
+    },
+    "/submissions/{submissionId}": {
+      "schema": "Submission",
+      "description": "Partner solution proposals"
+    },
+    "/checkoutRequests/{requestId}": {
+      "schema": "CheckoutRequest",
+      "description": "Audit log for checkout attempts"
+    },
+    "/posts/{postId}": {
+      "schema": "BlogPost",
+      "description": "Educational content articles"
+    },
+    "/entitlements/{entitlementId}": {
+      "schema": "Entitlement",
+      "description": "Individual product access rights"
+    },
     "/users/{userId}": {
       "schema": "User",
-      "description": "Public and private user profile data"
-    },
-    "/documents/{docId}": {
-      "schema": "Document",
-      "description": "Individual documents (NF-e) per user"
-    },
-    "/nfeMonitoredClients/{clientId}": {
-      "schema": "MonitoredClient",
-      "description": "Clients registered for SEFAZ monitoring"
+      "description": "User profiles and generic plan status"
     }
   }
 }

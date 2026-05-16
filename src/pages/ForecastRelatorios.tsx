@@ -66,7 +66,7 @@ export default function ForecastRelatorios() {
               <button className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 rounded-xl font-bold text-sm transition-all">
                 <Filter className="w-4 h-4" /> Filtros
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-indigo-100">
+              <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-100">
                 <Download className="w-4 h-4" /> Exportar PDF
               </button>
             </div>
@@ -81,7 +81,7 @@ export default function ForecastRelatorios() {
             onClick={() => setScenario('optimistic')}
             className={cn(
               "px-6 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2",
-              scenario === 'optimistic' ? "bg-indigo-600 text-white shadow-lg" : "text-slate-500"
+              scenario === 'optimistic' ? "bg-blue-600 text-white shadow-lg" : "text-slate-500"
             )}
           >
             <TrendingUp className="w-4 h-4" /> Cenário Otimista
@@ -107,10 +107,10 @@ export default function ForecastRelatorios() {
           >
             <div className="flex justify-between items-center mb-8">
                <h3 className="font-bold flex items-center gap-2 text-slate-800 dark:text-white">
-                 <BarChart3 className="w-5 h-5 text-indigo-600" /> Fluxo de Caixa Projetado
+                 <BarChart3 className="w-5 h-5 text-blue-600" /> Fluxo de Caixa Projetado
                </h3>
                <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                  <span className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-indigo-600" /> Receita</span>
+                  <span className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-600" /> Receita</span>
                   <span className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-rose-500" /> Despesas</span>
                </div>
             </div>
@@ -146,7 +146,7 @@ export default function ForecastRelatorios() {
                className="bg-white dark:bg-slate-900 p-8 rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-sm"
              >
                 <h3 className="font-bold flex items-center gap-2 mb-8">
-                  <PieIcon className="w-5 h-5 text-indigo-600" /> Canais de Receita
+                  <PieIcon className="w-5 h-5 text-blue-600" /> Canais de Receita
                 </h3>
                 <div className="h-64 relative">
                    <ResponsiveContainer width="100%" height="100%">
@@ -187,14 +187,14 @@ export default function ForecastRelatorios() {
                initial={{ opacity: 0, y: 20 }}
                animate={{ opacity: 1, y: 0 }}
                transition={{ delay: 0.2 }}
-               className="bg-gradient-to-br from-indigo-600 to-violet-700 p-8 rounded-[32px] text-white shadow-xl"
+               className="bg-gradient-to-br from-blue-600 to-violet-700 p-8 rounded-[32px] text-white shadow-xl"
              >
                 <div className="flex items-center gap-3 mb-6">
-                   <Target className="w-6 h-6 text-indigo-200" />
+                   <Target className="w-6 h-6 text-blue-200" />
                    <h3 className="font-bold">Meta do Trimestre</h3>
                 </div>
                 <div className="space-y-2">
-                   <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-indigo-100">
+                   <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-blue-100">
                       <span>Progresso</span>
                       <span>72%</span>
                    </div>
@@ -206,7 +206,7 @@ export default function ForecastRelatorios() {
                         className="h-full bg-white rounded-full shadow-[0_0_15px_rgba(255,255,255,0.5)]" 
                       />
                    </div>
-                   <p className="text-[10px] text-indigo-100 mt-4 leading-relaxed">Faltam **R$ 28.500** para atingir a meta de expansão do Q2.</p>
+                   <p className="text-[10px] text-blue-100 mt-4 leading-relaxed">Faltam **R$ 28.500** para atingir a meta de expansão do Q2.</p>
                 </div>
              </motion.div>
           </div>
@@ -246,12 +246,12 @@ export default function ForecastRelatorios() {
 
         {/* Smart Recommendations */}
         <div className="mt-12 p-8 bg-white dark:bg-slate-900 rounded-[48px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden relative group">
-           <div className="absolute top-0 right-0 p-8 text-indigo-600/10 group-hover:text-indigo-600/20 transition-all">
+           <div className="absolute top-0 right-0 p-8 text-blue-600/10 group-hover:text-blue-600/20 transition-all">
               <Sparkles className="w-32 h-32" />
            </div>
            <div className="relative z-10 flex flex-col lg:flex-row items-center gap-12">
-              <div className="w-24 h-24 bg-indigo-50 dark:bg-indigo-900/30 rounded-[32px] flex items-center justify-center flex-shrink-0">
-                 <Target className="w-10 h-10 text-indigo-600" />
+              <div className="w-24 h-24 bg-blue-50 dark:bg-blue-900/30 rounded-[32px] flex items-center justify-center flex-shrink-0">
+                 <Target className="w-10 h-10 text-blue-600" />
               </div>
               <div className="flex-1 space-y-4 text-center lg:text-left">
                  <h2 className="text-2xl font-black text-slate-800 dark:text-white">Insight da IA: Otimize seu Fluxo de Caixa</h2>
@@ -259,7 +259,7 @@ export default function ForecastRelatorios() {
                    Detectamos que 45% do seu faturamento em Julho será de honorários fixos. Sugerimos antecipar o disparo das propostas de consultoria variável para manter a liquidez acima de 15%.
                  </p>
               </div>
-              <button className="btn-primary py-4 px-10 rounded-2xl font-bold flex items-center gap-2 group whitespace-nowrap shadow-xl shadow-indigo-100">
+              <button className="btn-primary py-4 px-10 rounded-2xl font-bold flex items-center gap-2 group whitespace-nowrap shadow-xl shadow-blue-100">
                 Aplicar Estratégia <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
            </div>

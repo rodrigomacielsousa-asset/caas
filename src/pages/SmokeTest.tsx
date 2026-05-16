@@ -60,10 +60,10 @@ export default function SmokeTest() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-32 pb-20">
       <div className="max-w-4xl mx-auto px-4">
         <div className="bg-white dark:bg-slate-900 rounded-[40px] shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
-          <div className="bg-indigo-600 p-10 text-white flex justify-between items-center">
+          <div className="bg-blue-600 p-10 text-white flex justify-between items-center">
             <div className="space-y-1">
               <h1 className="text-3xl font-black tracking-tighter uppercase">Painel de Diagnóstico</h1>
-              <p className="text-indigo-200 text-xs font-bold uppercase tracking-widest">MicroCaaS Smoke Test v1.0</p>
+              <p className="text-blue-200 text-xs font-bold uppercase tracking-widest">MicroCaaS Smoke Test v1.0</p>
             </div>
             <button 
               onClick={() => {
@@ -110,7 +110,7 @@ export default function SmokeTest() {
                    {res.path && (
                      <Link 
                        to={res.path}
-                       className="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-xl transition-all text-slate-400 hover:text-indigo-600"
+                       className="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-xl transition-all text-slate-400 hover:text-blue-600"
                        title="Testar Link"
                      >
                         <ExternalLink className="w-4 h-4" />
@@ -133,7 +133,7 @@ export default function SmokeTest() {
             </div>
             
             <div className="flex justify-center pt-4">
-               <Link to="/" className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-indigo-600 flex items-center gap-2">
+               <Link to="/" className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-blue-600 flex items-center gap-2">
                  <ChevronRight className="w-3 h-3" /> Voltar para Home
                </Link>
             </div>

@@ -16,7 +16,7 @@ export default function BundleDetail() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4">Combo não encontrado</h2>
-          <Link to="/microcaas" className="text-indigo-600 font-bold hover:underline">Voltar ao Marketplace</Link>
+          <Link to="/microcaas" className="text-blue-600 font-bold hover:underline">Voltar ao Marketplace</Link>
         </div>
       </div>
     );
@@ -29,10 +29,10 @@ export default function BundleDetail() {
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 pb-24">
       {/* Background Decor */}
-      <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-indigo-50/50 dark:from-indigo-900/10 to-transparent -z-10" />
+      <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-blue-50/50 dark:from-blue-900/10 to-transparent -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">
-        <Link to="/microcaas" className="inline-flex items-center gap-2 text-slate-500 hover:text-indigo-600 font-bold text-sm mb-12 transition-colors">
+        <Link to="/microcaas" className="inline-flex items-center gap-2 text-slate-500 hover:text-blue-600 font-bold text-sm mb-12 transition-colors">
           <ArrowLeft className="w-4 h-4" /> Voltar ao Marketplace
         </Link>
 
@@ -48,7 +48,7 @@ export default function BundleDetail() {
                 <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
                   <Zap className="w-3 h-3" /> Bundle Exclusivo
                 </span>
-                <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-[10px] font-bold uppercase tracking-widest">
                   Economia de 35%
                 </span>
               </div>
@@ -65,8 +65,8 @@ export default function BundleDetail() {
               <div className="grid grid-cols-1 gap-4">
                 {includedItems.map((item) => (
                   <div key={item.id} className="flex items-start gap-4 p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm transition-all hover:scale-[1.02]">
-                    <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Package className="w-6 h-6 text-indigo-600" />
+                    <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Package className="w-6 h-6 text-blue-600" />
                     </div>
                     <div>
                       <h4 className="font-bold text-slate-900 dark:text-white">{item.name}</h4>
@@ -103,7 +103,7 @@ export default function BundleDetail() {
           >
             <div className="bg-white dark:bg-slate-900 rounded-[40px] p-10 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-8 relative overflow-hidden">
               {/* Promo Decor */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-600 rotate-45 translate-x-16 -translate-y-16 flex items-end justify-center pb-4">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600 rotate-45 translate-x-16 -translate-y-16 flex items-end justify-center pb-4">
                  <Sparkles className="w-6 h-6 text-white -rotate-45" />
               </div>
 
@@ -133,7 +133,7 @@ export default function BundleDetail() {
                     "w-full py-5 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all text-lg shadow-lg",
                     isInCart 
                       ? "bg-slate-100 text-slate-400 cursor-not-allowed" 
-                      : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200 hover:scale-[1.02]"
+                      : "bg-blue-600 text-white hover:bg-blue-700 shadow-blue-200 hover:scale-[1.02]"
                   )}
                 >
                   <ShoppingCart className="w-6 h-6" />
@@ -146,11 +146,11 @@ export default function BundleDetail() {
 
               <div className="pt-8 border-t border-slate-100 dark:border-slate-800 space-y-4">
                  <div className="flex items-center gap-3">
-                    <ShieldCheck className="w-5 h-5 text-indigo-600" />
+                    <ShieldCheck className="w-5 h-5 text-blue-600" />
                     <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Garantia de Satisfação 7 dias</span>
                  </div>
                  <div className="flex items-center gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-indigo-600" />
+                    <CheckCircle2 className="w-5 h-5 text-blue-600" />
                     <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Certificado Homologado CaaS</span>
                  </div>
               </div>

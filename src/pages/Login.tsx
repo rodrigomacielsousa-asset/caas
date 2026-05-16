@@ -48,11 +48,31 @@ export default function Login() {
     setIsLoading(true);
     setError(null);
 
+    // Mock login for the user's requested test account
+    if (email === 'teste@microcaas.com.br' && password === '178801') {
+       localStorage.setItem('mock_user', JSON.stringify({
+         uid: 'teste-microcaas-uid',
+         email: 'teste@microcaas.com.br',
+         displayName: 'Usuário Teste',
+         plano: 'free'
+       }));
+       handleSuccessfulLogin('teste-microcaas-uid');
+       setIsLoading(false);
+       return;
+    }
+
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       handleSuccessfulLogin(userCredential.user.uid);
     } catch (err: any) {
-      setError(err.message || 'Erro ao realizar login');
+      console.error(err);
+      let msg = 'Erro ao realizar login. Verifique seu e-mail e senha.';
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        msg = 'E-mail ou senha incorretos.';
+      } else if (err.code === 'auth/too-many-requests') {
+        msg = 'Muitas tentativas sem sucesso. Tente novamente mais tarde.';
+      }
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
@@ -116,8 +136,8 @@ export default function Login() {
         
         <div className="space-y-8 relative z-10">
           <div className="flex flex-col items-center text-center gap-2">
-            <h1 className="text-3xl font-black text-slate-900 tracking-tighter italic uppercase leading-none">Acesso Hub</h1>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">Entre com sua conta MicroCaaS</p>
+            <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">Entrar no Portal</h1>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Acesse suas ferramentas e relatórios</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-5">
@@ -134,7 +154,7 @@ export default function Login() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Seu email corporativo"
+                  placeholder="Seu e-mail"
                   required
                   className="w-full pl-16 pr-6 py-6 bg-slate-50 border-none rounded-3xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-blue-100 transition-all outline-none"
                 />
@@ -146,7 +166,7 @@ export default function Login() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Senha ultra-secreta"
+                  placeholder="Sua senha"
                   required
                   className="w-full pl-16 pr-16 py-6 bg-slate-50 border-none rounded-3xl text-sm font-bold text-slate-900 focus:ring-4 focus:ring-blue-100 transition-all outline-none"
                 />
@@ -203,7 +223,7 @@ export default function Login() {
 
           <div className="pt-6 border-t border-slate-100 text-center">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-              Não tem uma conta? <Link to="/signup" className="text-blue-600 hover:underline">Sussurrar Novo Acesso</Link>
+              Ainda não tem acesso? <Link to="/signup" className="text-blue-600 hover:underline">Criar conta gratuita</Link>
             </p>
           </div>
         </div>

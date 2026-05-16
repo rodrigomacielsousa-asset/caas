@@ -53,7 +53,7 @@ export default function APInteligente() {
               </div>
             </div>
             <div className="flex gap-3">
-              <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl font-bold text-sm shadow-indigo-200 shadow-lg">
+              <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl font-bold text-sm shadow-blue-200 shadow-lg">
                  <Plus className="w-4 h-4" /> Nova Conta
               </button>
             </div>
@@ -70,8 +70,8 @@ export default function APInteligente() {
             className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm"
           >
             <div className="flex justify-between items-start mb-4">
-              <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl">
-                <DollarSign className="w-6 h-6 text-indigo-600" />
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-2xl">
+                <DollarSign className="w-6 h-6 text-blue-600" />
               </div>
               <span className="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-2 py-1 rounded-full">+12% vs mês ant.</span>
             </div>
@@ -92,7 +92,7 @@ export default function APInteligente() {
             </div>
             <h3 className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-1">Aguardando Alçada</h3>
             <div className="text-2xl font-bold text-slate-900 dark:text-white">08 <span className="text-sm font-normal text-slate-400">títulos</span></div>
-            <button className="text-xs text-indigo-600 font-bold mt-2 hover:underline">Ver aprovações</button>
+            <button className="text-xs text-blue-600 font-bold mt-2 hover:underline">Ver aprovações</button>
           </motion.div>
 
           <motion.div 
@@ -140,7 +140,7 @@ export default function APInteligente() {
                     <input 
                       type="text" 
                       placeholder="Buscar título..."
-                      className="bg-slate-50 dark:bg-slate-800 border-none rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500" 
+                      className="bg-slate-50 dark:bg-slate-800 border-none rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-blue-500" 
                     />
                   </div>
                   <button className="p-2 bg-slate-50 dark:bg-slate-800 rounded-xl">
@@ -165,7 +165,7 @@ export default function APInteligente() {
                       <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
                         <td className="px-6 py-4">
                           <div className="flex flex-col">
-                            <span className="font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 transition-colors">{item.title}</span>
+                            <span className="font-bold text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors">{item.title}</span>
                             <span className="text-[10px] text-slate-400">{item.category}</span>
                           </div>
                         </td>
@@ -183,7 +183,7 @@ export default function APInteligente() {
                             "px-2 py-1 rounded-md text-[10px] font-bold uppercase",
                             item.status === 'Aprovado' ? "bg-emerald-100 text-emerald-700" :
                             item.status === 'Vencido' ? "bg-rose-100 text-rose-700" :
-                            item.status === 'Agendado' ? "bg-indigo-100 text-indigo-700" : "bg-amber-100 text-amber-700"
+                            item.status === 'Agendado' ? "bg-blue-100 text-blue-700" : "bg-amber-100 text-amber-700"
                           )}>
                             {item.status}
                           </span>
@@ -204,25 +204,25 @@ export default function APInteligente() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-gradient-to-br from-indigo-600 to-violet-700 p-8 rounded-3xl text-white shadow-xl">
+              <div className="bg-gradient-to-br from-blue-600 to-violet-700 p-8 rounded-3xl text-white shadow-xl">
                  <div className="flex items-center gap-3 mb-6">
-                    <FileText className="w-6 h-6 text-indigo-200" />
+                    <FileText className="w-6 h-6 text-blue-200" />
                     <h3 className="font-bold">IA Workflow</h3>
                  </div>
-                 <p className="text-indigo-100 text-sm mb-6">Processamos 45 novos e-mails hoje. 42 foram classificados automaticamente para o fluxo de aprovação.</p>
+                 <p className="text-blue-100 text-sm mb-6">Processamos 45 novos e-mails hoje. 42 foram classificados automaticamente para o fluxo de aprovação.</p>
                  <button className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-xl font-bold text-xs transition-all">
                     Revisar Pendentes <ArrowRight className="w-4 h-4" />
                  </button>
               </div>
               <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800">
                  <div className="flex items-center gap-3 mb-6">
-                    <Users className="w-6 h-6 text-indigo-600" />
+                    <Users className="w-6 h-6 text-blue-600" />
                     <h3 className="font-bold">Equipe Contábil</h3>
                  </div>
                  <div className="space-y-4">
                     <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-2xl">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold">D</div>
+                        <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">D</div>
                         <span className="text-sm font-bold">Diego S.</span>
                       </div>
                       <span className="text-[10px] font-bold text-slate-400">12 tickets abertos</span>
@@ -243,7 +243,7 @@ export default function APInteligente() {
           <div className="space-y-8">
             <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
               <h3 className="font-bold mb-6 flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-indigo-600" /> Centro de Custo
+                <BarChart3 className="w-5 h-5 text-blue-600" /> Centro de Custo
               </h3>
               <div className="space-y-6">
                 {COST_CENTERS.map(center => (
@@ -256,7 +256,7 @@ export default function APInteligente() {
                         <div 
                           className={cn(
                             "h-full rounded-full transition-all duration-1000",
-                            center.current > center.budget ? "bg-rose-500" : "bg-indigo-600"
+                            center.current > center.budget ? "bg-rose-500" : "bg-blue-600"
                           )}
                           style={{ width: `${Math.min((center.current / center.budget) * 100, 100)}%` }}
                         />

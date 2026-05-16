@@ -71,11 +71,11 @@ export default function ConsultaNFe() {
     <div className="min-h-screen bg-white dark:bg-slate-950 pt-32 pb-20">
       <div className="max-w-4xl mx-auto px-4">
         <div className="text-center space-y-6 mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 rounded-full text-[10px] font-black uppercase tracking-widest">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest">
             Ferramentas Fiscais
           </div>
           <h1 className="text-5xl font-black text-slate-900 dark:text-white tracking-tighter italic uppercase leading-none">
-            Consulta <span className="text-indigo-600">NF-e</span>
+            Consulta <span className="text-blue-600">NF-e</span>
           </h1>
           <p className="text-slate-500 font-medium italic text-lg max-w-2xl mx-auto">
             Consulte qualquer nota fiscal eletrônica apenas com a chave de acesso. Baixe XML e PDF instantaneamente.
@@ -93,13 +93,13 @@ export default function ConsultaNFe() {
                   value={chave}
                   onChange={(e) => setChave(e.target.value)}
                   placeholder="0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000"
-                  className="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-3xl py-6 px-8 text-xl font-mono tracking-wider focus:border-indigo-600 focus:ring-0 transition-all placeholder:text-slate-200 dark:placeholder:text-slate-700"
+                  className="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-3xl py-6 px-8 text-xl font-mono tracking-wider focus:border-blue-600 focus:ring-0 transition-all placeholder:text-slate-200 dark:placeholder:text-slate-700"
                 />
                 <div className="absolute right-3 top-3">
                   <button 
                     type="submit"
                     disabled={loading}
-                    className="h-14 w-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center hover:bg-slate-900 transition-all shadow-lg shadow-indigo-100 dark:shadow-none disabled:opacity-50"
+                    className="h-14 w-14 bg-blue-600 text-white rounded-2xl flex items-center justify-center hover:bg-slate-900 transition-all shadow-lg shadow-blue-100 dark:shadow-none disabled:opacity-50"
                   >
                     {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : <Search className="w-6 h-6" />}
                   </button>
@@ -144,7 +144,7 @@ export default function ConsultaNFe() {
                 <div className="flex flex-wrap items-center justify-center gap-4">
                   <button 
                     onClick={() => result.xml && nfeService.downloadXML(result.chave, result.xml)}
-                    className="flex items-center gap-2 px-8 py-4 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-indigo-600 transition-all"
+                    className="flex items-center gap-2 px-8 py-4 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-blue-600 transition-all"
                   >
                     <Download className="w-4 h-4" /> Baixar XML
                   </button>
@@ -157,10 +157,10 @@ export default function ConsultaNFe() {
                 </div>
 
                 {!user && (
-                  <div className="mt-12 p-6 bg-indigo-50 dark:bg-indigo-900/20 rounded-3xl border border-indigo-100 dark:border-indigo-800 text-center max-w-sm">
-                    <Zap className="w-8 h-8 text-indigo-600 mx-auto mb-4" />
+                  <div className="mt-12 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-3xl border border-blue-100 dark:border-blue-800 text-center max-w-sm">
+                    <Zap className="w-8 h-8 text-blue-600 mx-auto mb-4" />
                     <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-4">Quer monitorar notas fiscais automaticamente?</p>
-                    <Link to="/signup" className="inline-block text-[10px] font-black text-indigo-600 uppercase tracking-widest hover:underline decoration-2">Crie sua conta grátis agora →</Link>
+                    <Link to="/signup" className="inline-block text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline decoration-2">Crie sua conta grátis agora →</Link>
                   </div>
                 )}
               </motion.div>
@@ -177,7 +177,7 @@ export default function ConsultaNFe() {
            ].map((f, i) => (
              <div key={i} className="text-center space-y-4">
                <div className="w-12 h-12 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
-                 <f.icon className="w-6 h-6 text-indigo-600" />
+                 <f.icon className="w-6 h-6 text-blue-600" />
                </div>
                <h3 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white italic">{f.title}</h3>
                <p className="text-[11px] font-medium text-slate-500 italic">{f.desc}</p>

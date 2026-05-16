@@ -262,13 +262,12 @@ export default function ProductDetail() {
     return <Navigate to="/solucoes" replace />;
   }
 
-  // Estados para CheckCNPJ 360
-  const [cnpjInput, setCnpjInput] = useState('');
+  // Remover estados para CheckCNPJ 360 que não existem mais ou não são necessários
   const [isConsulting, setIsConsulting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [cnpjData, setCnpjData] = useState<NormalizedCNPJProfile | null>(null);
   const [showReport, setShowReport] = useState(false);
-  const [isPremium, setIsPremium] = useState(false);
+  const [isPremium, setIsPremium] = useState(true); 
   
   // Scanners State
   const [connectorResults, setConnectorResults] = useState<Record<string, ConnectorResult>>({
@@ -287,32 +286,13 @@ export default function ProductDetail() {
     { id: 'tcu', name: 'Consulta TCU Consolidada', type: 'assisted' },
   ];
   
-  // User Data State
   const [user, setUser] = useState<any>(null);
-  const [credits, setCredits] = useState<number>(0);
-  const [isUserPremium, setIsUserPremium] = useState(false);
+  const [isUserPremium, setIsUserPremium] = useState(true); // Forçar premium
+  const [cnpjInput, setCnpjInput] = useState('');
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (u) => {
       setUser(u);
-      if (u) {
-        const userRef = doc(db, 'users', u.uid);
-        const userDoc = await getDoc(userRef);
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          setCredits(userData.credits || 0);
-          setIsUserPremium(userData.isPro || false);
-        } else {
-          // If profile doesn't exist, create one with 0 credits
-          await setDoc(userRef, {
-            uid: u.uid,
-            email: u.email,
-            credits: 0,
-            isPro: false,
-            createdAt: serverTimestamp()
-          }, { merge: true });
-        }
-      }
     });
     return () => unsubscribe();
   }, []);
@@ -508,74 +488,40 @@ export default function ProductDetail() {
     };
   }, [cnpjData, connectorResults]);
 
-  const handleUnlockPremium = async () => {
-    if (!user) {
-      navigate('/login', { state: { from: `/solucoes/${slug}` } });
-      return;
-    }
+  const handleUnlockPremium = () => {
+    setIsPremium(true);
+  };
 
-    if (isUserPremium) {
-      setIsPremium(true);
-      return;
-    }
-
-    if (credits > 0) {
-      try {
-        const userRef = doc(db, 'users', user.uid);
-        await updateDoc(userRef, {
-          credits: increment(-1)
-        });
-        
-        // Log consultation
-        const logRef = doc(collection(db, 'logs', user.uid, 'consultas'), `${Date.now()}`);
-        await setDoc(logRef, {
-          cnpj: cnpjData?.cnpj,
-          timestamp: serverTimestamp(),
-          status: 'success'
-        });
-
-        setCredits(prev => prev - 1);
-        setIsPremium(true);
-      } catch (err) {
-        console.error('Charge error:', err);
-        setApiError('Erro ao processar créditos. Tente novamente.');
-      }
-    } else {
-      // Open checkout or payment modal
-      addItem({
-        id: 'credit-single',
-        slug: 'credit-single',
-        name: 'Crédito Consulta Avulsa - CheckCNPJ 360',
-        price: 9,
-        priceLabel: 'R$ 9,00',
-        type: 'individual',
-        pricingModel: 'one_time'
-      });
-      navigate('/checkout');
-    }
+  const handleAddToCart = () => {
+    addItem({
+      id: product.id,
+      slug: product.slug,
+      name: product.name,
+      price: product.pricing.priceValue || 0,
+      priceLabel: product.pricing.priceLabel,
+      type: 'individual',
+      pricingModel: product.pricingModel
+    });
+    navigate('/checkout');
   };
 
   const handleCTA = () => {
-    if (product.pricing.ctaAction === 'checkout') {
-      addItem({
-        id: product.id,
-        slug: product.slug,
-        name: product.name,
-        price: product.pricing.priceValue,
-        priceLabel: product.pricing.priceLabel,
-        type: 'individual',
-        pricingModel: product.pricingModel
-      });
-      navigate('/checkout');
+    const model = product.pricingModel as string;
+    if (model === 'free') {
+       if (product.liveUrl) {
+         navigate(product.liveUrl);
+       }
+       return;
+    }
+
+    if (product.pricing.ctaAction === 'checkout' || model !== 'free') {
+      handleAddToCart();
     } else if (product.pricing.ctaAction === 'contact') {
       navigate('/contato', { state: { product: product.name } });
     } else if (product.pricing.ctaAction === 'open_app') {
        if (product.liveUrl) {
          navigate(product.liveUrl);
-       } else {
-         navigate(`/solucoes/${product.slug}`);
        }
-       window.scrollTo(0, 0);
     }
   };
 
@@ -640,7 +586,7 @@ export default function ProductDetail() {
                        <span className="text-xs font-black uppercase tracking-widest text-slate-400">Homologado 2026</span>
                     </div>
                     <div className="flex items-center gap-3">
-                       <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 rounded-full flex items-center justify-center text-indigo-600"><ShieldCheck className="w-5 h-5" /></div>
+                       <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center text-blue-600"><ShieldCheck className="w-5 h-5" /></div>
                        <span className="text-xs font-black uppercase tracking-widest text-slate-400">Dados Segregados</span>
                     </div>
                  </div>
@@ -650,44 +596,70 @@ export default function ProductDetail() {
               <motion.div 
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                className="bg-slate-900 rounded-[48px] p-10 md:p-14 text-white shadow-2xl relative overflow-hidden group border border-white/5"
+                className="bg-white rounded-[40px] p-8 md:p-12 text-slate-900 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] relative overflow-hidden border border-slate-100"
               >
-                  <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
-                    <Zap className="w-48 h-48 group-hover:scale-110 transition-transform duration-1000" />
+                  <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none text-blue-600">
+                    <ShoppingCart className="w-48 h-48" />
                   </div>
                   
-                  <div className="relative z-10 space-y-10">
+                  <div className="space-y-8 relative z-10">
                      <div className="space-y-2">
-                        <div className="text-xs font-black text-indigo-400 uppercase tracking-[0.2em]">{product.pricingModel === 'subscription' ? 'Assinatura' : product.pricingModel === 'one_time' ? 'Pagamento Único' : product.pricingModel === 'free' ? 'Gratuitous' : 'Especialista'}</div>
-                        <div className="text-6xl font-black tracking-tighter text-white">{product.pricing.priceLabel}</div>
-                        <p className="text-sm text-slate-400 font-medium">{product.pricing.ctaAction === 'checkout' ? 'Ativação imediata pós-checkout.' : 'Consulte condições com nosso time.'}</p>
+                        <div className="text-[10px] font-black text-blue-600 uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full w-fit">Disponível Agora</div>
+                        <div className="text-5xl font-black tracking-tighter text-slate-900">{product.pricing.priceLabel}</div>
+                        <p className="text-sm text-slate-500 font-medium font-serif italic">Entrega digital imediata</p>
                      </div>
 
-                     <div className="space-y-4">
-                        <h4 className="text-[10px] font-black uppercase tracking-widest text-indigo-200 opacity-60">O que você recebe:</h4>
-                        <ul className="grid grid-cols-1 gap-3">
+                     <div className="space-y-4 pb-8 border-b border-slate-100">
+                        <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Recursos inclusos:</h4>
+                        <ul className="space-y-3">
                            {product.pricing.includes.map((item, i) => (
-                             <li key={i} className="flex items-center gap-3 text-sm font-bold"><CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" /> {item}</li>
+                             <li key={i} className="flex items-center gap-3 text-sm font-bold text-slate-600">
+                               <CheckCircle className="w-4 h-4 text-blue-600 shrink-0" /> {item}
+                             </li>
                            ))}
                         </ul>
                      </div>
 
-                     <div className="space-y-4">
-                        <button 
-                           onClick={handleCTA}
-                           className="w-full bg-white text-slate-900 py-6 rounded-3xl font-black text-xl flex items-center justify-center gap-3 hover:bg-indigo-50 transition-all shadow-xl active:scale-95 group/btn"
-                        >
-                           {product.pricing.ctaAction === 'checkout' ? <ShoppingCart className="w-6 h-6" /> : product.pricing.ctaAction === 'contact' ? <MessageSquare className="w-6 h-6" /> : <Play className="w-6 h-6 fill-current" />}
-                           {product.pricing.ctaAction === 'open_app' ? 'Testar agora' : product.pricing.ctaText}
-                           <ArrowRight className="w-5 h-5 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                        </button>
-                        <p className="text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest">Suporte técnico especializado incluso</p>
+                     <div className="flex flex-col gap-4">
+                        {product.pricingModel !== 'free' && (
+                          <button 
+                            onClick={handleAddToCart}
+                            className="w-full bg-blue-600 text-white py-6 rounded-3xl font-black text-xl flex items-center justify-center gap-3 hover:bg-slate-900 transition-all shadow-xl shadow-blue-100 active:scale-95 group/btn"
+                          >
+                            <ShoppingCart className="w-6 h-6" />
+                            Comprar Agora
+                            <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+                          </button>
+                        )}
+                        
+                        {product.liveUrl && (
+                          <button 
+                            onClick={() => navigate(product.liveUrl!)}
+                            className="w-full bg-slate-900 text-white py-6 rounded-3xl font-black text-xl flex items-center justify-center gap-3 hover:bg-blue-600 transition-all active:scale-95"
+                          >
+                            <Play className="w-6 h-6 fill-current" />
+                            Acessar Exemplo
+                          </button>
+                        )}
+
+                        {!product.liveUrl && product.pricingModel === 'free' && (
+                            <button 
+                              onClick={handleCTA}
+                              className="w-full bg-blue-600 text-white py-6 rounded-3xl font-black text-xl flex items-center justify-center gap-3 hover:bg-slate-900 transition-all active:scale-95"
+                            >
+                              Acessar Agora
+                            </button>
+                        )}
+                        
+                        <div className="flex items-center justify-center gap-2 py-4 text-[10px] font-black text-slate-300 uppercase tracking-widest">
+                          <ShieldCheck className="w-4 h-4" /> Pagamento 100% Seguro via Stripe / Mercado Pago
+                        </div>
                      </div>
                   </div>
               </motion.div>
-           </div>
-        </div>
-      </div>
+               </div>
+            </div>
+         </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-24 space-y-32">
          {/* Sales Sections: Dor / Solução / Resultado */}
@@ -777,19 +749,19 @@ export default function ProductDetail() {
 
          {/* Inputs / Outputs */}
          <section className="bg-slate-900 rounded-[64px] p-12 md:p-24 text-white relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/20 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2" />
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/20 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2" />
             
             <div className="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-16">
                <div className="lg:col-span-1 space-y-6">
                   <h2 className="text-5xl font-black tracking-tighter leading-none">O fluxo <br />de dados.</h2>
-                  <p className="text-lg text-indigo-200/60 font-medium">Entenda exatamente o que você fornece e o que recebe como entrega final.</p>
+                  <p className="text-lg text-blue-200/60 font-medium">Entenda exatamente o que você fornece e o que recebe como entrega final.</p>
                </div>
                
                <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-12">
                   <div className="space-y-6">
                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center"><ArrowUpRight className="w-5 h-5 text-white" /></div>
-                        <h4 className="text-sm font-black uppercase tracking-widest text-indigo-400">Entradas (Inputs)</h4>
+                        <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center"><ArrowUpRight className="w-5 h-5 text-white" /></div>
+                        <h4 className="text-sm font-black uppercase tracking-widest text-blue-400">Entradas (Inputs)</h4>
                      </div>
                      <ul className="space-y-3">
                         {product.inputs.map((input, i) => (
@@ -820,13 +792,13 @@ export default function ProductDetail() {
                <div className="grid grid-cols-1 lg:grid-cols-12">
                  <div className="lg:col-span-5 bg-slate-50 dark:bg-slate-800/50 p-12 lg:p-20 border-r border-slate-200 dark:border-slate-800">
                    <div className="space-y-8">
-                     <div className="inline-flex px-3 py-1 bg-indigo-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest">
+                     <div className="inline-flex px-3 py-1 bg-blue-600 text-white rounded-lg text-[10px] font-black uppercase tracking-widest">
                        Live Analyzer 360
                      </div>
-                     <h2 className="text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tighter leading-tight italic">
+                     <h2 className="text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tighter leading-tight">
                        Diagnóstico <br /> de Conformidade.
                      </h2>
-                     <p className="text-lg text-slate-500 font-medium italic font-serif">
+                     <p className="text-lg text-slate-500 font-medium font-serif">
                        Insira um CNPJ para iniciar o escaneamento em tempo real nas bases oficiais.
                      </p>
                      
@@ -834,14 +806,14 @@ export default function ProductDetail() {
                        <div className="relative group">
                          <Search className={cn(
                            "absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 transition-colors",
-                           isConsulting ? "text-indigo-600 animate-pulse" : "text-slate-400 group-focus-within:text-indigo-600"
+                           isConsulting ? "text-blue-600 animate-pulse" : "text-slate-400 group-focus-within:text-blue-600"
                          )} />
                          <input 
                            type="text" 
                            value={cnpjInput}
                            onChange={(e) => setCnpjInput(e.target.value)}
                            placeholder="00.000.000/0001-00"
-                           className="w-full bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-3xl pl-16 pr-6 py-6 text-xl font-black text-slate-900 dark:text-white outline-none transition-all focus:border-indigo-600 focus:ring-8 focus:ring-indigo-600/5 placeholder:text-slate-200 dark:placeholder:text-slate-800" 
+                           className="w-full bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-3xl pl-16 pr-6 py-6 text-xl font-black text-slate-900 dark:text-white outline-none transition-all focus:border-blue-600 focus:ring-8 focus:ring-blue-600/5 placeholder:text-slate-200 dark:placeholder:text-slate-800" 
                          />
                        </div>
                        
@@ -860,7 +832,7 @@ export default function ProductDetail() {
                          disabled={isConsulting}
                          className={cn(
                            "w-full py-6 rounded-3xl font-black uppercase text-sm tracking-widest transition-all overflow-hidden relative group",
-                           isConsulting ? "bg-slate-100 text-slate-400 cursor-wait" : "bg-indigo-600 text-white shadow-xl shadow-indigo-200 dark:shadow-none hover:bg-slate-900"
+                           isConsulting ? "bg-slate-100 text-slate-400 cursor-wait" : "bg-blue-600 text-white shadow-xl shadow-blue-200 dark:shadow-none hover:bg-slate-900"
                          )}
                        >
                          <span className="relative z-10 flex items-center justify-center gap-3">
@@ -900,8 +872,8 @@ export default function ProductDetail() {
                         >
                           <div className="relative">
                             <div className="w-32 h-32 border-4 border-slate-100 dark:border-slate-800 rounded-full" />
-                            <div className="absolute inset-0 border-4 border-t-indigo-600 border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin" />
-                            <Sparkles className="absolute inset-0 m-auto w-8 h-8 text-indigo-600 animate-pulse" />
+                            <div className="absolute inset-0 border-4 border-t-blue-600 border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin" />
+                            <Sparkles className="absolute inset-0 m-auto w-8 h-8 text-blue-600 animate-pulse" />
                           </div>
                           <div className="text-center space-y-2">
                             <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-widest">Escaneando Redes Oficiais</h3>
@@ -928,7 +900,7 @@ export default function ProductDetail() {
                                   <p className="text-xs font-bold text-slate-400 italic">"{cnpjData.nomeFantasia}"</p>
                                 )}
                               </div>
-                              <p className="inline-block px-4 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 rounded-xl text-sm font-black">{cnpjData?.cnpj}</p>
+                              <p className="inline-block px-4 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 rounded-xl text-sm font-black">{cnpjData?.cnpj}</p>
                             </div>
                             
                             <div className="flex items-center gap-6">
@@ -957,21 +929,20 @@ export default function ProductDetail() {
                           {/* Scanners / Connectors Grid */}
                           <div className="space-y-6">
                             <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                              <Activity className="w-4 h-4 text-indigo-600" /> Scanner de Agentes (Connectors)
+                              <Activity className="w-4 h-4 text-blue-600" /> Scanner de Agentes (Connectors)
                             </h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                               {connectors.map(conn => {
                                 const res = connectorResults[conn.id];
-                                const isLocked = !isPremium && conn.id !== 'profile';
+    /* Removido bloqueio por créditos - O usuário solicitou que isso não exista */
+    const isLocked = false; 
 
                                 return (
                                   <div 
                                     key={conn.id} 
                                     className={cn(
                                       "relative group p-6 rounded-3xl border transition-all",
-                                      isLocked 
-                                        ? "bg-slate-50/50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 grayscale opacity-60" 
-                                        : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-indigo-200 shadow-sm"
+                                      "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-blue-200 shadow-sm"
                                     )}
                                   >
                                     <div className="space-y-4">
@@ -982,46 +953,42 @@ export default function ProductDetail() {
                                           res.status === 'ok' ? "bg-emerald-500" :
                                           res.status === 'pendente' ? "bg-rose-500" :
                                           res.status === 'nao_verificado' ? "bg-amber-500" :
-                                          res.status === 'running' ? "bg-indigo-600 animate-pulse" : "bg-slate-300"
+                                          res.status === 'running' ? "bg-blue-600 animate-pulse" : "bg-slate-300"
                                         )} />
                                       </div>
 
                                       <div className="flex items-end justify-between gap-2">
                                         <div className="space-y-1">
                                           <div className="text-xs font-black text-slate-900 dark:text-white uppercase truncate max-w-[120px]">
-                                            {isLocked ? 'BLOQUEADO' : res.label}
+                                            {res.label}
                                           </div>
                                           <div className="text-[10px] font-bold text-slate-400 flex items-center gap-1">
                                             {res.status === 'running' ? 'Processando...' : conn.type.toUpperCase()}
                                           </div>
                                         </div>
-                                        {isLocked ? (
-                                          <Lock className="w-4 h-4 text-slate-400" />
-                                        ) : (
-                                          <div className="flex gap-2">
-                                            {res.evidence?.kind === 'url' && (
-                                              <a 
-                                                href={res.evidence.value} 
-                                                target="_blank" 
-                                                rel="noreferrer" 
-                                                className="p-2 bg-slate-50 dark:bg-slate-800 rounded-lg text-slate-400 hover:text-indigo-600 transition-colors"
-                                              >
-                                                <ExternalLink className="w-4 h-4" />
-                                              </a>
-                                            )}
-                                            {(conn.type === 'assisted' || conn.type === 'upload') && (
-                                              <button 
-                                                onClick={() => {
-                                                  setActiveUploadId(conn.id);
-                                                  fileInputRef.current?.click();
-                                                }}
-                                                className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg text-indigo-600 hover:bg-slate-900 hover:text-white transition-colors"
-                                              >
-                                                <Upload className="w-4 h-4" />
-                                              </button>
-                                            )}
-                                          </div>
-                                        )}
+                                        <div className="flex gap-2">
+                                          {res.evidence?.kind === 'url' && (
+                                            <a 
+                                              href={res.evidence.value} 
+                                              target="_blank" 
+                                              rel="noreferrer" 
+                                              className="p-2 bg-slate-50 dark:bg-slate-800 rounded-lg text-slate-400 hover:text-blue-600 transition-colors"
+                                            >
+                                              <ExternalLink className="w-4 h-4" />
+                                            </a>
+                                          )}
+                                          {(conn.type === 'assisted' || conn.type === 'upload') && (
+                                            <button 
+                                              onClick={() => {
+                                                setActiveUploadId(conn.id);
+                                                fileInputRef.current?.click();
+                                              }}
+                                              className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg text-blue-600 hover:bg-slate-900 hover:text-white transition-colors"
+                                            >
+                                              <Upload className="w-4 h-4" />
+                                            </button>
+                                          )}
+                                        </div>
                                       </div>
                                     </div>
                                   </div>
@@ -1042,27 +1009,27 @@ export default function ProductDetail() {
  
                          {!isPremium ? (
                            <div className="relative group">
-                             <div className="absolute inset-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-[8px] z-10 flex items-center justify-center p-8 rounded-[40px] border-2 border-dashed border-indigo-200 dark:border-indigo-900/50">
+                             <div className="absolute inset-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-[8px] z-10 flex items-center justify-center p-8 rounded-[40px] border-2 border-dashed border-blue-200 dark:border-blue-900/50">
                                <div className="text-center space-y-6 max-w-sm">
-                                 <div className="w-16 h-16 bg-indigo-600 text-white rounded-2xl flex items-center justify-center mx-auto shadow-xl shadow-indigo-200 dark:shadow-none animate-bounce">
+                                 <div className="w-16 h-16 bg-blue-600 text-white rounded-2xl flex items-center justify-center mx-auto shadow-xl shadow-blue-200 dark:shadow-none animate-bounce">
                                    <ShieldCheck className="w-8 h-8" />
                                  </div>
                                  <div className="space-y-2">
                                    <h4 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">Scanner de Pendências</h4>
-                                   <p className="text-sm text-slate-500 font-medium italic">Desbloqueie o diagnóstico detalhado para ver score, restrições federais, trabalhistas e relatório de risco.</p>
+                                   <p className="text-sm text-slate-500 font-medium">Desbloqueie o diagnóstico detalhado para ver score, restrições federais, trabalhistas e relatório de risco.</p>
                                  </div>
                                  <div className="flex flex-col gap-3">
                                    <button 
                                      onClick={handleUnlockPremium}
-                                     className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-slate-900 transition-all flex items-center justify-center gap-3"
+                                     className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-slate-900 transition-all flex items-center justify-center gap-3"
                                    >
                                      Desbloquear análise completa
                                    </button>
                                    <div className="grid grid-cols-2 gap-4">
-                                     <div className="flex items-center gap-2 text-[8px] font-black text-slate-400 uppercase italic"><CheckCircle2 className="w-3 h-3 text-emerald-500" /> Score Completo</div>
-                                     <div className="flex items-center gap-2 text-[8px] font-black text-slate-400 uppercase italic"><CheckCircle2 className="w-3 h-3 text-emerald-500" /> Scanner PGFN</div>
-                                     <div className="flex items-center gap-2 text-[8px] font-black text-slate-400 uppercase italic"><CheckCircle2 className="w-3 h-3 text-emerald-500" /> Relatório PDF</div>
-                                     <div className="flex items-center gap-2 text-[8px] font-black text-slate-400 uppercase italic"><CheckCircle2 className="w-3 h-3 text-emerald-500" /> Upload de Certidões</div>
+                                     <div className="flex items-center gap-2 text-[8px] font-black text-slate-400 uppercase"><CheckCircle2 className="w-3 h-3 text-emerald-500" /> Score Completo</div>
+                                     <div className="flex items-center gap-2 text-[8px] font-black text-slate-400 uppercase"><CheckCircle2 className="w-3 h-3 text-emerald-500" /> Scanner PGFN</div>
+                                     <div className="flex items-center gap-2 text-[8px] font-black text-slate-400 uppercase"><CheckCircle2 className="w-3 h-3 text-emerald-500" /> Relatório PDF</div>
+                                     <div className="flex items-center gap-2 text-[8px] font-black text-slate-400 uppercase"><CheckCircle2 className="w-3 h-3 text-emerald-500" /> Upload de Certidões</div>
                                    </div>
                                  </div>
                                </div>
@@ -1090,7 +1057,7 @@ export default function ProductDetail() {
                                 {/* Empresa Block */}
                                 <div className="space-y-6">
                                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                      <Building2 className="w-4 h-4 text-indigo-600" /> Dados da Empresa
+                                      <Building2 className="w-4 h-4 text-blue-600" /> Dados da Empresa
                                    </h4>
                                    <div className="space-y-4">
                                       <div className="flex gap-4">
@@ -1124,7 +1091,7 @@ export default function ProductDetail() {
                                 {/* Endereço Block */}
                                 <div className="space-y-6">
                                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                      <Map className="w-4 h-4 text-indigo-600" /> Endereço Sede
+                                      <Map className="w-4 h-4 text-blue-600" /> Endereço Sede
                                    </h4>
                                    <div className="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-3xl border border-slate-100 dark:border-slate-800 space-y-3">
                                        <div className="flex items-start gap-3">
@@ -1144,13 +1111,13 @@ export default function ProductDetail() {
                              {/* Sócios Block */}
                              <div className="space-y-6">
                                 <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                   <Users className="w-4 h-4 text-indigo-600" /> Quadro de Sócios e Administradores (QSA)
+                                   <Users className="w-4 h-4 text-blue-600" /> Quadro de Sócios e Administradores (QSA)
                                 </h4>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                    {cnpjData?.qsa && cnpjData.qsa.length > 0 ? (
                                       cnpjData.qsa.map((socio, idx) => (
                                          <div key={idx} className="p-5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl flex items-center gap-4">
-                                            <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 rounded-full flex items-center justify-center text-indigo-600 shrink-0">
+                                            <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center text-blue-600 shrink-0">
                                                <Users className="w-5 h-5" />
                                             </div>
                                             <div>
@@ -1172,8 +1139,8 @@ export default function ProductDetail() {
                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                   <div className="p-8 bg-slate-900 text-white rounded-[40px] md:col-span-2">
                                      <div className="flex items-center gap-3 mb-6">
-                                       <Sparkles className="w-6 h-6 text-indigo-400" />
-                                       <span className="text-xs font-black uppercase tracking-widest text-indigo-200">Diagnóstico Estratégico</span>
+                                       <Sparkles className="w-6 h-6 text-blue-400" />
+                                       <span className="text-xs font-black uppercase tracking-widest text-blue-200">Diagnóstico Estratégico</span>
                                      </div>
                                      <div className="space-y-6">
                                         <div>
@@ -1194,7 +1161,7 @@ export default function ProductDetail() {
                                            </div>
                                            <div>
                                               <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Maturidade</div>
-                                              <div className="text-xl font-black uppercase italic text-indigo-400">
+                                              <div className="text-xl font-black uppercase italic text-blue-400">
                                                  {analysis.yearsFloor >= 5 ? 'Consolidada' : analysis.yearsFloor >= 2 ? 'Em Expansão' : 'Startup/Nova'}
                                               </div>
                                            </div>
@@ -1202,14 +1169,14 @@ export default function ProductDetail() {
                                      </div>
                                   </div>
  
-                                  <div className="p-8 bg-indigo-50 dark:bg-indigo-900/10 rounded-[40px] flex flex-col justify-between border border-indigo-100/50 dark:border-indigo-900/30">
+                                  <div className="p-8 bg-blue-50 dark:bg-blue-900/10 rounded-[40px] flex flex-col justify-between border border-blue-100/50 dark:border-blue-900/30">
                                      <div className="space-y-4">
-                                        <div className="w-12 h-12 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center text-indigo-600 shadow-sm"><Gavel className="w-6 h-6" /></div>
+                                        <div className="w-12 h-12 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center text-blue-600 shadow-sm"><Gavel className="w-6 h-6" /></div>
                                         <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase leading-tight tracking-tighter italic">Compliance <br /> Fiscal 360</h4>
                                      </div>
                                      <div className="space-y-2">
                                         <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase leading-relaxed">Status da situação cadastral validado na base Receita Federal.</p>
-                                        <div className="text-xs font-black text-indigo-600 uppercase tracking-widest">{cnpjData?.situacaoCadastral}</div>
+                                        <div className="text-xs font-black text-blue-600 uppercase tracking-widest">{cnpjData?.situacaoCadastral}</div>
                                       </div>
                                    </div>
                                 </div>
@@ -1225,13 +1192,13 @@ export default function ProductDetail() {
                                      { label: 'PGFN / Débitos', url: 'https://solucoes.receita.fazenda.gov.br/Servicos/CertidaoInternet/PJ/emitir/' },
                                      { label: 'TCU / Licitante', url: 'https://certidoes-apf.apps.tcu.gov.br/' }
                                    ].map((v, i) => (
-                                     <div key={i} className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[32px] p-6 flex flex-col items-center text-center space-y-4 shadow-sm group hover:border-indigo-200 transition-all">
+                                     <div key={i} className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[32px] p-6 flex flex-col items-center text-center space-y-4 shadow-sm group hover:border-blue-200 transition-all">
                                         <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 h-8 flex items-center">{v.label}</span>
                                         <a 
                                            href={v.url} 
                                            target="_blank" 
                                            rel="noreferrer"
-                                           className="w-full py-3 bg-slate-50 dark:bg-slate-800 text-indigo-600 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-all flex items-center justify-center gap-2"
+                                           className="w-full py-3 bg-slate-50 dark:bg-slate-800 text-blue-600 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all flex items-center justify-center gap-2"
                                         >
                                            Verificar <ExternalLink className="w-3 h-3" />
                                         </a>
@@ -1267,15 +1234,15 @@ export default function ProductDetail() {
                                       className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[32px] p-8 flex items-center justify-between group hover:scale-[1.02] transition-all shadow-sm"
                                    >
                                       <div className="flex items-center gap-6">
-                                         <div className="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform">
+                                         <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform">
                                             <PieChart className="w-8 h-8 text-white" />
                                          </div>
                                          <div>
-                                            <h5 className="text-[10px] font-black uppercase tracking-widest text-indigo-600 mb-1">Valida Empresa</h5>
+                                            <h5 className="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-1">Valida Empresa</h5>
                                             <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight">Análise de Viabilidade <br />Tributária / Financeira</p>
                                          </div>
                                       </div>
-                                      <ChevronRight className="w-6 h-6 text-slate-300 group-hover:text-indigo-600 transition-colors" />
+                                      <ChevronRight className="w-6 h-6 text-slate-300 group-hover:text-blue-600 transition-colors" />
                                    </Link>
 
                                    <Link 
@@ -1291,7 +1258,7 @@ export default function ProductDetail() {
                                             <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight">Gerar Proposta e <br />Contrato de Serviço</p>
                                          </div>
                                       </div>
-                                      <ChevronRight className="w-6 h-6 text-slate-300 group-hover:text-indigo-600 transition-colors" />
+                                      <ChevronRight className="w-6 h-6 text-slate-300 group-hover:text-blue-600 transition-colors" />
                                    </Link>
 
                                    <Link 
@@ -1300,14 +1267,14 @@ export default function ProductDetail() {
                                    >
                                       <div className="flex items-center gap-6">
                                          <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform">
-                                            <Briefcase className="w-8 h-8 text-indigo-600" />
+                                            <Briefcase className="w-8 h-8 text-blue-600" />
                                          </div>
                                          <div>
                                             <h5 className="text-[10px] font-black uppercase tracking-widest text-slate-600 mb-1">Office Contábil</h5>
                                             <p className="text-sm font-bold text-slate-900 dark:text-white leading-tight">Cadastrar no <br />Meu Escritório</p>
                                          </div>
                                       </div>
-                                      <ChevronRight className="w-6 h-6 text-slate-300 group-hover:text-indigo-600 transition-colors" />
+                                      <ChevronRight className="w-6 h-6 text-slate-300 group-hover:text-blue-600 transition-colors" />
                                    </Link>
                                 </div>
                              </div>
@@ -1315,7 +1282,7 @@ export default function ProductDetail() {
                              {analysis && (
                                <div className="p-8 bg-slate-50 dark:bg-slate-800/50 rounded-[40px] border border-slate-100 dark:border-slate-800">
                                  <div className="flex items-center gap-2 mb-4">
-                                   <Activity className="w-4 h-4 text-indigo-600" />
+                                   <Activity className="w-4 h-4 text-blue-600" />
                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Atividade Econômica / CNAE</span>
                                  </div>
                                  <p className="text-xs font-bold text-slate-600 dark:text-slate-400 leading-relaxed italic pr-12">
@@ -1354,7 +1321,7 @@ export default function ProductDetail() {
                {product.faq?.map((item, i) => (
                  <div key={i} className="bg-white dark:bg-slate-900 rounded-[32px] p-8 border border-slate-200 dark:border-slate-800 shadow-sm">
                     <h4 className="text-lg font-black text-slate-900 dark:text-white mb-3 flex items-center gap-3">
-                       <HelpCircle className="w-5 h-5 text-indigo-600" /> {item.q}
+                       <HelpCircle className="w-5 h-5 text-blue-600" /> {item.q}
                     </h4>
                     <p className="text-slate-500 font-medium leading-relaxed pl-8">{item.a}</p>
                  </div>
@@ -1362,7 +1329,7 @@ export default function ProductDetail() {
                {!product.faq && (
                  <div className="bg-white dark:bg-slate-900 rounded-[32px] p-8 border border-slate-200 dark:border-slate-800 shadow-sm">
                     <h4 className="text-lg font-black text-slate-900 dark:text-white mb-3 flex items-center gap-3">
-                       <HelpCircle className="w-5 h-5 text-indigo-600" /> Como é feito o suporte?
+                       <HelpCircle className="w-5 h-5 text-blue-600" /> Como é feito o suporte?
                     </h4>
                     <p className="text-slate-500 font-medium leading-relaxed pl-8">O suporte é feito via canais digitais (E-mail e WhatsApp) por especialistas contábeis de segunda a sexta, em horário comercial.</p>
                  </div>
@@ -1377,7 +1344,7 @@ export default function ProductDetail() {
                  <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">Quem usa este parceiro também usa:</h2>
                  <p className="text-slate-500 font-medium italic font-serif">Soluções que potencializam o seu fluxo de trabalho atual.</p>
                </div>
-               <Link to="/solucoes" className="text-xs font-black text-indigo-600 uppercase tracking-widest flex items-center gap-2 hover:gap-3 transition-all">
+               <Link to="/solucoes" className="text-xs font-black text-blue-600 uppercase tracking-widest flex items-center gap-2 hover:gap-3 transition-all">
                   Ver todo o catálogo <ChevronRight className="w-4 h-4" />
                </Link>
             </div>
@@ -1439,27 +1406,27 @@ export default function ProductDetail() {
                   </div>
                   <div className="flex justify-between border-b border-slate-200 dark:border-slate-700 pb-2">
                     <span className="text-slate-400 uppercase tracking-widest font-bold">Situação</span>
-                    <span className="font-black text-indigo-600">{cnpjData?.situacaoCadastral}</span>
+                    <span className="font-black text-blue-600">{cnpjData?.situacaoCadastral}</span>
                   </div>
                   <div className="flex justify-between border-b border-slate-200 dark:border-slate-700 pb-2">
                     <span className="text-slate-400 uppercase tracking-widest font-bold">Risco</span>
-                    <span className="font-black text-indigo-600 uppercase italic">{analysis?.operationalRisk}</span>
+                    <span className="font-black text-blue-600 uppercase italic">{analysis?.operationalRisk}</span>
                   </div>
                   <div className="flex justify-between border-b border-slate-200 dark:border-slate-700 pb-2">
                     <span className="text-slate-400 uppercase tracking-widest font-bold">Score</span>
-                    <span className="font-black text-indigo-600">{analysis?.score}/100</span>
+                    <span className="font-black text-blue-600">{analysis?.score}/100</span>
                   </div>
                   <div className="pt-4">
                     <span className="text-[10px] text-slate-400 uppercase tracking-widest font-bold block mb-2">Conclusão Heurística</span>
                     <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                      Auditoria realizada via CheckCNPJ 360 Core. A empresa apresenta status <span className="font-black text-indigo-600">{analysis?.statusGeral}</span> e score de risco nível <span className="font-black uppercase">{analysis?.operationalRisk}</span>. Recomendamos conferência manual na RFB caso o score seja inferior a 60.
+                      Auditoria realizada via CheckCNPJ 360 Core. A empresa apresenta status <span className="font-black text-blue-600">{analysis?.statusGeral}</span> e score de risco nível <span className="font-black uppercase">{analysis?.operationalRisk}</span>. Recomendamos conferência manual na RFB caso o score seja inferior a 60.
                     </p>
                   </div>
                 </div>
 
                 <button 
                   onClick={() => window.print()}
-                  className="w-full py-6 bg-indigo-600 text-white rounded-3xl font-black uppercase text-xs tracking-widest shadow-xl shadow-indigo-200 dark:shadow-none hover:bg-slate-900 transition-all flex items-center justify-center gap-3"
+                  className="w-full py-6 bg-blue-600 text-white rounded-3xl font-black uppercase text-xs tracking-widest shadow-xl shadow-blue-200 dark:shadow-none hover:bg-slate-900 transition-all flex items-center justify-center gap-3"
                 >
                   <Printer className="w-4 h-4" /> Imprimir Documento
                 </button>

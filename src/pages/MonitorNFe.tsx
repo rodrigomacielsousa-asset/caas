@@ -107,7 +107,7 @@ export default function MonitorNFe() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
-        <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -120,7 +120,7 @@ export default function MonitorNFe() {
           animate={{ opacity: 1, y: 0 }}
           className="max-w-md w-full bg-white dark:bg-slate-900 rounded-[48px] p-12 text-center shadow-2xl border border-slate-100 dark:border-slate-800"
         >
-          <div className="w-20 h-20 bg-indigo-600 text-white rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-indigo-100 dark:shadow-none">
+          <div className="w-20 h-20 bg-blue-600 text-white rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-blue-100 dark:shadow-none">
             <Lock className="w-10 h-10" />
           </div>
           <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter mb-4">Acesso Restrito</h2>
@@ -130,13 +130,13 @@ export default function MonitorNFe() {
           <div className="space-y-4">
             <Link 
               to="/login" 
-              className="block w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-slate-900 transition-all"
+              className="block w-full py-5 bg-blue-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-slate-900 transition-all"
             >
               Fazer Login agora
             </Link>
             <Link 
               to="/solucoes" 
-              className="block text-xs font-black text-slate-400 uppercase tracking-widest hover:text-indigo-600 transition-all"
+              className="block text-xs font-black text-slate-400 uppercase tracking-widest hover:text-blue-600 transition-all"
             >
               Voltar ao catálogo
             </Link>
@@ -151,15 +151,15 @@ export default function MonitorNFe() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-32">
       <div className="bg-slate-900 pt-32 pb-20 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-[600px] h-full bg-indigo-600/10 blur-[150px]" />
+        <div className="absolute top-0 right-0 w-[600px] h-full bg-blue-600/10 blur-[150px]" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
             <div className="space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-lg text-[10px] font-black uppercase tracking-widest">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/10 border border-blue-500/20 text-blue-400 rounded-lg text-[10px] font-black uppercase tracking-widest">
                 <Activity className="w-3 h-3" /> Monitoramento em Tempo Real
               </div>
               <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter leading-[0.9]">
-                Monitor <br /> <span className="text-indigo-500 italic">NF-e Autônomo.</span>
+                Monitor <br /> <span className="text-blue-500 italic">NF-e Autônomo.</span>
               </h1>
               <p className="text-xl text-slate-400 font-medium leading-relaxed italic font-serif max-w-lg">
                 Detectamos todas as notas enviadas para seus CNPJs automaticamente. Sem scraping, sem captcha.
@@ -168,7 +168,7 @@ export default function MonitorNFe() {
             
             <button 
               onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-3 px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-2xl shadow-indigo-900/20 hover:bg-white hover:text-slate-900 transition-all group"
+              className="flex items-center gap-3 px-8 py-4 bg-blue-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-2xl shadow-blue-900/20 hover:bg-white hover:text-slate-900 transition-all group"
             >
               <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" /> Monitorar Novo CNPJ
             </button>
@@ -192,8 +192,8 @@ export default function MonitorNFe() {
                     className={cn(
                       "w-full p-4 rounded-2xl border text-left transition-all group",
                       activeClientId === c.id 
-                        ? "bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-100 dark:shadow-none" 
-                        : "bg-slate-50 dark:bg-slate-800/50 border-transparent text-slate-600 dark:text-slate-400 hover:border-indigo-200"
+                        ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-100 dark:shadow-none" 
+                        : "bg-slate-50 dark:bg-slate-800/50 border-transparent text-slate-600 dark:text-slate-400 hover:border-blue-200"
                     )}
                   >
                     <div className="font-black text-xs mb-1 truncate">{c.nome}</div>
@@ -222,7 +222,7 @@ export default function MonitorNFe() {
                 {/* Insights Row */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {[
-                    { label: 'Notas Detectadas (Total)', value: documents.length.toLocaleString(), icon: Activity, color: 'text-indigo-600' },
+                    { label: 'Notas Detectadas (Total)', value: documents.length.toLocaleString(), icon: Activity, color: 'text-blue-600' },
                     { label: 'Eventos em Aberto', value: '12', icon: Bell, color: 'text-amber-500', alert: true },
                     { label: 'Última Captura', value: 'Ativo', icon: RefreshCw, color: 'text-emerald-500' }
                   ].map((stat, i) => (
@@ -242,7 +242,7 @@ export default function MonitorNFe() {
                 <div className="bg-white dark:bg-slate-900 rounded-[48px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                   <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center text-indigo-600">
+                      <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-blue-600">
                         <Activity className="w-6 h-6" />
                       </div>
                       <div>
@@ -257,12 +257,12 @@ export default function MonitorNFe() {
                         <input 
                           type="text" 
                           placeholder="Filtre por emissor..."
-                          className="bg-slate-50 dark:bg-slate-800 border-none rounded-xl pl-10 pr-4 py-3 text-xs font-bold outline-none focus:ring-2 focus:ring-indigo-600/20 transition-all min-w-[240px]"
+                          className="bg-slate-50 dark:bg-slate-800 border-none rounded-xl pl-10 pr-4 py-3 text-xs font-bold outline-none focus:ring-2 focus:ring-blue-600/20 transition-all min-w-[240px]"
                         />
                       </div>
                       <button 
                         onClick={() => handleSync(activeClientId)}
-                        className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl text-slate-400 hover:text-indigo-600 transition-all"
+                        className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl text-slate-400 hover:text-blue-600 transition-all"
                       >
                         <RefreshCw className="w-5 h-5" />
                       </button>
@@ -285,7 +285,7 @@ export default function MonitorNFe() {
                           <tr key={doc.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-all">
                             <td className="px-8 py-6">
                               <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl flex items-center justify-center text-indigo-600">
+                                <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/20 rounded-xl flex items-center justify-center text-blue-600">
                                   <Activity className="w-5 h-5" />
                                 </div>
                                 <div>
@@ -304,7 +304,7 @@ export default function MonitorNFe() {
                               </div>
                             </td>
                             <td className="px-8 py-6 text-right">
-                              <div className="flex items-center justify-end gap-2 text-indigo-600">
+                              <div className="flex items-center justify-end gap-2 text-blue-600">
                                 <button onClick={() => nfeService.downloadXML(doc.chave, doc.xml || '')} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all"><Download className="w-4 h-4" /></button>
                                 <button onClick={() => nfeService.generatePDF(doc.chave)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all"><FileText className="w-4 h-4" /></button>
                               </div>
@@ -327,7 +327,7 @@ export default function MonitorNFe() {
                   </div>
 
                   <div className="p-8 bg-slate-50/50 dark:bg-slate-800/10 border-t border-slate-100 dark:border-slate-800 text-center">
-                    <button className="text-xs font-black text-indigo-600 uppercase tracking-widest hover:underline">Download em lote (CSV/ZIP)</button>
+                    <button className="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">Download em lote (CSV/ZIP)</button>
                   </div>
                 </div>
 
@@ -341,7 +341,7 @@ export default function MonitorNFe() {
                       <div className="space-y-8">
                          <div className="space-y-4">
                             <h2 className="text-4xl font-black tracking-tighter leading-tight italic">Configuração de <br />Certificado Digital.</h2>
-                            <p className="text-lg text-indigo-200/60 font-medium font-serif italic leading-relaxed">
+                            <p className="text-lg text-blue-200/60 font-medium font-serif italic leading-relaxed">
                                Para capturar as notas diretamente da SEFAZ, precisamos do seu certificado A1 (.pfx). A segurança é garantida por criptografia de ponta-a-ponta.
                             </p>
                          </div>
@@ -360,7 +360,7 @@ export default function MonitorNFe() {
 
                       <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-10 rounded-[40px] space-y-8">
                          <div className="space-y-2">
-                            <div className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Status do Certificado</div>
+                            <div className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Status do Certificado</div>
                             <div className="flex items-center gap-3">
                                <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse" />
                                <div className="text-xl font-black italic">Ativo para {activeClient?.nome}</div>
@@ -368,7 +368,7 @@ export default function MonitorNFe() {
                          </div>
                          
                          <div className="grid grid-cols-1 gap-4">
-                            <button className="w-full py-5 bg-white text-slate-900 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-indigo-50 transition-all flex items-center justify-center gap-3">
+                            <button className="w-full py-5 bg-white text-slate-900 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-blue-50 transition-all flex items-center justify-center gap-3">
                                <Plus className="w-5 h-5" /> Atualizar Certificado
                             </button>
                             <button className="w-full py-5 bg-white/5 text-white rounded-2xl font-black uppercase text-xs tracking-widest border border-white/10 hover:bg-white/10 transition-all">
@@ -387,7 +387,7 @@ export default function MonitorNFe() {
                 <h3 className="text-3xl font-black text-slate-400 tracking-tighter">Nenhum CNPJ sob monitoramento. <br />Comece adicionando seu primeiro cliente.</h3>
                 <button 
                   onClick={() => setShowAddModal(true)}
-                  className="mt-8 px-10 py-5 bg-indigo-600 text-white rounded-3xl font-black uppercase text-xs tracking-widest hover:scale-105 active:scale-95 transition-all flex items-center gap-3 mx-auto"
+                  className="mt-8 px-10 py-5 bg-blue-600 text-white rounded-3xl font-black uppercase text-xs tracking-widest hover:scale-105 active:scale-95 transition-all flex items-center gap-3 mx-auto"
                 >
                   <Plus className="w-5 h-5" /> Adicionar Primeiro CNPJ
                 </button>
@@ -430,7 +430,7 @@ export default function MonitorNFe() {
                         required
                         value={newClient.nome}
                         onChange={e => setNewClient({ ...newClient, nome: e.target.value })}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl py-4 px-6 text-sm font-bold focus:ring-2 focus:ring-indigo-600" 
+                        className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl py-4 px-6 text-sm font-bold focus:ring-2 focus:ring-blue-600" 
                       />
                     </div>
                     <div>
@@ -440,7 +440,7 @@ export default function MonitorNFe() {
                         value={newClient.cnpj}
                         onChange={e => setNewClient({ ...newClient, cnpj: e.target.value })}
                         placeholder="00.000.000/0001-00"
-                        className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl py-4 px-6 text-sm font-bold focus:ring-2 focus:ring-indigo-600" 
+                        className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl py-4 px-6 text-sm font-bold focus:ring-2 focus:ring-blue-600" 
                       />
                     </div>
                     <div>
@@ -454,11 +454,11 @@ export default function MonitorNFe() {
                          />
                          <label 
                            htmlFor="cert-upload"
-                           className="w-full flex items-center justify-between bg-slate-50 dark:bg-slate-800 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl py-6 px-8 cursor-pointer hover:border-indigo-600 transition-all"
+                           className="w-full flex items-center justify-between bg-slate-50 dark:bg-slate-800 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl py-6 px-8 cursor-pointer hover:border-blue-600 transition-all"
                          >
                             <div className="flex items-center gap-3">
-                               <Upload className="w-5 h-5 text-indigo-600" />
-                               <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover:text-indigo-600">
+                               <Upload className="w-5 h-5 text-blue-600" />
+                               <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover:text-blue-600">
                                  {certFile ? certFile.name : "Clique para selecionar"}
                                </span>
                             </div>
@@ -470,7 +470,7 @@ export default function MonitorNFe() {
 
                   <button 
                     type="submit"
-                    className="w-full py-6 bg-indigo-600 text-white rounded-3xl font-black text-xs uppercase tracking-widest shadow-xl shadow-indigo-100 hover:bg-slate-900 transition-all"
+                    className="w-full py-6 bg-blue-600 text-white rounded-3xl font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-slate-900 transition-all"
                   >
                     Ativar Monitoramento
                   </button>

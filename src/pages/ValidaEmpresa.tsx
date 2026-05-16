@@ -218,17 +218,17 @@ export default function ValidaEmpresa() {
       {/* Header */}
       <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 pt-32 pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-           <Link to="/solucoes" className="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 hover:text-indigo-600 transition-all uppercase tracking-widest mb-12">
+           <Link to="/solucoes" className="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 hover:text-blue-600 transition-all uppercase tracking-widest mb-12">
               <ArrowLeft className="w-4 h-4" /> Catálogo de Soluções
            </Link>
            
            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-end">
               <div className="space-y-6">
-                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 rounded-full text-[10px] font-black uppercase tracking-widest">
+                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest">
                     <Sparkles className="w-3 h-3" /> New Ecosystem Tool 2026
                  </div>
                  <h1 className="text-6xl md:text-8xl font-black text-slate-900 dark:text-white tracking-tighter leading-[0.85]">
-                    Valida <br /><span className="text-indigo-600 italic">Empresa.</span>
+                    Valida <br /><span className="text-blue-600 italic">Empresa.</span>
                  </h1>
                  <p className="text-xl text-slate-500 font-medium font-serif italic max-w-md">
                     Descubra se sua ideia de negócio é financeiramente viável antes de emitir o primeiro CNPJ.
@@ -263,7 +263,7 @@ export default function ValidaEmpresa() {
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">CNAE Principal</label>
                   <div className="relative group" ref={dropdownRef}>
-                    <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-indigo-600 transition-colors" />
+                    <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
                     <input 
                       type="text"
                       name="cnae"
@@ -271,11 +271,11 @@ export default function ValidaEmpresa() {
                       onChange={handleCnaeChange}
                       autoComplete="off"
                       placeholder="Busque por código ou descrição..."
-                      className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl pl-12 pr-12 py-4 font-bold focus:ring-4 focus:ring-indigo-600/10 outline-none transition-all"
+                      className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl pl-12 pr-12 py-4 font-bold focus:ring-4 focus:ring-blue-600/10 outline-none transition-all"
                     />
                     {isSearchingCnae && (
                       <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                        <Loader2 className="w-4 h-4 text-indigo-600 animate-spin" />
+                        <Loader2 className="w-4 h-4 text-blue-600 animate-spin" />
                       </div>
                     )}
                     
@@ -295,10 +295,10 @@ export default function ValidaEmpresa() {
                               className="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 border-b border-slate-50 dark:border-slate-800 last:border-none transition-colors group"
                             >
                               <div className="flex justify-between items-start gap-3">
-                                <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest mt-1 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded">
+                                <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest mt-1 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded">
                                   {item.id.replace(/^(\d{4})(\d)(\d{2})$/, "$1-$2/$3")}
                                 </span>
-                                <span className="text-xs font-bold text-slate-700 dark:text-slate-300 flex-1 leading-tight group-hover:text-indigo-600 transition-colors">
+                                <span className="text-xs font-bold text-slate-700 dark:text-slate-300 flex-1 leading-tight group-hover:text-blue-600 transition-colors">
                                   {item.descricao}
                                 </span>
                               </div>
@@ -309,10 +309,10 @@ export default function ValidaEmpresa() {
                     </AnimatePresence>
                   </div>
                   {formData.cnaeDesc && (
-                    <div className="px-4 py-3 bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-900/30 rounded-2xl">
+                    <div className="px-4 py-3 bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-2xl">
                       <div className="flex gap-2 items-start">
-                        <Sparkles className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
-                        <div className="text-[10px] font-bold text-indigo-600/80 uppercase leading-relaxed font-serif italic">
+                        <Sparkles className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                        <div className="text-[10px] font-bold text-blue-600/80 uppercase leading-relaxed font-serif italic">
                           {formData.cnaeDesc}
                         </div>
                       </div>
@@ -324,28 +324,28 @@ export default function ValidaEmpresa() {
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Faturamento Mensal</label>
                     <div className="relative group">
-                      <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-indigo-600 transition-colors" />
+                      <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
                       <input 
                         type="number"
                         name="revenue"
                         value={formData.revenue}
                         onChange={handleInputChange}
                         placeholder="0,00"
-                        className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl pl-12 pr-4 py-4 font-bold focus:ring-4 focus:ring-indigo-600/10 outline-none transition-all"
+                        className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl pl-12 pr-4 py-4 font-bold focus:ring-4 focus:ring-blue-600/10 outline-none transition-all"
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Custos Mensais</label>
                     <div className="relative group">
-                      <Calculator className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-indigo-600 transition-colors" />
+                      <Calculator className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
                       <input 
                         type="number"
                         name="costs"
                         value={formData.costs}
                         onChange={handleInputChange}
                         placeholder="0,00"
-                        className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl pl-12 pr-4 py-4 font-bold focus:ring-4 focus:ring-indigo-600/10 outline-none transition-all"
+                        className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl pl-12 pr-4 py-4 font-bold focus:ring-4 focus:ring-blue-600/10 outline-none transition-all"
                       />
                     </div>
                   </div>
@@ -355,14 +355,14 @@ export default function ValidaEmpresa() {
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Folha de Pagamento</label>
                     <div className="relative group">
-                      <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-indigo-600 transition-colors" />
+                      <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
                       <input 
                         type="number"
                         name="payroll"
                         value={formData.payroll}
                         onChange={handleInputChange}
                         placeholder="Total CLT + PL"
-                        className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl pl-12 pr-4 py-4 font-bold focus:ring-4 focus:ring-indigo-600/10 outline-none transition-all"
+                        className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl pl-12 pr-4 py-4 font-bold focus:ring-4 focus:ring-blue-600/10 outline-none transition-all"
                       />
                     </div>
                   </div>
@@ -372,7 +372,7 @@ export default function ValidaEmpresa() {
                       name="state"
                       value={formData.state}
                       onChange={handleInputChange}
-                      className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-4 py-4 font-bold focus:ring-4 focus:ring-indigo-600/10 outline-none transition-all"
+                      className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-4 py-4 font-bold focus:ring-4 focus:ring-blue-600/10 outline-none transition-all"
                     >
                       {['AC', 'AL', 'AM', 'AP', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MG', 'MS', 'MT', 'PA', 'PB', 'PE', 'PI', 'PR', 'RJ', 'RN', 'RO', 'RR', 'RS', 'SC', 'SE', 'SP', 'TO'].map(uf => (
                         <option key={uf} value={uf}>{uf}</option>
@@ -384,7 +384,7 @@ export default function ValidaEmpresa() {
                 <button 
                   onClick={calculateViability}
                   disabled={isCalculating || !formData.revenue}
-                  className="w-full py-6 bg-indigo-600 text-white rounded-[24px] font-black uppercase text-sm tracking-widest shadow-xl shadow-indigo-200 dark:shadow-none hover:bg-slate-900 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed group"
+                  className="w-full py-6 bg-blue-600 text-white rounded-[24px] font-black uppercase text-sm tracking-widest shadow-xl shadow-blue-200 dark:shadow-none hover:bg-slate-900 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed group"
                 >
                   {isCalculating ? (
                     <>
@@ -423,12 +423,12 @@ export default function ValidaEmpresa() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="h-full min-h-[400px] flex flex-col items-center justify-center space-y-8 bg-white dark:bg-slate-900 rounded-[48px] border border-indigo-100 dark:border-indigo-900/30 shadow-2xl"
+                  className="h-full min-h-[400px] flex flex-col items-center justify-center space-y-8 bg-white dark:bg-slate-900 rounded-[48px] border border-blue-100 dark:border-blue-900/30 shadow-2xl"
                 >
                   <div className="relative">
                     <div className="w-32 h-32 border-8 border-slate-100 dark:border-slate-800 rounded-full" />
-                    <div className="absolute inset-0 border-8 border-t-indigo-600 border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin" />
-                    <Zap className="absolute inset-0 m-auto w-10 h-10 text-indigo-600 animate-pulse" />
+                    <div className="absolute inset-0 border-8 border-t-blue-600 border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin" />
+                    <Zap className="absolute inset-0 m-auto w-10 h-10 text-blue-600 animate-pulse" />
                   </div>
                   <div className="text-center space-y-2">
                     <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-widest">Analisando Cenários</h3>
@@ -496,7 +496,7 @@ export default function ValidaEmpresa() {
                      </div>
                      <div className="bg-white dark:bg-slate-900 p-8 rounded-[40px] border border-slate-100 dark:border-slate-800 shadow-sm">
                         <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Imposto Estimado</div>
-                        <div className="text-2xl font-black text-indigo-600 italic tracking-tighter">
+                        <div className="text-2xl font-black text-blue-600 italic tracking-tighter">
                           {formatCurrency(results.taxAmount)}
                         </div>
                         <div className="text-[10px] font-bold text-slate-400 flex items-center gap-1 mt-1 transition-all">
@@ -519,14 +519,14 @@ export default function ValidaEmpresa() {
                      
                      <div className="relative z-10 space-y-12">
                         <div className="flex items-center gap-3">
-                           <Sparkles className="w-6 h-6 text-indigo-400" />
-                           <span className="text-[10px] font-black uppercase tracking-widest text-indigo-200">Inteligência de Mercado Analytics</span>
+                           <Sparkles className="w-6 h-6 text-blue-400" />
+                           <span className="text-[10px] font-black uppercase tracking-widest text-blue-200">Inteligência de Mercado Analytics</span>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                            <div className="space-y-6">
                               <h4 className="text-xl font-bold flex items-center gap-2">
-                                 <History className="w-5 h-5 text-indigo-400" /> Diagnóstico Base
+                                 <History className="w-5 h-5 text-blue-400" /> Diagnóstico Base
                               </h4>
                               <div className="space-y-4">
                                  <div className="flex justify-between items-center py-3 border-b border-white/5">
@@ -555,7 +555,7 @@ export default function ValidaEmpresa() {
 
                            {!isPremium ? (
                              <div className="flex flex-col justify-center items-center text-center p-8 bg-white/5 rounded-[40px] border border-white/10 space-y-6">
-                                <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg"><Lock className="w-6 h-6 text-white" /></div>
+                                <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg"><Lock className="w-6 h-6 text-white" /></div>
                                 <div className="space-y-2">
                                    <h5 className="font-black uppercase text-sm tracking-widest">Análise Premium Bloqueada</h5>
                                    <p className="text-xs text-slate-400 font-serif italic">Desbloqueie cenários preditivos e auditoria tributária completa.</p>
@@ -600,7 +600,7 @@ export default function ValidaEmpresa() {
                           <motion.div 
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="p-8 bg-indigo-600 rounded-[40px] space-y-6"
+                            className="p-8 bg-blue-600 rounded-[40px] space-y-6"
                           >
                              <div className="flex items-center gap-3">
                                 <FileText className="w-6 h-6" />

@@ -13,9 +13,9 @@ export default function Cart() {
   if (items.length === 0) {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center p-4">
-        <div className="bg-indigo-50 dark:bg-indigo-900/20 p-12 rounded-[40px] text-center max-w-md w-full border-2 border-dashed border-indigo-200 dark:border-indigo-800">
+        <div className="bg-blue-50 dark:bg-blue-900/20 p-12 rounded-[40px] text-center max-w-md w-full border-2 border-dashed border-blue-200 dark:border-blue-800">
           <div className="w-20 h-20 bg-white dark:bg-slate-900 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl">
-             <ShoppingBag className="w-10 h-10 text-indigo-600" />
+             <ShoppingBag className="w-10 h-10 text-blue-600" />
           </div>
           <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">Seu carrinho está vazio</h2>
           <p className="text-slate-500 mb-8 font-medium">Explore nosso catálogo e encontre a solução ideal para seu escritório.</p>
@@ -39,7 +39,7 @@ export default function Cart() {
             <h1 className="text-4xl font-bold text-slate-900 dark:text-white flex items-center gap-4 tracking-tight">
               Meu Carrinho <span className="text-lg font-normal text-slate-400 bg-slate-100 dark:bg-slate-900 px-3 py-1 rounded-full">{items.length}</span>
             </h1>
-            <Link to="/microcaas" className="text-sm font-bold text-indigo-600 hover:underline">Continuar comprando</Link>
+            <Link to="/microcaas" className="text-sm font-bold text-blue-600 hover:underline">Continuar comprando</Link>
           </div>
 
           <div className="space-y-4">
@@ -53,18 +53,18 @@ export default function Cart() {
                 className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all group flex items-center gap-6"
               >
                 <div className="w-20 h-20 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
-                   {item.type === 'bundle' ? <Zap className="w-10 h-10 text-amber-500" /> : <ShoppingBag className="w-10 h-10 text-indigo-600" />}
+                   {item.type === 'bundle' ? <Zap className="w-10 h-10 text-amber-500" /> : <ShoppingBag className="w-10 h-10 text-blue-600" />}
                 </div>
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{item.type === 'bundle' ? 'Bundle' : 'Individual'}</span>
                     <span className="w-1 h-1 bg-slate-200 rounded-full" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-600">{item.pricingModel}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600">{item.pricingModel}</span>
                   </div>
                   <h3 className="text-xl font-bold text-slate-900 dark:text-white truncate">{item.name}</h3>
                   <div className="mt-4 flex items-center gap-4 lg:hidden">
-                     <span className="font-bold text-indigo-600">{item.priceLabel}</span>
+                     <span className="font-bold text-blue-600">{item.priceLabel}</span>
                      <button onClick={() => removeItem(item.id)} className="text-rose-500 font-bold text-xs">Remover</button>
                   </div>
                 </div>
@@ -90,18 +90,18 @@ export default function Cart() {
             <motion.div 
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="mt-12 bg-gradient-to-br from-indigo-600 to-violet-700 p-8 rounded-[40px] text-white shadow-xl relative overflow-hidden"
+              className="mt-12 bg-gradient-to-br from-blue-600 to-violet-700 p-8 rounded-[40px] text-white shadow-xl relative overflow-hidden"
             >
                <div className="absolute top-0 right-0 p-8 opacity-20"><Sparkles className="w-32 h-32" /></div>
                <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
                   <div className="max-w-md">
                      <span className="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest mb-4 inline-block italic">Proposta do Dia</span>
                      <h3 className="text-2xl font-bold mb-4 leading-tight">Que tal economizar mais com o {suggestedBundle.name}?</h3>
-                     <p className="text-indigo-100 text-sm">Este bundle já inclui alguns itens do seu carrinho e oferece ferramentas complementares por um preço muito menor do que avulsos.</p>
+                     <p className="text-blue-100 text-sm">Este bundle já inclui alguns itens do seu carrinho e oferece ferramentas complementares por um preço muito menor do que avulsos.</p>
                   </div>
                   <Link 
                     to={`/bundle/${suggestedBundle.slug}`}
-                    className="bg-white text-indigo-600 px-8 py-4 rounded-2xl font-bold shadow-lg hover:scale-105 transition-all text-center whitespace-nowrap"
+                    className="bg-white text-blue-600 px-8 py-4 rounded-2xl font-bold shadow-lg hover:scale-105 transition-all text-center whitespace-nowrap"
                   >
                     Ver Oferta <ArrowRight className="w-4 h-4 inline ml-2" />
                   </Link>
@@ -128,7 +128,7 @@ export default function Cart() {
                 <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-between items-baseline">
                   <span className="font-bold text-slate-900 dark:text-white text-lg">Total</span>
                   <div className="text-right">
-                    <span className="text-4xl font-black text-indigo-600 tracking-tighter">R$ {total.toFixed(2)}</span>
+                    <span className="text-4xl font-black text-blue-600 tracking-tighter">R$ {total.toFixed(2)}</span>
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Estimativa Anual</p>
                   </div>
                 </div>
@@ -137,7 +137,7 @@ export default function Cart() {
               <div className="space-y-4">
                 <Link
                   to="/checkout"
-                  className="w-full btn-primary py-5 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all text-lg shadow-lg shadow-indigo-200"
+                  className="w-full btn-primary py-5 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all text-lg shadow-lg shadow-blue-200"
                 >
                   Ir para Pagamento
                   <ArrowRight className="w-6 h-6" />
@@ -161,8 +161,8 @@ export default function Cart() {
 
             <div className="mt-8 px-6 space-y-4">
                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center">
-                     <ShieldCheck className="w-5 h-5 text-indigo-600" />
+                  <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
+                     <ShieldCheck className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
                     <h4 className="text-sm font-bold">Compra Garantida</h4>

@@ -1,53 +1,72 @@
+import { collection, doc, getDocs, setDoc, query, orderBy, addDoc, updateDoc } from 'firebase/firestore';
+import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import type { Submission, CheckoutRequest } from '../types';
 
-// Mock storage for demo purposes using LocalStorage
-// In production, these should be Firestore calls
-
-const SUBMISSIONS_KEY = 'microcaas_submissions';
-const CHECKOUT_REQUESTS_KEY = 'microcaas_checkout_requests';
+const SUBMISSIONS_COLLECTION = 'submissions';
+const CHECKOUT_REQUESTS_COLLECTION = 'checkoutRequests';
 
 export const storageService = {
   async getSubmissions(): Promise<Submission[]> {
-    const data = localStorage.getItem(SUBMISSIONS_KEY);
-    return data ? JSON.parse(data) : [];
+    try {
+      const q = query(collection(db, SUBMISSIONS_COLLECTION), orderBy('createdAt', 'desc'));
+      const querySnapshot = await getDocs(q);
+      return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Submission));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.LIST, SUBMISSIONS_COLLECTION);
+      return [];
+    }
   },
 
   async addSubmission(submission: Omit<Submission, 'id' | 'status' | 'createdAt'>): Promise<void> {
-    const subs = await this.getSubmissions();
-    const newSub: Submission = {
-      ...submission,
-      id: Math.random().toString(36).substr(2, 9),
-      status: 'pending',
-      createdAt: new Date().toISOString()
-    };
-    localStorage.setItem(SUBMISSIONS_KEY, JSON.stringify([newSub, ...subs]));
+    try {
+      const newSub = {
+        ...submission,
+        status: 'pending',
+        createdAt: new Date().toISOString()
+      };
+      await addDoc(collection(db, SUBMISSIONS_COLLECTION), newSub);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, SUBMISSIONS_COLLECTION);
+    }
   },
 
   async updateSubmissionStatus(id: string, status: 'approved' | 'rejected' | 'analyzing'): Promise<void> {
-    const subs = await this.getSubmissions();
-    const updated = subs.map(s => s.id === id ? { ...s, status } : s);
-    localStorage.setItem(SUBMISSIONS_KEY, JSON.stringify(updated));
+    try {
+      await updateDoc(doc(db, SUBMISSIONS_COLLECTION, id), { status });
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, SUBMISSIONS_COLLECTION);
+    }
   },
 
   async getCheckoutRequests(): Promise<CheckoutRequest[]> {
-    const data = localStorage.getItem(CHECKOUT_REQUESTS_KEY);
-    return data ? JSON.parse(data) : [];
+     try {
+      const q = query(collection(db, CHECKOUT_REQUESTS_COLLECTION), orderBy('createdAt', 'desc'));
+      const querySnapshot = await getDocs(q);
+      return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as CheckoutRequest));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.LIST, CHECKOUT_REQUESTS_COLLECTION);
+      return [];
+    }
   },
 
   async addCheckoutRequest(req: Omit<CheckoutRequest, 'id' | 'status' | 'createdAt'>): Promise<void> {
-    const requests = await this.getCheckoutRequests();
-    const newReq: CheckoutRequest = {
-      ...req,
-      id: 'REQ-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
-      status: 'pending',
-      createdAt: new Date().toISOString()
-    };
-    localStorage.setItem(CHECKOUT_REQUESTS_KEY, JSON.stringify([newReq, ...requests]));
+    try {
+      const newReq = {
+        ...req,
+        status: 'pending',
+        createdAt: new Date().toISOString()
+      };
+      await addDoc(collection(db, CHECKOUT_REQUESTS_COLLECTION), newReq);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, CHECKOUT_REQUESTS_COLLECTION);
+    }
   },
 
   async updateCheckoutRequest(id: string, data: Partial<CheckoutRequest>): Promise<void> {
-    const requests = await this.getCheckoutRequests();
-    const updated = requests.map(r => r.id === id ? { ...r, ...data } : r);
-    localStorage.setItem(CHECKOUT_REQUESTS_KEY, JSON.stringify(updated));
+    try {
+      await updateDoc(doc(db, CHECKOUT_REQUESTS_COLLECTION, id), data);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, CHECKOUT_REQUESTS_COLLECTION);
+    }
   }
 };

@@ -7,7 +7,7 @@ export default function PropostasContratos() {
       <div className="max-w-7xl mx-auto space-y-12">
         <div className="flex flex-col md:flex-row justify-between items-end gap-8">
            <div className="space-y-4">
-              <h1 className="text-4xl font-black tracking-tighter">Propostas & <span className="text-indigo-600">Contratos.</span></h1>
+              <h1 className="text-4xl font-black tracking-tighter">Propostas & <span className="text-blue-600">Contratos.</span></h1>
               <p className="text-slate-500 font-medium italic font-serif">Gerenciamento do ciclo de vida comercial do seu escritório.</p>
            </div>
            <button className="btn-primary py-4 px-10 rounded-2xl font-bold flex items-center gap-2">
@@ -60,7 +60,7 @@ export default function PropostasContratos() {
                             )}>{row.s}</span>
                          </td>
                          <td className="px-8 py-6 text-right">
-                            <button className="text-indigo-600 p-2 hover:bg-indigo-50 rounded-xl transition-all"><ArrowRight className="w-4 h-4" /></button>
+                            <button className="text-blue-600 p-2 hover:bg-blue-50 rounded-xl transition-all"><ArrowRight className="w-4 h-4" /></button>
                          </td>
                       </tr>
                     ))}

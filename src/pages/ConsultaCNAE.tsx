@@ -122,11 +122,11 @@ export default function ConsultaCNAE() {
         
         {/* Header */}
         <div className="space-y-6 text-center">
-           <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 rounded-full text-[10px] font-black uppercase tracking-widest">
+           <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest">
               <Search className="w-3 h-3" /> CNAE Intelligence
            </div>
            <h1 className="text-5xl md:text-6xl font-black text-slate-900 dark:text-white tracking-tighter uppercase italic leading-none">
-             Consulta <span className="text-indigo-600">Estratégica.</span>
+             Consulta <span className="text-blue-600">Estratégica.</span>
            </h1>
            <p className="text-lg text-slate-500 font-medium font-serif italic max-w-2xl mx-auto">
              Descubra o enquadramento fiscal, alíquotas do Simples Nacional e viabilidade MEI de forma automatizada.
@@ -136,7 +136,7 @@ export default function ConsultaCNAE() {
         {/* Search Bar */}
         <div className="bg-white dark:bg-slate-900 p-8 md:p-12 rounded-[56px] border border-slate-100 dark:border-slate-800 shadow-2xl relative group">
            <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none group-hover:rotate-12 transition-transform duration-700">
-              <Layers className="w-48 h-48 text-indigo-600" />
+              <Layers className="w-48 h-48 text-blue-600" />
            </div>
 
            <div className="relative z-10 flex flex-col md:flex-row gap-4">
@@ -148,7 +148,7 @@ export default function ConsultaCNAE() {
                   onChange={e => handleInputChange(e.target.value)}
                   onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
                   placeholder="Digite o código (ex: 6201-5/00) ou descrição..."
-                  className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-[28px] pl-16 pr-8 py-6 text-xl font-black shadow-inner focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-600" 
+                  className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-[28px] pl-16 pr-8 py-6 text-xl font-black shadow-inner focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-600" 
                 />
 
                 {/* Autocomplete Suggestions */}
@@ -158,23 +158,23 @@ export default function ConsultaCNAE() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="absolute left-0 right-0 top-full mt-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-[32px] shadow-2xl shadow-indigo-200/50 dark:shadow-none overflow-hidden z-50 p-2"
+                      className="absolute left-0 right-0 top-full mt-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-[32px] shadow-2xl shadow-blue-200/50 dark:shadow-none overflow-hidden z-50 p-2"
                     >
                       {suggestions.map((s, i) => (
                         <button
                           key={i}
                           type="button"
                           onClick={() => selecionarCNAE(s)}
-                          className="w-full text-left p-6 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-2xl transition-colors group flex items-start gap-4"
+                          className="w-full text-left p-6 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-2xl transition-colors group flex items-start gap-4"
                         >
-                          <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/50 rounded-xl flex items-center justify-center font-black text-[12px] text-indigo-600 dark:text-indigo-400 flex-shrink-0">
+                          <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/50 rounded-xl flex items-center justify-center font-black text-[12px] text-blue-600 dark:text-blue-400 flex-shrink-0">
                             {s.cnae.substring(0, 2)}
                           </div>
                           <div>
                             <div className="font-black text-slate-900 dark:text-white text-base tracking-tight">{s.cnae}</div>
-                            <div className="text-xs font-bold text-slate-400 group-hover:text-indigo-600 uppercase tracking-widest mt-0.5">{s.descricao}</div>
+                            <div className="text-xs font-bold text-slate-400 group-hover:text-blue-600 uppercase tracking-widest mt-0.5">{s.descricao}</div>
                           </div>
-                          <ArrowRight className="w-5 h-5 ml-auto text-slate-200 group-hover:text-indigo-600 transition-colors self-center" />
+                          <ArrowRight className="w-5 h-5 ml-auto text-slate-200 group-hover:text-blue-600 transition-colors self-center" />
                         </button>
                       ))}
                     </motion.div>
@@ -209,7 +209,7 @@ export default function ConsultaCNAE() {
 
            {loading && (
              <div className="mt-8 flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
              </div>
            )}
         </div>
@@ -228,11 +228,11 @@ export default function ConsultaCNAE() {
                 <div className="lg:col-span-2 space-y-8">
                    <div className="p-10 bg-white dark:bg-slate-900 rounded-[48px] border border-slate-100 dark:border-slate-800 shadow-xl space-y-6">
                       <div className="flex items-center gap-4">
-                         <div className="p-4 bg-indigo-600 rounded-3xl text-white">
+                         <div className="p-4 bg-blue-600 rounded-3xl text-white">
                             <FileText className="w-8 h-8" />
                          </div>
                          <div>
-                            <div className="text-[10px] font-black uppercase tracking-widest text-indigo-600">Identificação Principal</div>
+                            <div className="text-[10px] font-black uppercase tracking-widest text-blue-600">Identificação Principal</div>
                             <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">{result.local.cnae}</h2>
                          </div>
                       </div>
@@ -257,7 +257,7 @@ export default function ConsultaCNAE() {
 
                    {/* Simples e MEI Details */}
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <div className="p-10 bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-[48px] text-white space-y-6 shadow-2xl shadow-indigo-200 dark:shadow-none">
+                      <div className="p-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-[48px] text-white space-y-6 shadow-2xl shadow-blue-200 dark:shadow-none">
                          <div className="flex items-center justify-between">
                             <Briefcase className="w-8 h-8" />
                             <div className="px-3 py-1 bg-white/20 rounded-full text-[9px] font-black uppercase tracking-widest">Simples Nacional</div>
@@ -302,8 +302,8 @@ export default function ConsultaCNAE() {
 
                 {/* Sidebar Stats */}
                 <div className="space-y-8">
-                   <div className="p-8 bg-slate-900 dark:bg-indigo-900/20 rounded-[40px] text-white space-y-8">
-                      <h3 className="text-sm font-black uppercase tracking-widest text-indigo-400 italic">Inteligência Fiscal</h3>
+                   <div className="p-8 bg-slate-900 dark:bg-blue-900/20 rounded-[40px] text-white space-y-8">
+                      <h3 className="text-sm font-black uppercase tracking-widest text-blue-400 italic">Inteligência Fiscal</h3>
                       
                       <div className="space-y-6">
                          <div className="flex justify-between items-center pb-4 border-b border-white/5">
@@ -316,7 +316,7 @@ export default function ConsultaCNAE() {
                          </div>
                          <div className="flex justify-between items-center pb-4 border-b border-white/5">
                             <div className="text-[10px] uppercase font-bold text-slate-400">Alíquota RAT</div>
-                            <div className="text-lg font-black italic text-indigo-400">{result.local.rat_2010 || "1.0%"}</div>
+                            <div className="text-lg font-black italic text-blue-400">{result.local.rat_2010 || "1.0%"}</div>
                          </div>
                          <div className="flex justify-between items-center pb-4 border-b border-white/5">
                             <div className="text-[10px] uppercase font-bold text-slate-400">Inscrição Estadual</div>
@@ -334,14 +334,14 @@ export default function ConsultaCNAE() {
 
                       <button 
                         onClick={() => window.print()}
-                        className="w-full py-4 bg-indigo-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-white hover:text-indigo-600 transition-all flex items-center justify-center gap-2"
+                        className="w-full py-4 bg-blue-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-white hover:text-blue-600 transition-all flex items-center justify-center gap-2"
                       >
                          <Download className="w-4 h-4" /> Exportar Análise (PDF)
                       </button>
                    </div>
 
                    <div className="p-8 bg-white dark:bg-slate-900 rounded-[40px] border border-slate-200 dark:border-slate-800 space-y-4">
-                      <div className="flex items-center gap-2 text-indigo-600">
+                      <div className="flex items-center gap-2 text-blue-600">
                          <Scale className="w-5 h-5" />
                          <span className="text-[10px] font-black uppercase tracking-widest">Base Legal</span>
                       </div>

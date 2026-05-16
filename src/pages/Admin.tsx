@@ -58,7 +58,23 @@ export default function AdminPage() {
 
   const handleSaveProduct = async () => {
     if (!editingProduct?.name || !editingProduct?.slug) return;
-    await productService.saveProduct(editingProduct as Product);
+    
+    // Ensure nested pricing object exists if it's a new product or semi-filled
+    const p = { ...editingProduct } as any;
+    if (!p.pricing) {
+       p.pricing = {
+         priceLabel: p.priceLabel || 'Grátis',
+         priceValue: p.priceValue || 0,
+         currency: 'BRL',
+         ctaText: 'Acessar',
+         ctaAction: 'checkout'
+       };
+    } else {
+       if (p.priceLabel) p.pricing.priceLabel = p.priceLabel;
+       if (p.priceValue !== undefined) p.pricing.priceValue = p.priceValue;
+    }
+    
+    await productService.saveProduct(p as Product);
     const updated = await productService.getProducts();
     setProducts(updated);
     setEditingProduct(null);
@@ -104,24 +120,22 @@ export default function AdminPage() {
   const stats = useMemo(() => {
     const paidCheckouts = checkoutRequests.filter(r => r.status === 'paid');
     
-    const totalSales = paidCheckouts
-      .reduce((acc, curr) => acc + (parseFloat(curr.totalLabel.replace('R$ ', '').replace('.', '').replace(',', '.')) || 0), 0);
+    const calculateTotal = (requests: CheckoutRequest[]) => 
+      requests.reduce((acc, curr) => acc + (curr.totalValue || parseFloat(curr.totalLabel.replace('R$ ', '').replace('.', '').replace(',', '.')) || 0), 0);
+
+    const totalSales = calculateTotal(paidCheckouts);
     
     const now = new Date();
-    const monthlySales = paidCheckouts
-      .filter(r => {
-        const d = new Date(r.createdAt);
-        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-      })
-      .reduce((acc, curr) => acc + (parseFloat(curr.totalLabel.replace('R$ ', '').replace('.', '').replace(',', '.')) || 0), 0);
+    const monthlySales = calculateTotal(paidCheckouts.filter(r => {
+      const d = new Date(r.createdAt);
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }));
 
     const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const prevMonthSales = paidCheckouts
-      .filter(r => {
-        const d = new Date(r.createdAt);
-        return d.getMonth() === prevMonth.getMonth() && d.getFullYear() === prevMonth.getFullYear();
-      })
-      .reduce((acc, curr) => acc + (parseFloat(curr.totalLabel.replace('R$ ', '').replace('.', '').replace(',', '.')) || 0), 0);
+    const prevMonthSales = calculateTotal(paidCheckouts.filter(r => {
+      const d = new Date(r.createdAt);
+      return d.getMonth() === prevMonth.getMonth() && d.getFullYear() === prevMonth.getFullYear();
+    }));
     
     const growthPercent = prevMonthSales > 0 ? ((monthlySales - prevMonthSales) / prevMonthSales * 100).toFixed(1) : '100';
 
@@ -130,7 +144,6 @@ export default function AdminPage() {
       ...checkoutRequests.map(r => r.userEmail?.toLowerCase()).filter(Boolean) as string[]
     ]);
 
-    // Conversion: paid checkouts / total checkouts initiated
     const conversion = checkoutRequests.length > 0 
       ? ((paidCheckouts.length / checkoutRequests.length) * 100).toFixed(1) + '%' 
       : '0%';
@@ -142,7 +155,7 @@ export default function AdminPage() {
       });
     });
 
-    const topProducts = products
+    const topProducts = [...products]
       .map(p => ({ ...p, salesCount: productSalesMap[p.id] || productSalesMap[p.slug] || 0 }))
       .sort((a, b) => (b.salesCount || 0) - (a.salesCount || 0));
 
@@ -155,7 +168,7 @@ export default function AdminPage() {
       totalSales,
       monthlySales,
       growthPercent,
-      activeUsers: uniqueEmails.size || 42,
+      activeUsers: uniqueEmails.size,
       conversionRate: conversion,
       topProducts
     };
@@ -165,7 +178,7 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
           <p className="text-slate-500 font-bold animate-pulse">Carregando Ecossistema...</p>
         </div>
       </div>
@@ -177,15 +190,15 @@ export default function AdminPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12">
           <div className="space-y-1">
-            <div className="flex items-center gap-2 text-indigo-600 font-black text-xs uppercase tracking-[0.2em]">
+            <div className="flex items-center gap-2 text-blue-600 font-black text-xs uppercase tracking-[0.2em]">
                <ShieldCheck className="w-4 h-4" /> Acesso Administrativo
             </div>
-            <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">Command <span className="text-indigo-600">Center.</span></h1>
+            <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">Centro de <span className="text-blue-600">Comando.</span></h1>
           </div>
           
           <div className="flex bg-white dark:bg-slate-900 p-1.5 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800 overflow-x-auto max-w-full no-scrollbar">
             {[
-              { id: 'dashboard', label: 'Monitor', icon: LayoutDashboard },
+              { id: 'dashboard', label: 'Monitoramento', icon: LayoutDashboard },
               { id: 'products', label: 'Produtos', icon: Package },
               { id: 'bundles', label: 'Campanhas', icon: Zap },
               { id: 'checkout_requests', label: 'Vendas', icon: ShoppingBag, badge: stats.pendingCheckouts },
@@ -198,7 +211,7 @@ export default function AdminPage() {
                 onClick={() => setActiveTab(tab.id as AdminTab)}
                 className={cn(
                   "px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2 transition-all whitespace-nowrap relative",
-                  activeTab === tab.id ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800"
+                  activeTab === tab.id ? "bg-blue-600 text-white shadow-lg shadow-blue-200" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800"
                 )}
               >
                 <tab.icon className="w-4 h-4" /> {tab.label}
@@ -234,7 +247,7 @@ export default function AdminPage() {
                   <div className="bg-white dark:bg-slate-900 p-8 rounded-[40px] border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
                      <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform"><ShoppingBag className="w-24 h-24" /></div>
                      <h3 className="text-slate-400 font-bold text-[10px] uppercase tracking-widest mb-4">Este Mês</h3>
-                     <div className="text-4xl font-black text-indigo-600 tracking-tighter">R$ {stats.monthlySales.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+                     <div className="text-4xl font-black text-blue-600 tracking-tighter">R$ {stats.monthlySales.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
                      <p className="text-xs text-slate-500 mt-2 font-medium">Meta: R$ 15.000,00</p>
                   </div>
                   <div className="bg-white dark:bg-slate-900 p-8 rounded-[40px] border border-slate-100 dark:border-slate-800 shadow-sm relative overflow-hidden group">
@@ -267,9 +280,9 @@ export default function AdminPage() {
                                  </div>
                               </div>
                               <div className="text-right">
-                                 <span className="text-sm font-black text-indigo-600">{p.salesCount} vendas</span>
+                                 <span className="text-sm font-black text-blue-600">{p.salesCount} vendas</span>
                                  <div className="w-24 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full mt-1 overflow-hidden">
-                                    <div className="h-full bg-indigo-600 rounded-full" style={{ width: `${((p.salesCount || 0) / (stats.topProducts[0]?.salesCount || 1)) * 100}%` }} />
+                                    <div className="h-full bg-blue-600 rounded-full" style={{ width: `${((p.salesCount || 0) / (stats.topProducts[0]?.salesCount || 1)) * 100}%` }} />
                                  </div>
                               </div>
                            </div>
@@ -283,22 +296,22 @@ export default function AdminPage() {
                    <div className="bg-slate-900 rounded-[48px] p-10 text-white relative overflow-hidden">
                       <div className="absolute bottom-0 right-0 p-12 opacity-10"><Zap className="w-48 h-48" /></div>
                       <div className="relative z-10 space-y-8">
-                         <h3 className="text-2xl font-black text-white italic">Health Score do Sistema</h3>
+                         <h3 className="text-2xl font-black text-white italic">Saúde do Sistema</h3>
                          <div className="grid grid-cols-2 gap-12">
                             <div className="space-y-2">
-                               <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Uptime APIs</span>
+                               <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Disponibilidade das APIs</span>
                                <div className="text-3xl font-black">99.98%</div>
                             </div>
                             <div className="space-y-2">
-                               <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Tempo Resposta</span>
+                               <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Tempo Resposta</span>
                                <div className="text-3xl font-black">142ms</div>
                             </div>
                             <div className="space-y-2">
-                               <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Entitlements OK</span>
+                               <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Acessos Ativos</span>
                                <div className="text-3xl font-black">{stats.activeUsers * 2}</div>
                             </div>
                             <div className="space-y-2">
-                               <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Cache Hit Rate</span>
+                               <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Taxa de Cache</span>
                                <div className="text-3xl font-black">94%</div>
                             </div>
                          </div>
@@ -324,7 +337,7 @@ export default function AdminPage() {
           </div>
 
           {editingProduct && (
-            <div className="bg-indigo-50 dark:bg-indigo-900/10 p-8 rounded-3xl border border-indigo-100 dark:border-indigo-900/30 space-y-6">
+            <div className="bg-blue-50 dark:bg-blue-900/10 p-8 rounded-3xl border border-blue-100 dark:border-blue-900/30 space-y-6">
               <h3 className="font-bold flex items-center gap-2"><Edit className="w-4 h-4" /> {editingProduct.id ? 'Editar' : 'Criar'} Produto</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -355,6 +368,37 @@ export default function AdminPage() {
                     <option value="free">Free</option>
                     <option value="one_time">Uma Vez (One-time)</option>
                     <option value="subscription">Assinatura (Subscription)</option>
+                    <option value="usage">Uso (Usage)</option>
+                    <option value="quote">Consultar (Quote)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-bold uppercase text-slate-400 block mb-1">Status</label>
+                  <select 
+                    value={editingProduct.status} 
+                    onChange={e => setEditingProduct({ ...editingProduct, status: e.target.value as any })}
+                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2"
+                  >
+                    <option value="active">Ativo</option>
+                    <option value="beta">Beta</option>
+                    <option value="inactive">Inativo</option>
+                    <option value="coming_soon">Em breve</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-bold uppercase text-slate-400 block mb-1">Categoria</label>
+                  <select 
+                    value={editingProduct.category} 
+                    onChange={e => setEditingProduct({ ...editingProduct, category: e.target.value as any })}
+                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2"
+                  >
+                    <option value="Automação">Automação</option>
+                    <option value="Contábil">Contábil</option>
+                    <option value="Fiscal">Fiscal</option>
+                    <option value="Financeiro">Financeiro</option>
+                    <option value="Gestão">Gestão</option>
+                    <option value="Compliance">Compliance</option>
+                    <option value="Simulação">Simulação</option>
                   </select>
                 </div>
                 <div className="flex flex-wrap items-center gap-6 mt-6">
@@ -364,7 +408,7 @@ export default function AdminPage() {
                       id="isFree"
                       checked={editingProduct.isFree || false} 
                       onChange={e => setEditingProduct({ ...editingProduct, isFree: e.target.checked })}
-                      className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500"
+                      className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
                     />
                     <label htmlFor="isFree" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer">
                       Grátis?
@@ -376,7 +420,7 @@ export default function AdminPage() {
                       id="isFeatured"
                       checked={editingProduct.isFeatured || false} 
                       onChange={e => setEditingProduct({ ...editingProduct, isFeatured: e.target.checked })}
-                      className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500"
+                      className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
                     />
                     <label htmlFor="isFeatured" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer">
                       Destaque?
@@ -388,7 +432,7 @@ export default function AdminPage() {
                       id="isPromo"
                       checked={editingProduct.isPromo || false} 
                       onChange={e => setEditingProduct({ ...editingProduct, isPromo: e.target.checked })}
-                      className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500"
+                      className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
                     />
                     <label htmlFor="isPromo" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer">
                       Promoção?
@@ -402,6 +446,16 @@ export default function AdminPage() {
                     placeholder="Ex: R$ 49,90"
                     value={editingProduct.priceLabel} 
                     onChange={e => setEditingProduct({ ...editingProduct, priceLabel: e.target.value })}
+                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold uppercase text-slate-400 block mb-1">Preço Numérico (para métricas)</label>
+                  <input 
+                    type="number" 
+                    placeholder="49.90"
+                    value={editingProduct.priceValue} 
+                    onChange={e => setEditingProduct({ ...editingProduct, priceValue: parseFloat(e.target.value) })}
                     className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2"
                   />
                 </div>
@@ -476,7 +530,7 @@ export default function AdminPage() {
                         >
                           <ExternalLink className="w-4 h-4" />
                         </button>
-                        <button onClick={() => setEditingProduct(p)} className="p-2 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-lg transition-all"><Edit className="w-4 h-4" /></button>
+                        <button onClick={() => setEditingProduct(p)} className="p-2 hover:bg-blue-50 text-slate-400 hover:text-blue-600 rounded-lg transition-all"><Edit className="w-4 h-4" /></button>
                         <button onClick={() => handleDeleteProduct(p.id)} className="p-2 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-lg transition-all"><Trash2 className="w-4 h-4" /></button>
                       </div>
                     </td>
@@ -501,7 +555,7 @@ export default function AdminPage() {
           </div>
 
           {editingBundle && (
-            <div className="bg-indigo-50 dark:bg-indigo-900/10 p-8 rounded-3xl border border-indigo-100 dark:border-indigo-900/30 space-y-6">
+            <div className="bg-blue-50 dark:bg-blue-900/10 p-8 rounded-3xl border border-blue-100 dark:border-blue-900/30 space-y-6">
               <h3 className="font-bold">Configurar Combo</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -563,7 +617,7 @@ export default function AdminPage() {
                     <td className="px-6 py-4">
                       <div className="flex flex-wrap gap-1">
                         {b.bundleItems.map((item: string) => (
-                          <span key={item} className="px-1.5 py-0.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 rounded text-[9px] font-bold">{item}</span>
+                          <span key={item} className="px-1.5 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 rounded text-[9px] font-bold">{item}</span>
                         ))}
                       </div>
                     </td>
@@ -578,7 +632,7 @@ export default function AdminPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex gap-2">
-                         <button onClick={() => setEditingBundle(b)} className="p-2 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-lg"><Edit className="w-4 h-4" /></button>
+                         <button onClick={() => setEditingBundle(b)} className="p-2 hover:bg-blue-50 text-slate-400 hover:text-blue-600 rounded-lg"><Edit className="w-4 h-4" /></button>
                          <button onClick={() => handleDeleteBundle(b.id)} className="p-2 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-lg"><Trash2 className="w-4 h-4" /></button>
                       </div>
                     </td>
@@ -603,7 +657,7 @@ export default function AdminPage() {
                 <div className="flex flex-col md:flex-row justify-between items-start gap-8">
                   <div className="space-y-4 flex-1">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center font-bold">#</div>
+                      <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-bold">#</div>
                       <div>
                         <h4 className="font-bold text-slate-900 dark:text-white">Pedido Multi-item ({req.items.length} itens)</h4>
                         <p className="text-xs text-slate-400">{req.id} • {new Date(req.createdAt).toLocaleString()}</p>
@@ -630,7 +684,7 @@ export default function AdminPage() {
                       </div>
                       <div>
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Total Sugerido</span>
-                        <span className="text-sm font-bold text-indigo-600">{req.totalLabel}</span>
+                        <span className="text-sm font-bold text-blue-600">{req.totalLabel}</span>
                       </div>
                     </div>
                   </div>
@@ -710,7 +764,7 @@ export default function AdminPage() {
                          {userSubmissions.length} sugestões
                       </td>
                       <td className="px-8 py-5">
-                         <div className="text-sm font-black text-indigo-600">{paidCheckouts.length} pagas</div>
+                         <div className="text-sm font-black text-blue-600">{paidCheckouts.length} pagas</div>
                          <div className="text-[10px] text-slate-400">{userCheckouts.length} totais</div>
                       </td>
                       <td className="px-8 py-5">
@@ -724,7 +778,7 @@ export default function AdminPage() {
                       <td className="px-8 py-5">
                          <button 
                            onClick={() => alert(`Histórico de ${email}:\n\nSugestões: ${userSubmissions.length}\nCompras: ${userCheckouts.length}`)}
-                           className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-indigo-600 transition-all font-bold text-xs"
+                           className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-blue-600 transition-all font-bold text-xs"
                          >
                            Ver Histórico
                          </button>
@@ -751,7 +805,7 @@ export default function AdminPage() {
           </div>
 
           {editingPost && (
-            <div className="bg-indigo-50 dark:bg-indigo-900/10 p-8 rounded-3xl border border-indigo-100 dark:border-indigo-900/30 space-y-6">
+            <div className="bg-blue-50 dark:bg-blue-900/10 p-8 rounded-3xl border border-blue-100 dark:border-blue-900/30 space-y-6">
               <h3 className="font-bold flex items-center gap-2"><Edit className="w-4 h-4" /> {editingPost.id ? 'Editar' : 'Criar'} Post</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -862,7 +916,7 @@ export default function AdminPage() {
                     <td className="px-6 py-4 text-xs text-slate-500">{new Date(p.createdAt).toLocaleDateString()}</td>
                     <td className="px-6 py-4">
                       <div className="flex gap-2">
-                        <button onClick={() => setEditingPost(p)} className="p-2 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-lg transition-all"><Edit className="w-4 h-4" /></button>
+                        <button onClick={() => setEditingPost(p)} className="p-2 hover:bg-blue-50 text-slate-400 hover:text-blue-600 rounded-lg transition-all"><Edit className="w-4 h-4" /></button>
                         <button onClick={() => handleDeletePost(p.id)} className="p-2 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-lg transition-all"><Trash2 className="w-4 h-4" /></button>
                       </div>
                     </td>
@@ -902,7 +956,7 @@ export default function AdminPage() {
                       <span className={cn(
                         "px-2 py-0.5 rounded text-[10px] font-bold uppercase",
                         sub.status === 'pending' ? "bg-amber-100 text-amber-700" :
-                        sub.status === 'analyzing' ? "bg-indigo-100 text-indigo-700" :
+                        sub.status === 'analyzing' ? "bg-blue-100 text-blue-700" :
                         sub.status === 'approved' ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
                       )}>
                         {sub.status === 'pending' ? 'Pendente' : 
@@ -923,7 +977,7 @@ export default function AdminPage() {
                     {sub.status === 'pending' && (
                       <button 
                         onClick={() => handleStatusUpdate(sub.id, 'analyzing')}
-                        className="w-full py-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-xl text-xs font-black uppercase tracking-widest transition-all"
+                        className="w-full py-3 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-xl text-xs font-black uppercase tracking-widest transition-all"
                       >
                         Mudar p/ Análise
                       </button>

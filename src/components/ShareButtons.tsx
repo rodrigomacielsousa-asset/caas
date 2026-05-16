@@ -57,8 +57,8 @@ export function ShareButtons() {
           className={cn(
             "flex items-center gap-2 px-4 py-1.5 rounded-full transition-all text-[10px] font-black uppercase tracking-widest border outline-none",
             showOptions 
-              ? "bg-indigo-600 text-white border-indigo-600" 
-              : "bg-white dark:bg-slate-900 text-indigo-600 border-indigo-600/30 hover:border-indigo-600"
+              ? "bg-blue-600 text-white border-blue-600" 
+              : "bg-white dark:bg-slate-900 text-blue-600 border-blue-600/30 hover:border-blue-600"
           )}
         >
           <Share2 className="w-3 h-3" />

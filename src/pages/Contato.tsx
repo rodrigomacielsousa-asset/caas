@@ -14,7 +14,7 @@ export default function Contato() {
           >
             <h1 className="text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
               Vamos conversar sobre o <br /> 
-              <span className="text-indigo-600">futuro da contabilidade.</span>
+              <span className="text-blue-600">futuro da contabilidade.</span>
             </h1>
             <p className="text-xl text-slate-500 max-w-2xl mx-auto font-medium">
               Dúvidas sobre o ecossistema, propostas de parcerias ou suporte técnico? Nossa equipe está pronta para ajudar.
@@ -33,13 +33,13 @@ export default function Contato() {
             transition={{ delay: 0.1 }}
             className="bg-white dark:bg-slate-900 p-10 rounded-[40px] border border-slate-200 dark:border-slate-800 shadow-xl space-y-8"
           >
-            <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-900/30 rounded-3xl flex items-center justify-center">
-              <Mail className="w-8 h-8 text-indigo-600" />
+            <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 rounded-3xl flex items-center justify-center">
+              <Mail className="w-8 h-8 text-blue-600" />
             </div>
             <div>
               <h3 className="text-2xl font-bold mb-2">E-mail</h3>
               <p className="text-slate-500 mb-6 font-medium">Envie sua dúvida e responderemos em até 24h úteis.</p>
-              <a href="mailto:contato@microcaas.com.br" className="text-indigo-600 font-black text-lg hover:underline block">contato@microcaas.com.br</a>
+              <a href="mailto:contato@microcaas.com.br" className="text-blue-600 font-black text-lg hover:underline block">contato@microcaas.com.br</a>
             </div>
           </motion.div>
 
@@ -84,14 +84,14 @@ export default function Contato() {
             <div className="space-y-6">
               <h2 className="text-4xl font-black text-slate-900 dark:text-white leading-tight">Acompanhe a revolução <br /> nas redes sociais</h2>
               <div className="flex gap-6">
-                <a href="#" className="w-14 h-14 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center hover:bg-indigo-600 hover:text-white transition-all"><Linkedin className="w-6 h-6" /></a>
-                <a href="#" className="w-14 h-14 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center hover:bg-indigo-600 hover:text-white transition-all"><Instagram className="w-6 h-6" /></a>
-                <a href="#" className="w-14 h-14 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center hover:bg-indigo-600 hover:text-white transition-all"><Youtube className="w-6 h-6" /></a>
+                <a href="#" className="w-14 h-14 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all"><Linkedin className="w-6 h-6" /></a>
+                <a href="#" className="w-14 h-14 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all"><Instagram className="w-6 h-6" /></a>
+                <a href="#" className="w-14 h-14 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all"><Youtube className="w-6 h-6" /></a>
               </div>
             </div>
 
-            <div className="p-8 bg-indigo-50 dark:bg-indigo-900/20 rounded-[32px] border border-indigo-100 dark:border-indigo-900/30">
-               <h4 className="font-bold flex items-center gap-2 mb-2"><Globe className="w-5 h-5 text-indigo-600" /> Portal MicroCaaS 2025</h4>
+            <div className="p-8 bg-blue-50 dark:bg-blue-900/20 rounded-[32px] border border-blue-100 dark:border-blue-900/30">
+               <h4 className="font-bold flex items-center gap-2 mb-2"><Globe className="w-5 h-5 text-blue-600" /> Portal MicroCaaS 2025</h4>
                <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">Ao submeter seu contato, você autoriza o recebimento de novidades sobre lançamentos e updates do sistema.</p>
             </div>
           </div>
@@ -100,16 +100,16 @@ export default function Contato() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                <div className="space-y-1">
                   <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Nome</label>
-                  <input type="text" className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-6 py-4 focus:ring-2 focus:ring-indigo-600 transition-all font-medium" placeholder="Ex: João Silva" />
+                  <input type="text" className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-6 py-4 focus:ring-2 focus:ring-blue-600 transition-all font-medium" placeholder="Ex: João Silva" />
                </div>
                <div className="space-y-1">
                   <label className="text-xs font-bold uppercase tracking-widest text-slate-400">E-mail</label>
-                  <input type="email" className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-6 py-4 focus:ring-2 focus:ring-indigo-600 transition-all font-medium" placeholder="Ex: joao@empresa.com" />
+                  <input type="email" className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-6 py-4 focus:ring-2 focus:ring-blue-600 transition-all font-medium" placeholder="Ex: joao@empresa.com" />
                </div>
             </div>
             <div className="space-y-1">
                <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Assunto</label>
-               <select className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-6 py-4 focus:ring-2 focus:ring-indigo-600 transition-all font-medium appearance-none">
+               <select className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-6 py-4 focus:ring-2 focus:ring-blue-600 transition-all font-medium appearance-none">
                   <option>Parceria Comercial</option>
                   <option>Suporte Técnico</option>
                   <option>MicroCaaS Factory (Expertise)</option>
@@ -118,7 +118,7 @@ export default function Contato() {
             </div>
             <div className="space-y-1">
                <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Mensagem</label>
-               <textarea rows={4} className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-6 py-4 focus:ring-2 focus:ring-indigo-600 transition-all font-medium" placeholder="Como podemos ajudar?"></textarea>
+               <textarea rows={4} className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-6 py-4 focus:ring-2 focus:ring-blue-600 transition-all font-medium" placeholder="Como podemos ajudar?"></textarea>
             </div>
             <button className="w-full btn-primary py-5 rounded-2xl flex items-center justify-center gap-3 text-lg transition-all group">
               Enviar Mensagem

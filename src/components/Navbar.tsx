@@ -113,6 +113,11 @@ export function Navbar() {
                       <Link to="/dashboard" className="block px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50">
                         Dashboard
                       </Link>
+                      {user.email === 'rodrigomaciel.sousa@gmail.com' && (
+                        <Link to="/admin" className="block px-4 py-2 text-xs font-bold text-blue-600 hover:bg-blue-50">
+                          Painel Admin
+                        </Link>
+                      )}
                       <Link to="/minhas-compras" className="block px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50">
                         Minhas Compras
                       </Link>
@@ -187,6 +192,11 @@ export function Navbar() {
                   <Link to="/dashboard" className="block px-3 py-3 text-base font-medium text-slate-700">
                     Dashboard
                   </Link>
+                  {user.email === 'rodrigomaciel.sousa@gmail.com' && (
+                    <Link to="/admin" className="block px-3 py-3 text-base font-medium text-blue-600">
+                      Painel Admin
+                    </Link>
+                  )}
                   <Link to="/minhas-compras" className="block px-3 py-3 text-base font-medium text-slate-700">
                     Minhas Compras
                   </Link>

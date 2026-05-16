@@ -92,15 +92,15 @@ export default function ICloudContabil() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Pesquisar em todos os documentos..."
-                  className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-indigo-600 transition-all font-medium" 
+                  className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-blue-600 transition-all font-medium" 
                 />
              </div>
-             <button className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl text-slate-500 hover:text-indigo-600 transition-all shadow-sm">
+             <button className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl text-slate-500 hover:text-blue-600 transition-all shadow-sm">
                 <Filter className="w-5 h-5" />
              </button>
           </div>
 
-          <label className="flex items-center gap-3 px-8 py-4 bg-indigo-600 text-white rounded-[20px] font-bold shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all cursor-pointer">
+          <label className="flex items-center gap-3 px-8 py-4 bg-blue-600 text-white rounded-[20px] font-bold shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all cursor-pointer">
              <Upload className="w-5 h-5" />
              {isUploading ? 'Classificando Documento...' : 'Upload Inteligente'}
              <input type="file" className="hidden" onChange={handleUpload} disabled={isUploading} />
@@ -124,10 +124,10 @@ export default function ICloudContabil() {
                   ].map(item => (
                     <button key={item.name} className={cn(
                       "w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all font-bold text-sm",
-                      item.active ? "bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-indigo-600 shadow-sm" : "text-slate-500 hover:bg-white/50"
+                      item.active ? "bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-blue-600 shadow-sm" : "text-slate-500 hover:bg-white/50"
                     )}>
                       <div className="flex items-center gap-3">
-                         <item.icon className={cn("w-4 h-4", item.active ? "text-indigo-600" : "text-slate-400")} />
+                         <item.icon className={cn("w-4 h-4", item.active ? "text-blue-600" : "text-slate-400")} />
                          {item.name}
                       </div>
                       <span className="text-[10px]">{item.count}</span>
@@ -136,11 +136,11 @@ export default function ICloudContabil() {
                 </nav>
              </div>
 
-             <div className="bg-gradient-to-br from-slate-900 to-indigo-950 p-8 rounded-[40px] text-white overflow-hidden relative group">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-600 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-all" />
+             <div className="bg-gradient-to-br from-slate-900 to-blue-950 p-8 rounded-[40px] text-white overflow-hidden relative group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-all" />
                 <div className="relative z-10 space-y-6">
                    <h4 className="text-xl font-bold leading-tight">Backup Georedundante</h4>
-                   <p className="text-xs text-indigo-200 leading-relaxed font-medium">Seus arquivos são replicados em 3 regiões diferentes para garantir 100% de disponibilidade.</p>
+                   <p className="text-xs text-blue-200 leading-relaxed font-medium">Seus arquivos são replicados em 3 regiões diferentes para garantir 100% de disponibilidade.</p>
                    <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase tracking-widest">
                       <CheckCircle2 className="w-4 h-4" /> Ativo
                    </div>
@@ -156,7 +156,7 @@ export default function ICloudContabil() {
                      Documentos Recentes <ChevronRight className="w-4 h-4 text-slate-300" />
                    </h2>
                    <div className="flex gap-4">
-                      <button className="flex items-center gap-2 text-xs font-bold text-indigo-600 hover:underline"><Plus className="w-4 h-4" /> Nova Pasta</button>
+                      <button className="flex items-center gap-2 text-xs font-bold text-blue-600 hover:underline"><Plus className="w-4 h-4" /> Nova Pasta</button>
                    </div>
                 </div>
 
@@ -178,12 +178,12 @@ export default function ICloudContabil() {
                              onClick={() => setSelectedFile(file)}
                              className={cn(
                                "hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group cursor-pointer",
-                               selectedFile?.id === file.id && "bg-indigo-50/30 dark:bg-indigo-900/10"
+                               selectedFile?.id === file.id && "bg-blue-50/30 dark:bg-blue-900/10"
                              )}
                            >
                              <td className="px-10 py-6">
                                 <div className="flex items-center gap-4">
-                                   <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-500">
+                                   <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
                                       <File className="w-5 h-5" />
                                    </div>
                                    <div>
@@ -197,12 +197,12 @@ export default function ICloudContabil() {
                                   "px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest",
                                   file.category === 'Fiscal' ? "bg-amber-100 text-amber-700" :
                                   file.category === 'RH' ? "bg-emerald-100 text-emerald-700" :
-                                  file.category === 'Legal' ? "bg-indigo-100 text-indigo-700" : "bg-slate-100 text-slate-700"
+                                  file.category === 'Legal' ? "bg-blue-100 text-blue-700" : "bg-slate-100 text-slate-700"
                                 )}>
                                    {file.category}
                                 </span>
                                 {file.confidence && (
-                                  <div className="text-[8px] font-black text-indigo-600 opacity-0 group-hover:opacity-100 mt-1 transition-opacity">IA: {file.confidence}% PRECISION</div>
+                                  <div className="text-[8px] font-black text-blue-600 opacity-0 group-hover:opacity-100 mt-1 transition-opacity">IA: {file.confidence}% PRECISION</div>
                                 )}
                              </td>
                              <td className="px-10 py-6">
@@ -212,7 +212,7 @@ export default function ICloudContabil() {
                                 <span className="text-xs font-medium text-slate-500">{file.updatedAt}</span>
                              </td>
                              <td className="px-10 py-6">
-                                <button className="p-2 opacity-0 group-hover:opacity-100 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-indigo-600 transition-all"><MoreVertical className="w-4 h-4" /></button>
+                                <button className="p-2 opacity-0 group-hover:opacity-100 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-blue-600 transition-all"><MoreVertical className="w-4 h-4" /></button>
                              </td>
                            </tr>
                          ))}
@@ -259,20 +259,20 @@ export default function ICloudContabil() {
                 <div className="p-6 bg-slate-50 dark:bg-slate-800 rounded-3xl space-y-4">
                    <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-slate-400">
                       <span>Categoria IA</span>
-                      <span className="text-indigo-600">{selectedFile.category}</span>
+                      <span className="text-blue-600">{selectedFile.category}</span>
                    </div>
                    <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-slate-400">
                       <span>Confiança</span>
-                      <span className="text-indigo-600">{selectedFile.confidence || 100}%</span>
+                      <span className="text-blue-600">{selectedFile.confidence || 100}%</span>
                    </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                   <button className="flex flex-col items-center gap-2 p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[32px] hover:border-indigo-600 hover:text-indigo-600 transition-all group">
+                   <button className="flex flex-col items-center gap-2 p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[32px] hover:border-blue-600 hover:text-blue-600 transition-all group">
                       <Download className="w-6 h-6 group-hover:scale-110 transition-transform" />
                       <span className="text-xs font-bold">Baixar</span>
                    </button>
-                   <button className="flex flex-col items-center gap-2 p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[32px] hover:border-indigo-600 hover:text-indigo-600 transition-all group">
+                   <button className="flex flex-col items-center gap-2 p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[32px] hover:border-blue-600 hover:text-blue-600 transition-all group">
                       <Share2 className="w-6 h-6 group-hover:scale-110 transition-transform" />
                       <span className="text-xs font-bold">Partilhar</span>
                    </button>

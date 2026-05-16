@@ -1,6 +1,8 @@
+import { collection, doc, getDocs, setDoc, query, orderBy, deleteDoc, addDoc, where, limit } from 'firebase/firestore';
+import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import type { BlogPost } from '../types';
 
-const BLOG_KEY = 'microcaas_blog_posts';
+const BLOG_COLLECTION = 'posts';
 
 const INITIAL_POSTS: BlogPost[] = [
   {
@@ -36,7 +38,7 @@ const INITIAL_POSTS: BlogPost[] = [
     content: `
       <p>O conceito de "pílulas de solução" está ganhando força. No dia a dia contábil, muitas vezes você não precisa de um módulo financeiro completo, mas apenas de uma forma rápida de converter um extrato PDF em Excel.</p>
       
-      <p>Cada uma de nossas ferramentas foi projetada para resolver EXATAMENTE um problema. Essa abordagem cirúrgica garante que você não se perca em menus infinitos.</p>
+      <p>Cada uma de nossas ferramentas foi projetada para resolver EXATAMENTE um problem. Essa abordagem cirúrgica garante que você não se perca em menus infinitos.</p>
       
       <h3>Exemplos de ganho de tempo real:</h3>
       <ul>
@@ -53,221 +55,150 @@ const INITIAL_POSTS: BlogPost[] = [
     updatedAt: new Date(Date.now() - 86400000).toISOString()
   },
   {
-    id: '3',
-    title: 'Pare de perder tempo com tarefas manuais na contabilidade',
-    slug: 'pare-perder-tempo-tarefas-manuais',
-    summary: 'Veja como eliminar digitação, planilhas e retrabalho com ferramentas específicas.',
-    content: `
-      <p>A digitação manual é a maior inimiga da rentabilidade de um escritório contábil. Cada minuto gasto digitando um lançamento é um minuto que você não gasta analisando dados estrategicamente para seu cliente.</p>
-      
-      <p>As planilhas são úteis, mas quando o processo se torna repetitivo e propenso a erros, é hora de automatizar.</p>
-      
-      <h3>O tripé da ineficiência:</h3>
-      <ol>
-        <li>Digitação manual de documentos físicos.</li>
-        <li>Planilhas paralelas sem integração.</li>
-        <li>Retrabalho por falta de validação na fonte.</li>
-      </ol>
-
-      <p>Ao adotar micro automações, você elimina esses gargalos e foca no que realmente importa: gerar valor para o cliente.</p>
-    `,
-    image: 'https://images.unsplash.com/photo-1454165833767-1330084b1d3c?q=80&w=2340&auto=format&fit=crop',
-    status: 'published',
-    createdAt: new Date(Date.now() - 172800000).toISOString(),
-    updatedAt: new Date(Date.now() - 172800000).toISOString()
-  },
-  {
     id: '4',
     title: 'Como reduzir o retrabalho contábil no dia a dia',
     slug: 'reduzir-retrabalho-contabil',
     summary: 'Veja como eliminar tarefas repetitivas e ganhar produtividade com soluções simples.',
     content: `
-      <p>O retrabalho é um dos maiores "ladrões de tempo" em qualquer escritório de contabilidade. Muitas vezes, a equipe gasta horas conferindo dados que já foram processados em outro sistema, simplesmente porque a integração falhou ou o sistema principal é complexo demais.</p>
+      <p>O retrabalho é um dos maiores vilões da produtividade nos escritórios de contabilidade. Muitas vezes, o contador se vê redigitando dados que já existem em outros sistemas ou corrigindo erros que poderiam ser evitados com automação.</p>
       
-      <p>A solução não é contratar mais pessoas, mas sim implementar ferramentas que façam o trabalho pesado de conferência de forma automática.</p>
+      <h3>A causa do retrabalho</h3>
+      <p>Sistemas complexos e falta de integração são os principais culpados. Quando a ferramenta é difícil de usar, o erro humano se torna frequente.</p>
       
-      <h3>O caminho para a eficiência:</h3>
-      <ul>
-        <li>Identificação de processos repetitivos.</li>
-        <li>Substituição de conferência manual por lógica automatizada.</li>
-        <li>Uso de ferramentas que "conversam" entre si sem burocracia.</li>
-      </ul>
-
-      <p>Menos retrabalho significa uma equipe mais motivada e uma margem de lucro maior para o seu negócio.</p>
+      <h3>A solução MicroCaaS</h3>
+      <p>Ao utilizar ferramentas específicas para cada tarefa, você elimina camadas de complexidade. Menos cliques, menos campos para preencher e validações automáticas garantem que o trabalho seja feito certo da primeira vez.</p>
+      
+      <p><strong>Mensagem:</strong> Menos retrabalho = mais produtividade para focar no que realmente importa: a consultoria para o seu cliente.</p>
     `,
-    image: 'https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=2340&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1454165833767-02750e5eb4e4?q=80&w=2340&auto=format&fit=crop',
     status: 'published',
-    createdAt: new Date(Date.now() - 259200000).toISOString(),
-    updatedAt: new Date(Date.now() - 259200000).toISOString()
+    createdAt: new Date(Date.now() - 172800000).toISOString(),
+    updatedAt: new Date(Date.now() - 172800000).toISOString()
   },
   {
     id: '5',
     title: 'Por que planilhas ainda travam a produtividade do contador',
     slug: 'planilhas-travam-produtividade',
-    summary: 'Entenda como o uso excessivo de planilhas pode estar atrasando seu trabalho.',
+    summary: 'Entenda como o uso excessivo de planilhas pode estar atrasando seu trabalho e gerando riscos.',
     content: `
-      <p>O Microsoft Excel é uma ferramenta fantástica, mas ele não foi feito para ser o coração de um escritório contábil escalável. Quando você depende de planilhas para tudo, você cria "ilhas de informação" que são difíceis de auditar e fáceis de corromper.</p>
+      <p>Planilhas são ótimas aliadas, mas quando se tornam a base da operação, viram um problema. Elas não possuem auditoria, perdem referências facilmente e dependem totalmente da memória de quem as criou.</p>
       
-      <p>Erros manuais em fórmulas podem causar prejuízos fiscais enormes para seus clientes e comprometer a confiança no seu trabalho.</p>
+      <h3>O perigo das "Planilhas de Controle"</h3>
+      <p>Quantas vezes você já se deparou com uma planilha corrompida ou com fórmulas erradas que passaram despercebidas? Na contabilidade, um erro de célula pode significar uma multa pesada.</p>
       
-      <h3>Os limites da planilha:</h3>
-      <ul>
-        <li>Falta de rastreabilidade de alterações.</li>
-        <li>Dificuldade de consolidação de dados em larga escala.</li>
-        <li>Dependência de um "expert" que criou a planilha.</li>
-      </ul>
-
-      <p>A alternativa é migrar para automações simples (MicroCaaS) que possuem regras de negócio blindadas e focadas em resultados específicos.</p>
+      <h3>IA e Microsserviços vs Excel</h3>
+      <p>Ferramentas dedicadas oferecem o que o Excel não consegue: persistência de dados, histórico de alterações e validação em tempo real. É hora de aposentar as planilhas complexas e adotar fluxos de trabalho inteligentes.</p>
     `,
-    image: 'https://images.unsplash.com/photo-1554224155-169641357288?q=80&w=2340&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1543286386-2e659306cd6c?q=80&w=2340&auto=format&fit=crop',
+    status: 'published',
+    createdAt: new Date(Date.now() - 259200000).toISOString(),
+    updatedAt: new Date(Date.now() - 259200000).toISOString()
+  },
+  {
+    id: '6',
+    title: 'Aumentando a rentabilidade do escritório com IA',
+    slug: 'rentabilidade-escritorio-ia',
+    summary: 'A inteligência artificial não vai substituir o contador, mas vai tornar seu escritório muito mais lucrativo.',
+    content: `
+      <p>A IA é a nova eletricidade para o setor contábil. Ela permite processar volumes massivos de dados em frações de segundo, identificando padrões que passariam batidos ao olho humano.</p>
+      <p>Com a automação de tarefas básicas, o custo operacional cai drasticamente, permitindo que o escritório atenda mais clientes com a mesma equipe, ou ofereça serviços de maior valor agregado.</p>
+    `,
+    image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2400&auto=format&fit=crop',
     status: 'published',
     createdAt: new Date(Date.now() - 345600000).toISOString(),
     updatedAt: new Date(Date.now() - 345600000).toISOString()
   },
   {
-    id: '6',
-    title: 'Como automatizar tarefas fiscais sem complicação',
-    slug: 'automatizar-tarefas-fiscais',
-    summary: 'Automatize processos fiscais sem precisar de sistemas complexos.',
+    id: '7',
+    title: 'O fim das pilhas de papel no setor fiscal',
+    slug: 'fim-pilhas-papel-fiscal',
+    summary: 'A jornada para um departamento fiscal 100% digital e sem estresse.',
     content: `
-      <p>Muitos contadores acreditam que para automatizar a área fiscal é necessário um projeto de TI de seis meses. Isso é um mito. A automação fiscal moderna pode ser feita através de pequenas ferramentas que resolvem dores atômicas.</p>
-      
-      <p>Seja baixando XMLs, validando alíquotas ou gerando guias de impostos, a automação prática é aquela que você começa a usar hoje.</p>
-      
-      <h3>Exemplos de automação imediata:</h3>
-      <ul>
-        <li>Monitoramento em tempo real de NF-e emitidas contra o cliente.</li>
-        <li>Cálculo automático de substituição tributária.</li>
-        <li>Consolidação de fechamento em lote.</li>
-      </ul>
-
-      <p>A automação simples funciona porque ela foca na dor real, não em funcionalidades que ninguém usa.</p>
+      <p>O setor fiscal sempre foi sinônimo de arquivos e pilhas de papel. Mas isso está mudando. Com a digitalização forçada por órgãos como a RFB, a oportunidade de ser 100% digital é agora.</p>
+      <p>Ferramentas de captura automática de documentos eliminam a necessidade de conferência manual e armazenamento físico, reduzindo custos de logística e espaço.</p>
     `,
-    image: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=2340&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1568667256549-094345857637?q=80&w=2340&auto=format&fit=crop',
     status: 'published',
     createdAt: new Date(Date.now() - 432000000).toISOString(),
     updatedAt: new Date(Date.now() - 432000000).toISOString()
   },
   {
-    id: '7',
-    title: 'O fim dos sistemas contábeis pesados?',
-    slug: 'fim-sistemas-contabeis-pesados',
-    summary: 'Veja por que o mercado está mudando para soluções mais simples e rápidas.',
+    id: '8',
+    title: 'Segurança de dados: os riscos que seu escritório corre hoje',
+    slug: 'seguranca-dados-riscos-escritorio',
+    summary: 'Proteja o bem mais precioso do seu cliente: as informações financeiras e fiscais.',
     content: `
-      <p>Estamos vendo o nascimento de uma nova era na tecnologia contábil. Os ERPs grandes e lentos estão perdendo espaço para ecossistemas de micro-serviços. O motivo? Agilidade.</p>
-      
-      <p>O custo de manter um sistema legado é alto, tanto em termos financeiros quanto em tempo de treinamento. O MicroCaaS (Micro Accounting as a Service) surge como a solução para quem quer eficiência sem o peso de um software gigante.</p>
-      
-      <h3>A mudança de paradigma:</h3>
-      <ul>
-        <li><strong>De:</strong> Um sistema que faz tudo (mais ou menos).</li>
-        <li><strong>Para:</strong> Dez ferramentas que fazem uma coisa cada (com perfeição).</li>
-      </ul>
-
-      <p>O resultado final é menos sistema e muito mais resultado para o contador e seu cliente.</p>
+      <p>Contadores lidam com dados sensíveis de centenas de empresas. Um vazamento pode ser fatal. A segurança não é mais um luxo, é uma questão de conformidade legal (LGPD) e sobrevivência.</p>
+      <p>Usar soluções em nuvem com criptografia de ponta a ponta é o primeiro passo para garantir que os dados de seus clientes estejam sempre protegidos contra ataques e falhas físicas.</p>
     `,
-    image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2340&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2340&auto=format&fit=crop',
     status: 'published',
     createdAt: new Date(Date.now() - 518400000).toISOString(),
     updatedAt: new Date(Date.now() - 518400000).toISOString()
   },
   {
-    id: '8',
-    title: 'Como ganhar escala no escritório contábil sem aumentar equipe',
-    slug: 'ganhar-escala-sem-aumentar-equipe',
-    summary: 'Descubra como atender mais clientes sem aumentar custos.',
+    id: '9',
+    title: 'Gestão de talentos na contabilidade moderna',
+    slug: 'gestao-talentos-contabilidade',
+    summary: 'Como atrair e reter bons profissionais em um mercado cada vez mais tecnológico.',
     content: `
-      <p>O limite de crescimento de muitos escritórios é o limite operacional da sua equipe. Quando cada novo cliente significa a necessidade de contratar um novo assistente, o seu negócio não possui escala real.</p>
-      
-      <p>Para escalar com eficiência, você precisa desvincular o faturamento do número de horas homem trabalhadas.</p>
-      
-      <h3>Estratégias de escala:</h3>
-      <ul>
-        <li>Padronização radical de processos de entrada de dados.</li>
-        <li>Uso de micro automações para tarefas de baixo valor agregado.</li>
-        <li>Foco da equipe em consultoria e análise estratégica.</li>
-      </ul>
-
-      <p>A tecnologia certa permite que você atenda o dobro de clientes com a mesma estrutura atual.</p>
+      <p>O perfil do profissional contábil mudou. Eles buscam ambientes que utilizem tecnologia de ponta e que valorizem o pensamento analítico em vez da digitação repetitiva.</p>
+      <p>Oferecer ferramentas modernas é uma forma de reter talentos, pois reduz o estresse operacional e permite que o colaborador veja o valor real do seu trabalho.</p>
     `,
     image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2340&auto=format&fit=crop',
     status: 'published',
     createdAt: new Date(Date.now() - 604800000).toISOString(),
     updatedAt: new Date(Date.now() - 604800000).toISOString()
-  },
-  {
-    id: '9',
-    title: 'Pequenas soluções que resolvem grandes problemas contábeis',
-    slug: 'pequenas-solucoes-grandes-problemas',
-    summary: 'Entenda como ferramentas simples podem substituir sistemas complexos.',
-    content: `
-      <p>Muitas vezes, a solução para um grande problema contábil não é um software de mil dólares, mas sim uma ferramenta simples que limpa e organiza seus dados antes que eles entrem no sistema principal.</p>
-      
-      <p>O conceito de micro solução é focar no gargalo. Se o seu fechamento atrasa por causa da demora no recebimento de extratos, resolva o recebimento de extratos primeiro.</p>
-      
-      <h3>Simplicidade resolve:</h3>
-      <ul>
-        <li>Foco total no problema específico.</li>
-        <li>Implementação imediata sem treinamento complexo.</li>
-        <li>Custo reduzido e alto retorno sobre o investimento.</li>
-      </ul>
-
-      <p>No final das contas, o que importa é a agilidade que você ganha para focar na estratégia do seu escritório.</p>
-    `,
-    image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2340&auto=format&fit=crop',
-    status: 'published',
-    createdAt: new Date(Date.now() - 691200000).toISOString(),
-    updatedAt: new Date(Date.now() - 691200000).toISOString()
   }
 ];
 
 export const blogService = {
   async getPosts(): Promise<BlogPost[]> {
-    const data = localStorage.getItem(BLOG_KEY);
-    if (!data) {
-      localStorage.setItem(BLOG_KEY, JSON.stringify(INITIAL_POSTS));
-      return INITIAL_POSTS;
+    try {
+      const q = query(collection(db, BLOG_COLLECTION), orderBy('createdAt', 'desc'));
+      const querySnapshot = await getDocs(q);
+      const posts = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as BlogPost));
+      
+      if (posts.length === 0) {
+        return INITIAL_POSTS;
+      }
+      return posts;
+    } catch (error) {
+       console.warn("Blog collection issue, falling back to static data", error);
+       try { handleFirestoreError(error, OperationType.LIST, BLOG_COLLECTION); } catch(e) {}
+       return INITIAL_POSTS;
     }
-    const currentPosts = JSON.parse(data);
-    
-    // Auto-migration: if we have added new default posts in code, merge them
-    if (currentPosts.length < INITIAL_POSTS.length) {
-      const merged = [...currentPosts];
-      INITIAL_POSTS.forEach(initialPost => {
-        if (!merged.find(p => p.slug === initialPost.slug)) {
-          merged.push(initialPost);
-        }
-      });
-      localStorage.setItem(BLOG_KEY, JSON.stringify(merged));
-      return merged;
-    }
-    
-    return currentPosts;
   },
 
   async getPostBySlug(slug: string): Promise<BlogPost | undefined> {
-    const posts = await this.getPosts();
-    return posts.find(p => p.slug === slug);
+    try {
+      const posts = await this.getPosts();
+      return posts.find(p => p.slug === slug);
+    } catch (error) {
+      return undefined;
+    }
   },
 
   async savePost(post: BlogPost): Promise<void> {
-    const posts = await this.getPosts();
-    const index = posts.findIndex(p => p.id === post.id);
-    
-    let updatedPosts;
-    if (index >= 0) {
-      updatedPosts = [...posts];
-      updatedPosts[index] = { ...post, updatedAt: new Date().toISOString() };
-    } else {
-      updatedPosts = [{ ...post, id: Math.random().toString(36).substr(2, 9), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }, ...posts];
-    }
-    
-    localStorage.setItem(BLOG_KEY, JSON.stringify(updatedPosts));
+     try {
+       const id = post.id || post.slug;
+       const data = {
+         ...post,
+         updatedAt: new Date().toISOString()
+       };
+       if (!post.createdAt) data.createdAt = new Date().toISOString();
+       
+       await setDoc(doc(db, BLOG_COLLECTION, id), data, { merge: true });
+     } catch (error) {
+       handleFirestoreError(error, OperationType.WRITE, BLOG_COLLECTION);
+     }
   },
 
   async deletePost(id: string): Promise<void> {
-    const posts = await this.getPosts();
-    const updated = posts.filter(p => p.id !== id);
-    localStorage.setItem(BLOG_KEY, JSON.stringify(updated));
+    try {
+      await deleteDoc(doc(db, BLOG_COLLECTION, id));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, BLOG_COLLECTION);
+    }
   }
 };

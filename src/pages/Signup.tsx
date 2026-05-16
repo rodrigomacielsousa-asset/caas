@@ -61,7 +61,16 @@ export default function Signup() {
 
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.message || 'Erro ao criar conta');
+      console.error(err);
+      let msg = 'Ocorreu um erro ao criar sua conta. Tente novamente.';
+      if (err.code === 'auth/email-already-in-use') {
+        msg = 'Este e-mail já está em uso. Que tal tentar entrar com ele?';
+      } else if (err.code === 'auth/weak-password') {
+        msg = 'Sua senha é muito fraca. Tente uma mais forte.';
+      } else if (err.code === 'auth/invalid-email') {
+        msg = 'O e-mail informado parece inválido.';
+      }
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
@@ -98,12 +107,12 @@ export default function Signup() {
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md bg-white dark:bg-slate-900 p-8 md:p-10 rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-xl relative overflow-hidden"
       >
-        <div className="absolute top-0 left-0 p-8 opacity-5 rotate-12"><Users className="w-48 h-48 text-indigo-600" /></div>
+        <div className="absolute top-0 left-0 p-8 opacity-5 rotate-12"><Users className="w-48 h-48 text-blue-600" /></div>
         
         <div className="space-y-8 relative z-10">
           <div className="flex flex-col items-center text-center gap-2">
-            <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter italic uppercase leading-none">Novo Acesso</h1>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">Crie sua conta em 30 segundos</p>
+            <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter uppercase leading-none">Novo Cadastro</h1>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Crie sua conta em segundos</p>
           </div>
 
           <form onSubmit={handleSignup} className="space-y-5">
@@ -122,7 +131,7 @@ export default function Signup() {
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Seu nome completo"
                   required
-                  className="w-full pl-16 pr-6 py-6 bg-slate-50 dark:bg-slate-800 border-none rounded-3xl text-sm font-bold text-slate-900 dark:text-white focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 transition-all outline-none"
+                  className="w-full pl-16 pr-6 py-6 bg-slate-50 dark:bg-slate-800 border-none rounded-3xl text-sm font-bold text-slate-900 dark:text-white focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30 transition-all outline-none"
                 />
               </div>
 
@@ -132,9 +141,9 @@ export default function Signup() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Seu melhor email"
+                  placeholder="Seu e-mail"
                   required
-                  className="w-full pl-16 pr-6 py-6 bg-slate-50 dark:bg-slate-800 border-none rounded-3xl text-sm font-bold text-slate-900 dark:text-white focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 transition-all outline-none"
+                  className="w-full pl-16 pr-6 py-6 bg-slate-50 dark:bg-slate-800 border-none rounded-3xl text-sm font-bold text-slate-900 dark:text-white focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30 transition-all outline-none"
                 />
               </div>
 
@@ -146,7 +155,7 @@ export default function Signup() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Defina sua senha"
                   required
-                  className="w-full pl-16 pr-6 py-6 bg-slate-50 dark:bg-slate-800 border-none rounded-3xl text-sm font-bold text-slate-900 dark:text-white focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 transition-all outline-none"
+                  className="w-full pl-16 pr-6 py-6 bg-slate-50 dark:bg-slate-800 border-none rounded-3xl text-sm font-bold text-slate-900 dark:text-white focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30 transition-all outline-none"
                 />
               </div>
             </div>
@@ -154,7 +163,7 @@ export default function Signup() {
             <button 
               type="submit"
               disabled={isLoading || isGoogleLoading}
-              className="w-full py-6 bg-indigo-600 text-white rounded-3xl font-black text-xs uppercase tracking-widest shadow-2xl shadow-indigo-100 dark:shadow-none hover:bg-slate-900 transition-all flex items-center justify-center gap-3 group"
+              className="w-full py-6 bg-blue-600 text-white rounded-3xl font-black text-xs uppercase tracking-widest shadow-2xl shadow-blue-100 dark:shadow-none hover:bg-slate-900 transition-all flex items-center justify-center gap-3 group"
             >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -177,14 +186,14 @@ export default function Signup() {
               {isGoogleLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
-                <><Chrome className="w-5 h-5 text-indigo-600" /> Cadastrar com Google</>
+                <><Chrome className="w-5 h-5 text-blue-600" /> Cadastrar com Google</>
               )}
             </button>
           </form>
 
           <div className="pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-              Já tem uma conta? <Link to="/login" className="text-indigo-600 hover:underline">Voltar ao Portal</Link>
+              Já tem uma conta? <Link to="/login" className="text-blue-600 hover:underline">Voltar ao Portal</Link>
             </p>
           </div>
         </div>

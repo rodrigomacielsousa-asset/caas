@@ -434,17 +434,17 @@ export default function FinanceInsight() {
 
   if (loadingAuth) return (
     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8 space-y-4">
-      <Loader2 className="w-12 h-12 animate-spin text-indigo-600" />
+      <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
       <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] animate-pulse">Verificando Identidade...</p>
     </div>
   );
 
   if (loading) return (
     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8 space-y-4">
-      <Loader2 className="w-12 h-12 animate-spin text-indigo-600" />
+      <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
       <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] animate-pulse">Iniciando Finance Insight Engine...</p>
-      <div className="mt-8 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-full">
-         <p className="text-[9px] font-bold text-indigo-600 dark:text-indigo-400 italic">Conectando ao Office Contábil Cloud</p>
+      <div className="mt-8 px-4 py-2 bg-blue-50 dark:bg-blue-900/20 rounded-full">
+         <p className="text-[9px] font-bold text-blue-600 dark:text-blue-400 italic">Conectando ao Office Contábil Cloud</p>
       </div>
     </div>
   );
@@ -454,12 +454,12 @@ export default function FinanceInsight() {
   if (!user) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-8 space-y-6">
-        <Lock className="w-16 h-16 text-indigo-600 mb-4" />
+        <Lock className="w-16 h-16 text-blue-600 mb-4" />
         <h1 className="text-3xl font-black text-slate-900 dark:text-white text-center italic tracking-tighter">Acesso Restrito</h1>
         <p className="text-slate-500 text-center max-w-md">Para acessar o Finance Insight PRO e gerenciar o fluxo de caixa dos seus clientes, você precisa estar autenticado no Office Contábil.</p>
         <button 
           onClick={() => window.location.href = '/login'}
-          className="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl hover:scale-105 transition-all"
+          className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl hover:scale-105 transition-all"
         >
           Ir para Login
         </button>
@@ -492,7 +492,7 @@ export default function FinanceInsight() {
         <div className="bg-white dark:bg-slate-900 p-10 rounded-[48px] border border-slate-100 dark:border-slate-800 shadow-xl space-y-8">
            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
               <div className="flex items-center gap-6">
-                 <div className="w-20 h-20 bg-indigo-600 rounded-[30px] flex items-center justify-center text-white shadow-xl shadow-indigo-100">
+                 <div className="w-20 h-20 bg-blue-600 rounded-[30px] flex items-center justify-center text-white shadow-xl shadow-blue-100">
                     <TrendingUp className="w-10 h-10" />
                  </div>
                  <div>
@@ -505,7 +505,7 @@ export default function FinanceInsight() {
               <div className="flex bg-slate-50 dark:bg-slate-800 p-2 rounded-2xl border border-slate-100 dark:border-slate-700">
                  <div className="px-6 py-2 border-r border-slate-200 dark:border-slate-700">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Plano Atual</p>
-                    <p className="text-sm font-bold text-indigo-600 uppercase">{userData?.plan || 'Free'}</p>
+                    <p className="text-sm font-bold text-blue-600 uppercase">{userData?.plan || 'Free'}</p>
                  </div>
                  <div className="px-6 py-2">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">CNPJs Monitorados</p>
@@ -520,7 +520,7 @@ export default function FinanceInsight() {
                  <select 
                    value={selectedClientId}
                    onChange={(e) => setSelectedClientId(e.target.value)}
-                   className="w-full bg-white dark:bg-slate-700 p-4 rounded-2xl border border-slate-200 dark:border-slate-600 font-bold outline-none ring-2 ring-transparent focus:ring-indigo-600 transition-all cursor-pointer"
+                   className="w-full bg-white dark:bg-slate-700 p-4 rounded-2xl border border-slate-200 dark:border-slate-600 font-bold outline-none ring-2 ring-transparent focus:ring-blue-600 transition-all cursor-pointer"
                  >
                     <option value="">Escolha um cliente...</option>
                     {clients.map(c => <option key={c.id} value={c.id}>{c.companyName}</option>)}
@@ -531,14 +531,14 @@ export default function FinanceInsight() {
                  <div className="flex bg-white dark:bg-slate-700 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-600">
                     <button 
                       onClick={() => setPeriodType('13w')}
-                      className={cn("flex-1 py-2 rounded-xl text-[10px] font-black uppercase transition-all", periodType === '13w' ? "bg-indigo-600 text-white shadow-lg" : "text-slate-400 hover:text-indigo-600")}
+                      className={cn("flex-1 py-2 rounded-xl text-[10px] font-black uppercase transition-all", periodType === '13w' ? "bg-blue-600 text-white shadow-lg" : "text-slate-400 hover:text-blue-600")}
                     >13 Semanas</button>
                     <button 
                       onClick={() => {
                         if (userData?.plan !== 'pro') { setShowPaywall(true); return; }
                         setPeriodType('12m');
                       }}
-                      className={cn("flex-1 py-2 rounded-xl text-[10px] font-black uppercase transition-all", periodType === '12m' ? "bg-indigo-600 text-white shadow-lg" : "text-slate-400 hover:text-indigo-600")}
+                      className={cn("flex-1 py-2 rounded-xl text-[10px] font-black uppercase transition-all", periodType === '12m' ? "bg-blue-600 text-white shadow-lg" : "text-slate-400 hover:text-blue-600")}
                     >12 Meses</button>
                  </div>
               </div>
@@ -547,7 +547,7 @@ export default function FinanceInsight() {
                     <button 
                       onClick={initModel}
                       disabled={isGenerating}
-                      className="flex-1 bg-indigo-600 hover:bg-slate-900 text-white font-black py-4 rounded-2xl text-sm uppercase tracking-widest shadow-xl shadow-indigo-100 transition-all flex items-center justify-center gap-3"
+                      className="flex-1 bg-blue-600 hover:bg-slate-900 text-white font-black py-4 rounded-2xl text-sm uppercase tracking-widest shadow-xl shadow-blue-100 transition-all flex items-center justify-center gap-3"
                     >
                        {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : <RefreshCw className="w-5 h-5" />}
                        Inicializar Projeção
@@ -592,7 +592,7 @@ export default function FinanceInsight() {
                   onClick={() => setActiveTab(tab.id as any)}
                   className={cn(
                     "px-8 py-5 rounded-[24px] text-[10px] font-black uppercase tracking-widest flex items-center gap-3 transition-all whitespace-nowrap",
-                    activeTab === tab.id ? "bg-white dark:bg-slate-900 text-indigo-600 shadow-xl border border-slate-100 dark:border-slate-800" : "text-slate-400 hover:text-indigo-600"
+                    activeTab === tab.id ? "bg-white dark:bg-slate-900 text-blue-600 shadow-xl border border-slate-100 dark:border-slate-800" : "text-slate-400 hover:text-blue-600"
                   )}
                 >
                    <tab.icon className="w-4 h-4" /> {tab.label}
@@ -618,7 +618,7 @@ export default function FinanceInsight() {
                         <div className="bg-white dark:bg-slate-900 p-10 rounded-[48px] border border-slate-100 dark:border-slate-800 shadow-sm space-y-4">
                            <div className="flex justify-between items-center">
                               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Saldo Atual</p>
-                              <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg"><DollarSign className="w-4 h-4" /></div>
+                              <div className="p-2 bg-blue-50 text-blue-600 rounded-lg"><DollarSign className="w-4 h-4" /></div>
                            </div>
                            <h3 className="text-3xl font-black text-slate-900 dark:text-white italic">R$ {currentModel.assumptions.initialCash.toLocaleString('pt-BR')}</h3>
                            <p className="text-[10px] font-bold text-slate-400 italic">Posição inicial para projeção</p>
@@ -665,7 +665,7 @@ export default function FinanceInsight() {
                            </div>
                            <div className="flex gap-4">
                               <div className="flex items-center gap-2">
-                                 <div className="w-3 h-3 rounded-full bg-indigo-600" />
+                                 <div className="w-3 h-3 rounded-full bg-blue-600" />
                                  <span className="text-[10px] font-bold uppercase text-slate-400">Base</span>
                               </div>
                               <div className="flex items-center gap-2">
@@ -710,7 +710,7 @@ export default function FinanceInsight() {
 
                      {/* Table Preview */}
                      <div className="bg-white dark:bg-slate-900 p-12 rounded-[56px] border border-slate-100 dark:border-slate-800 shadow-sm space-y-8">
-                        <h3 className="text-xl font-bold italic tracking-tight underline underline-offset-8 decoration-indigo-200">Trilha Numérica (Cenário Base)</h3>
+                        <h3 className="text-xl font-bold italic tracking-tight underline underline-offset-8 decoration-blue-200">Trilha Numérica (Cenário Base)</h3>
                         <div className="overflow-x-auto">
                            <table className="w-full text-left">
                               <thead>
@@ -725,7 +725,7 @@ export default function FinanceInsight() {
                                  {projectionData.slice(0, 6).map((d, i) => (
                                    <tr key={i} className="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50 transition-colors">
                                       <td className="py-6 px-4 font-black">{d.name}</td>
-                                      <td className="py-6 px-4 text-indigo-600 font-black">R$ {d.base.toLocaleString('pt-BR')}</td>
+                                      <td className="py-6 px-4 text-blue-600 font-black">R$ {d.base.toLocaleString('pt-BR')}</td>
                                       <td className="py-6 px-4 text-emerald-500 font-bold">R$ {d.optimistic.toLocaleString('pt-BR')}</td>
                                       <td className="py-6 px-4 text-rose-500 font-bold">R$ {d.pessimistic.toLocaleString('pt-BR')}</td>
                                    </tr>
@@ -742,7 +742,7 @@ export default function FinanceInsight() {
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                      <div className="space-y-8">
                         <div className="bg-white dark:bg-slate-900 p-10 rounded-[48px] border border-slate-100 dark:border-slate-800 shadow-sm space-y-8">
-                           <h3 className="text-xl font-black text-slate-900 flex items-center gap-3"><SlidersHorizontal className="w-6 h-6 text-indigo-600" /> Inputs Estruturais</h3>
+                           <h3 className="text-xl font-black text-slate-900 flex items-center gap-3"><SlidersHorizontal className="w-6 h-6 text-blue-600" /> Inputs Estruturais</h3>
                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                               <div className="space-y-2">
                                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Caixa Inicial</label>
@@ -752,7 +752,7 @@ export default function FinanceInsight() {
                                       type="number" 
                                       value={currentModel.assumptions.initialCash}
                                       onChange={(e) => saveAssumptions({ initialCash: parseFloat(e.target.value) })}
-                                      className="w-full bg-slate-50 border-none rounded-2xl px-12 py-4 font-black text-slate-700 outline-none ring-2 ring-transparent focus:ring-indigo-600 transition-all font-serif italic" 
+                                      className="w-full bg-slate-50 border-none rounded-2xl px-12 py-4 font-black text-slate-700 outline-none ring-2 ring-transparent focus:ring-blue-600 transition-all font-serif italic" 
                                     />
                                  </div>
                               </div>
@@ -764,7 +764,7 @@ export default function FinanceInsight() {
                                       type="number" 
                                       value={currentModel.assumptions.recurringRevenue}
                                       onChange={(e) => saveAssumptions({ recurringRevenue: parseFloat(e.target.value) })}
-                                      className="w-full bg-slate-50 border-none rounded-2xl px-12 py-4 font-black text-slate-700 outline-none ring-2 ring-transparent focus:ring-indigo-600 transition-all font-serif italic" 
+                                      className="w-full bg-slate-50 border-none rounded-2xl px-12 py-4 font-black text-slate-700 outline-none ring-2 ring-transparent focus:ring-blue-600 transition-all font-serif italic" 
                                     />
                                  </div>
                               </div>
@@ -776,7 +776,7 @@ export default function FinanceInsight() {
                                       type="number" 
                                       value={currentModel.assumptions.fixedExpenses}
                                       onChange={(e) => saveAssumptions({ fixedExpenses: parseFloat(e.target.value) })}
-                                      className="w-full bg-slate-50 border-none rounded-2xl px-12 py-4 font-black text-slate-700 outline-none ring-2 ring-transparent focus:ring-indigo-600 transition-all font-serif italic" 
+                                      className="w-full bg-slate-50 border-none rounded-2xl px-12 py-4 font-black text-slate-700 outline-none ring-2 ring-transparent focus:ring-blue-600 transition-all font-serif italic" 
                                     />
                                  </div>
                               </div>
@@ -788,7 +788,7 @@ export default function FinanceInsight() {
                                       type="number" 
                                       value={currentModel.assumptions.variableExpensesPercent}
                                       onChange={(e) => saveAssumptions({ variableExpensesPercent: parseFloat(e.target.value) })}
-                                      className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 font-black text-slate-700 outline-none ring-2 ring-transparent focus:ring-indigo-600 transition-all font-serif italic" 
+                                      className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 font-black text-slate-700 outline-none ring-2 ring-transparent focus:ring-blue-600 transition-all font-serif italic" 
                                     />
                                  </div>
                               </div>
@@ -825,7 +825,7 @@ export default function FinanceInsight() {
                                </div>
                                <button 
                                  onClick={() => setShowEventModal(true)}
-                                 className="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-[10px] font-black text-slate-400 uppercase tracking-widest hover:border-indigo-600 hover:text-indigo-600 transition-all flex items-center justify-center gap-2"
+                                 className="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-[10px] font-black text-slate-400 uppercase tracking-widest hover:border-blue-600 hover:text-blue-600 transition-all flex items-center justify-center gap-2"
                                >
                                   <Plus className="w-4 h-4" /> Adicionar Evento de Caixa
                                </button>
@@ -834,22 +834,22 @@ export default function FinanceInsight() {
                      </div>
 
                      <div className="space-y-8">
-                        <div className="p-10 bg-indigo-600 rounded-[56px] text-white space-y-8 shadow-2xl shadow-indigo-100">
+                        <div className="p-10 bg-blue-600 rounded-[56px] text-white space-y-8 shadow-2xl shadow-blue-100">
                            <h3 className="text-2xl font-black tracking-tighter leading-tight italic">Políticas de Riscos</h3>
                            <div className="space-y-6">
                               <div className="space-y-2">
-                                 <label className="text-[10px] font-black text-indigo-200 uppercase tracking-widest">Caixa Mínimo (Alerta)</label>
+                                 <label className="text-[10px] font-black text-blue-200 uppercase tracking-widest">Caixa Mínimo (Alerta)</label>
                                  <input 
                                    type="number" 
                                    value={currentModel.assumptions.minCash}
                                    onChange={(e) => saveAssumptions({ minCash: parseFloat(e.target.value) })}
                                    className="w-full bg-white/10 border-white/20 rounded-2xl px-6 py-4 font-black text-white outline-none focus:ring-2 focus:ring-white transition-all font-serif italic" 
                                  />
-                                 <p className="text-[9px] font-bold text-indigo-200 italic">* Define a linha vermelha no gráfico de projeção.</p>
+                                 <p className="text-[9px] font-bold text-blue-200 italic">* Define a linha vermelha no gráfico de projeção.</p>
                               </div>
                               <div className="grid grid-cols-2 gap-6">
                                  <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-indigo-200 uppercase tracking-widest">Boost Otimista</label>
+                                    <label className="text-[10px] font-black text-blue-200 uppercase tracking-widest">Boost Otimista</label>
                                     <div className="relative">
                                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 font-bold">%</span>
                                        <input 
@@ -861,7 +861,7 @@ export default function FinanceInsight() {
                                     </div>
                                  </div>
                                  <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-indigo-200 uppercase tracking-widest">Queda Pessimista</label>
+                                    <label className="text-[10px] font-black text-blue-200 uppercase tracking-widest">Queda Pessimista</label>
                                     <div className="relative">
                                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 font-bold">%</span>
                                        <input 
@@ -875,7 +875,7 @@ export default function FinanceInsight() {
                               </div>
                            </div>
                            <div className="pt-8 border-t border-white/10">
-                              <button onClick={() => setActiveTab('dashboard')} className="w-full py-5 bg-white text-indigo-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all">Ver Resultados Processados</button>
+                              <button onClick={() => setActiveTab('dashboard')} className="w-full py-5 bg-white text-blue-600 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all">Ver Resultados Processados</button>
                            </div>
                         </div>
                      </div>
@@ -896,7 +896,7 @@ export default function FinanceInsight() {
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                            <div className="p-8 bg-slate-50 dark:bg-slate-800 rounded-[32px] space-y-6">
                               <div className="flex items-center gap-3">
-                                 <div className="w-1.5 h-8 bg-indigo-600 rounded-full" />
+                                 <div className="w-1.5 h-8 bg-blue-600 rounded-full" />
                                  <h4 className="text-lg font-black italic">Cenário Base</h4>
                               </div>
                               <div className="space-y-4">
@@ -906,7 +906,7 @@ export default function FinanceInsight() {
                                  </div>
                                  <div className="flex justify-between text-sm font-bold">
                                     <span className="text-slate-400 uppercase text-[10px]">Runway</span>
-                                    <span className="text-indigo-600">{kpis?.runway} meses</span>
+                                    <span className="text-blue-600">{kpis?.runway} meses</span>
                                  </div>
                               </div>
                            </div>
@@ -951,7 +951,7 @@ export default function FinanceInsight() {
                               <h4 className="text-xl font-black italic tracking-tighter">Análise de Sensibilidade Automática</h4>
                               <p className="text-xs font-medium text-slate-400">Nossa IA calculou que uma queda de <span className="text-white font-bold">15,4%</span> no faturamento recorrente levará o caixa a zero em menos de 3 meses. Recomendamos renegociar contratos de longo prazo (ExtratoBR) para suavizar a curva.</p>
                            </div>
-                           <button className="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-800 transition-all">Ver Matriz de Risco</button>
+                           <button className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-800 transition-all">Ver Matriz de Risco</button>
                         </div>
                      </div>
                   </div>
@@ -960,7 +960,7 @@ export default function FinanceInsight() {
                 {/* --- RELATORIO TAB --- */}
                 {activeTab === 'relatorio' && (
                   <div className="flex flex-col items-center justify-center space-y-12 py-20">
-                     <div className="w-40 h-40 bg-white dark:bg-slate-900 rounded-[60px] flex items-center justify-center text-indigo-600 shadow-2xl border border-slate-50 transition-transform hover:rotate-6">
+                     <div className="w-40 h-40 bg-white dark:bg-slate-900 rounded-[60px] flex items-center justify-center text-blue-600 shadow-2xl border border-slate-50 transition-transform hover:rotate-6">
                         <FileText className="w-20 h-20" />
                      </div>
                      <div className="text-center max-w-xl space-y-6">
@@ -968,7 +968,7 @@ export default function FinanceInsight() {
                         <p className="text-lg font-medium text-slate-500 italic">Gere um documento profissional em segundos. Ideal para apresentar em reuniões de consultoria financeira.</p>
                      </div>
                      <div className="flex gap-6">
-                        <button onClick={() => window.print()} className="px-12 py-5 bg-indigo-600 text-white rounded-3xl font-black text-xs uppercase tracking-widest shadow-2xl shadow-indigo-100 hover:scale-105 transition-all flex items-center gap-3">
+                        <button onClick={() => window.print()} className="px-12 py-5 bg-blue-600 text-white rounded-3xl font-black text-xs uppercase tracking-widest shadow-2xl shadow-blue-100 hover:scale-105 transition-all flex items-center gap-3">
                            <Download className="w-5 h-5" /> Exportar para PDF
                         </button>
                         <button className="px-12 py-5 bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-800 rounded-3xl font-black text-xs uppercase tracking-widest hover:bg-slate-50 transition-all">
@@ -1016,12 +1016,12 @@ export default function FinanceInsight() {
                 {/* --- HISTORICO TAB --- */}
                 {activeTab === 'historico' && (
                   <div className="space-y-8">
-                     <h3 className="text-xl font-black px-4 italic underline decoration-indigo-600/30 underline-offset-8">Trilha de Auditoria (Versões)</h3>
+                     <h3 className="text-xl font-black px-4 italic underline decoration-blue-600/30 underline-offset-8">Trilha de Auditoria (Versões)</h3>
                      <div className="grid grid-cols-1 gap-6">
                         {history.map((h, i) => (
-                           <div key={h.id} className="bg-white dark:bg-slate-900 p-8 rounded-[40px] border border-slate-100 dark:border-slate-800 flex items-center justify-between group hover:border-indigo-600 transition-all cursor-pointer">
+                           <div key={h.id} className="bg-white dark:bg-slate-900 p-8 rounded-[40px] border border-slate-100 dark:border-slate-800 flex items-center justify-between group hover:border-blue-600 transition-all cursor-pointer">
                               <div className="flex items-center gap-6">
-                                 <div className="w-14 h-14 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-slate-400 font-black group-hover:text-indigo-600">v{h.version}</div>
+                                 <div className="w-14 h-14 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-slate-400 font-black group-hover:text-blue-600">v{h.version}</div>
                                  <div>
                                     <p className="text-sm font-black text-slate-900 dark:text-white">Relatório Consolidado #{h.version}</p>
                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Criado em {h.createdAt?.toDate().toLocaleString()}</p>
@@ -1032,7 +1032,7 @@ export default function FinanceInsight() {
                                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest italic">Caixa Inicial</p>
                                     <p className="text-sm font-bold text-slate-700 dark:text-slate-300">R$ {h.assumptions.initialCash.toLocaleString('pt-BR')}</p>
                                  </div>
-                                 <button onClick={() => setCurrentModel(h)} className="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl text-slate-400 hover:text-indigo-600 transition-colors">
+                                 <button onClick={() => setCurrentModel(h)} className="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl text-slate-400 hover:text-blue-600 transition-colors">
                                     <ArrowRight className="w-6 h-6" />
                                  </button>
                               </div>
@@ -1056,7 +1056,7 @@ export default function FinanceInsight() {
                    <h2 className="text-5xl font-black text-slate-900 dark:text-white tracking-tighter italic">Pronto para Projetar?</h2>
                    <p className="text-xl font-medium text-slate-500 italic">Selecione um cliente para carregar o histórico financeiro e gerar simulações estratégicas.</p>
                 </div>
-                 {!selectedClientId && <div className="animate-bounce"><ArrowRight className="w-10 h-10 text-indigo-600 rotate-90" /></div>}
+                 {!selectedClientId && <div className="animate-bounce"><ArrowRight className="w-10 h-10 text-blue-600 rotate-90" /></div>}
               </motion.div>
             )}
          </AnimatePresence>
@@ -1130,7 +1130,7 @@ export default function FinanceInsight() {
                          value={newEvent.description}
                          onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
                          placeholder="Ex: Compra de Servidores"
-                         className="w-full bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl border-none outline-none ring-2 ring-transparent focus:ring-indigo-600 transition-all font-bold"
+                         className="w-full bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl border-none outline-none ring-2 ring-transparent focus:ring-blue-600 transition-all font-bold"
                        />
                     </div>
 
@@ -1141,7 +1141,7 @@ export default function FinanceInsight() {
                             type="number" 
                             value={newEvent.amount}
                             onChange={(e) => setNewEvent({ ...newEvent, amount: parseFloat(e.target.value) })}
-                            className="w-full bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl border-none outline-none ring-2 ring-transparent focus:ring-indigo-600 transition-all font-bold"
+                            className="w-full bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl border-none outline-none ring-2 ring-transparent focus:ring-blue-600 transition-all font-bold"
                           />
                        </div>
                        <div className="space-y-2">
@@ -1150,7 +1150,7 @@ export default function FinanceInsight() {
                             type="date" 
                             value={newEvent.date}
                             onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
-                            className="w-full bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl border-none outline-none ring-2 ring-transparent focus:ring-indigo-600 transition-all font-bold"
+                            className="w-full bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl border-none outline-none ring-2 ring-transparent focus:ring-blue-600 transition-all font-bold"
                           />
                        </div>
                     </div>
@@ -1159,14 +1159,14 @@ export default function FinanceInsight() {
                        <div className="space-y-2">
                           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 flex justify-between">
                              <span>Probabilidade de Recebimento</span>
-                             <span className="text-indigo-600">{newEvent.prob}%</span>
+                             <span className="text-blue-600">{newEvent.prob}%</span>
                           </label>
                           <input 
                             type="range" 
                             min="0" max="100" 
                             value={newEvent.prob}
                             onChange={(e) => setNewEvent({ ...newEvent, prob: parseInt(e.target.value) })}
-                            className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                            className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
                           />
                        </div>
                     )}
@@ -1183,7 +1183,7 @@ export default function FinanceInsight() {
                      }
                      setShowEventModal(false);
                    }}
-                   className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-indigo-100 hover:scale-[1.02] transition-all"
+                   className="w-full py-5 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-100 hover:scale-[1.02] transition-all"
                  >
                     Confirmar Lançamento
                  </button>

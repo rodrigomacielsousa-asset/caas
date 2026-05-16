@@ -65,7 +65,7 @@ export default function PreContabilidade() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
            <div className="flex flex-col md:flex-row justify-between items-center gap-12">
               <div className="space-y-6 max-w-2xl text-center md:text-left">
-                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 rounded-full text-[10px] font-bold uppercase tracking-widest">
                     <Brain className="w-3 h-3" /> Gemini 1.5 Pro Enabled
                  </div>
                  <h1 className="text-5xl font-black text-slate-900 dark:text-white tracking-tighter leading-[0.9]">Pré-Contabilidade IA</h1>
@@ -93,9 +93,9 @@ export default function PreContabilidade() {
            
            {/* Section 1: Upload & Action */}
            <div className="space-y-12">
-              <div className="p-10 bg-slate-50 dark:bg-slate-900 rounded-[48px] border-4 border-dashed border-slate-200 dark:border-slate-800 text-center space-y-8 group hover:border-indigo-600 transition-all">
+              <div className="p-10 bg-slate-50 dark:bg-slate-900 rounded-[48px] border-4 border-dashed border-slate-200 dark:border-slate-800 text-center space-y-8 group hover:border-blue-600 transition-all">
                  <div className="w-20 h-20 bg-white dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto shadow-xl group-hover:scale-110 transition-transform">
-                    <Upload className="w-10 h-10 text-indigo-600" />
+                    <Upload className="w-10 h-10 text-blue-600" />
                  </div>
                  <div className="space-y-2">
                     <h3 className="text-2xl font-bold">Arraste seu arquivo aqui</h3>
@@ -103,9 +103,9 @@ export default function PreContabilidade() {
                  </div>
                  
                  {file ? (
-                   <div className="p-4 bg-indigo-50 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-between mx-auto max-w-xs border border-indigo-100">
+                   <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-2xl flex items-center justify-between mx-auto max-w-xs border border-blue-100">
                       <div className="flex items-center gap-3">
-                         <FileText className="w-5 h-5 text-indigo-600" />
+                         <FileText className="w-5 h-5 text-blue-600" />
                          <span className="text-sm font-bold truncate">{file.name}</span>
                       </div>
                       <button onClick={() => setFile(null)} className="p-1 hover:bg-white rounded-lg"><X className="w-4 h-4" /></button>
@@ -123,11 +123,11 @@ export default function PreContabilidade() {
                   onClick={handleUpload}
                   disabled={!file || isProcessing}
                   className={cn(
-                    "w-full btn-primary py-5 rounded-2xl font-black text-lg flex items-center justify-center gap-3 shadow-xl shadow-indigo-100 overflow-hidden relative",
+                    "w-full btn-primary py-5 rounded-2xl font-black text-lg flex items-center justify-center gap-3 shadow-xl shadow-blue-100 overflow-hidden relative",
                     (!file || isProcessing) && "opacity-50"
                   )}
                  >
-                   {isProcessing && <motion.div layoutId="loader" className="absolute inset-0 bg-indigo-700/50 backdrop-blur-sm flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin" /></motion.div>}
+                   {isProcessing && <motion.div layoutId="loader" className="absolute inset-0 bg-blue-700/50 backdrop-blur-sm flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin" /></motion.div>}
                    <Sparkles className="w-6 h-6" /> {isProcessing ? 'Extraindo Dados...' : 'Analisar com Gemini IA'}
                  </button>
               </div>
@@ -141,7 +141,7 @@ export default function PreContabilidade() {
                       <p className="text-xs text-slate-400 italic">Nenhum processamento recente.</p>
                     ) : (
                       history.map((h, i) => (
-                        <div key={i} className="p-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl flex justify-between items-center group cursor-pointer hover:border-indigo-200 transition-all">
+                        <div key={i} className="p-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl flex justify-between items-center group cursor-pointer hover:border-blue-200 transition-all">
                            <div className="flex items-center gap-3">
                               <div className="w-8 h-8 bg-slate-50 dark:bg-slate-800 rounded-lg flex items-center justify-center"><CheckCircle2 className="w-4 h-4 text-emerald-500" /></div>
                               <div>
@@ -149,7 +149,7 @@ export default function PreContabilidade() {
                                  <p className="text-[10px] text-slate-400">{h.date}</p>
                               </div>
                            </div>
-                           <ArrowRight className="w-4 h-4 text-slate-200 group-hover:text-indigo-600 transition-all" />
+                           <ArrowRight className="w-4 h-4 text-slate-200 group-hover:text-blue-600 transition-all" />
                         </div>
                       ))
                     )}
@@ -173,8 +173,8 @@ export default function PreContabilidade() {
                            <h2 className="text-3xl font-black text-slate-900 dark:text-white">{result.fornecedor}</h2>
                            <p className="text-xs text-slate-400 font-bold tracking-widest">{result.cnpj}</p>
                         </div>
-                        <div className="p-4 bg-indigo-50 dark:bg-indigo-900/30 rounded-3xl">
-                           <Zap className="w-8 h-8 text-indigo-600" />
+                        <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-3xl">
+                           <Zap className="w-8 h-8 text-blue-600" />
                         </div>
                      </div>
 
@@ -186,7 +186,7 @@ export default function PreContabilidade() {
                            </div>
                            <div className="space-y-1">
                               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Valor Fiscal</span>
-                              <p className="text-lg font-black text-indigo-600">R$ {result.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                              <p className="text-lg font-black text-blue-600">R$ {result.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                            </div>
                         </div>
                         <div className="space-y-4">
@@ -209,7 +209,7 @@ export default function PreContabilidade() {
                            <div className="space-y-3">
                               <div className="flex justify-between items-center text-sm">
                                  <span className="font-bold text-slate-700 dark:text-slate-200">{result.contaContabil}</span>
-                                 <button className="text-[10px] font-black text-indigo-600 uppercase hover:underline">Trocar</button>
+                                 <button className="text-[10px] font-black text-blue-600 uppercase hover:underline">Trocar</button>
                               </div>
                               <div className="flex justify-between items-center text-xs text-slate-500 font-medium italic">
                                  <span>Centro de Custo: {result.centroCusto}</span>

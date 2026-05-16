@@ -50,14 +50,14 @@ export default function GestaoEscritorio() {
                 onClick={() => setActiveTab('tasks')}
                 className={cn(
                   "px-6 py-2.5 rounded-xl text-sm font-bold transition-all",
-                  activeTab === 'tasks' ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm" : "text-slate-500"
+                  activeTab === 'tasks' ? "bg-white dark:bg-slate-700 text-blue-600 shadow-sm" : "text-slate-500"
                 )}
                >Operacional</button>
                <button 
                 onClick={() => setActiveTab('team')}
                 className={cn(
                   "px-6 py-2.5 rounded-xl text-sm font-bold transition-all",
-                  activeTab === 'team' ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm" : "text-slate-500"
+                  activeTab === 'team' ? "bg-white dark:bg-slate-700 text-blue-600 shadow-sm" : "text-slate-500"
                 )}
                >Time & RH</button>
             </div>
@@ -70,8 +70,8 @@ export default function GestaoEscritorio() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
            {[
              { label: 'SLA Atual', val: '99.2%', icon: CheckCircle2, color: 'text-emerald-500', bg: 'bg-emerald-50' },
-             { label: 'Ocupação do Time', val: '84%', icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50' },
-             { label: 'Receita / Colab.', val: 'R$ 12k', icon: TrendingUp, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+             { label: 'Ocupação do Time', val: '84%', icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
+             { label: 'Receita / Colab.', val: 'R$ 12k', icon: TrendingUp, color: 'text-blue-600', bg: 'bg-blue-50' },
              { label: 'Tarefas em Atraso', val: '03', icon: AlertCircle, color: 'text-rose-500', bg: 'bg-rose-50' },
            ].map(k => (
              <div key={k.label} className="bg-white dark:bg-slate-900 p-6 rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-6">
@@ -92,14 +92,14 @@ export default function GestaoEscritorio() {
              <div className="lg:col-span-2 space-y-8">
                 <div className="flex items-center justify-between">
                    <h2 className="text-xl font-bold flex items-center gap-2">
-                     <Target className="w-5 h-5 text-indigo-600" /> Backlog Ativo
+                     <Target className="w-5 h-5 text-blue-600" /> Backlog Ativo
                    </h2>
                    <div className="flex gap-2">
                       <div className="relative">
                         <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                         <input type="text" className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs" placeholder="Buscar tarefa..." />
                       </div>
-                      <button className="p-2 bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-100"><Plus className="w-4 h-4" /></button>
+                      <button className="p-2 bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-100"><Plus className="w-4 h-4" /></button>
                    </div>
                 </div>
 
@@ -119,7 +119,7 @@ export default function GestaoEscritorio() {
                                <tr key={task.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group cursor-pointer">
                                   <td className="px-8 py-6">
                                      <div className="flex flex-col">
-                                        <span className="font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 transition-colors">{task.title}</span>
+                                        <span className="font-bold text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors">{task.title}</span>
                                         <span className={cn(
                                           "text-[9px] font-black uppercase mt-1",
                                           task.priority === 'High' ? "text-rose-500" : "text-slate-400"
@@ -128,7 +128,7 @@ export default function GestaoEscritorio() {
                                   </td>
                                   <td className="px-8 py-6">
                                      <div className="flex items-center gap-2">
-                                        <div className="w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-[10px] font-bold">{task.responsible[0]}</div>
+                                        <div className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-[10px] font-bold">{task.responsible[0]}</div>
                                         <span className="text-sm font-medium">{task.responsible}</span>
                                      </div>
                                   </td>
@@ -154,11 +154,11 @@ export default function GestaoEscritorio() {
 
              {/* Right Sidebar - Analytics & Tools */}
              <div className="space-y-8">
-                <div className="bg-indigo-600 p-8 rounded-[40px] text-white shadow-xl shadow-indigo-100 relative overflow-hidden">
+                <div className="bg-blue-600 p-8 rounded-[40px] text-white shadow-xl shadow-blue-100 relative overflow-hidden">
                    <Zap className="w-32 h-32 absolute -right-8 -bottom-8 opacity-10" />
                    <div className="relative z-10">
                       <h3 className="text-xl font-bold mb-4 leading-tight">Insight Operacional</h3>
-                      <p className="text-indigo-100 text-sm mb-6 leading-relaxed">Diego finalizou 8 tarefas hoje antes do SLA. Sugerimos realocar o "Fechamento Cliente A" para ele.</p>
+                      <p className="text-blue-100 text-sm mb-6 leading-relaxed">Diego finalizou 8 tarefas hoje antes do SLA. Sugerimos realocar o "Fechamento Cliente A" para ele.</p>
                       <button className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-xl font-bold text-xs transition-all">
                         Ver Sugestões <ChevronRight className="w-4 h-4" />
                       </button>
@@ -167,7 +167,7 @@ export default function GestaoEscritorio() {
 
                 <div className="bg-white dark:bg-slate-900 p-8 rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-sm">
                    <h3 className="font-bold mb-6 flex items-center gap-2">
-                     <BarChart3 className="w-5 h-5 text-indigo-600" /> Gargalos de Processo
+                     <BarChart3 className="w-5 h-5 text-blue-600" /> Gargalos de Processo
                    </h3>
                    <div className="space-y-6">
                       <div>
@@ -205,7 +205,7 @@ export default function GestaoEscritorio() {
                  className="bg-white dark:bg-slate-900 p-10 rounded-[40px] border border-slate-200 dark:border-slate-800 shadow-sm group hover:shadow-xl transition-all"
                >
                   <div className="flex justify-between items-start mb-8">
-                     <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-[30px] flex items-center justify-center text-2xl font-black text-slate-300 dark:text-slate-600 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-500">
+                     <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-[30px] flex items-center justify-center text-2xl font-black text-slate-300 dark:text-slate-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
                         {member.name[0]}
                      </div>
                      <span className={cn(
@@ -216,7 +216,7 @@ export default function GestaoEscritorio() {
                        {member.status}
                      </span>
                   </div>
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-1 group-hover:text-indigo-600 transition-colors">{member.name}</h3>
+                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-1 group-hover:text-blue-600 transition-colors">{member.name}</h3>
                   <p className="text-sm text-slate-500 font-medium mb-8">{member.role}</p>
                   
                   <div className="grid grid-cols-2 gap-4 pb-8 border-b border-slate-50 dark:border-slate-800 mb-8">
@@ -230,7 +230,7 @@ export default function GestaoEscritorio() {
                      </div>
                   </div>
 
-                  <button className="w-full py-4 bg-slate-50 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 text-slate-500 hover:text-indigo-600 rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-2">
+                  <button className="w-full py-4 bg-slate-50 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-500 hover:text-blue-600 rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-2">
                     Ver Timesheet <ArrowRight className="w-4 h-4" />
                   </button>
                </motion.div>

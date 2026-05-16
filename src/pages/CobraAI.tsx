@@ -240,7 +240,7 @@ export default function CobraAI() {
   if (loadingAuth || loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center space-y-4">
-        <Loader2 className="w-12 h-12 animate-spin text-indigo-600" />
+        <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
         <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] animate-pulse">Iniciando Cobra AI Engine...</p>
       </div>
     );
@@ -251,10 +251,10 @@ export default function CobraAI() {
   if (!user) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-8 space-y-6">
-        <Lock className="w-16 h-16 text-indigo-600 mb-4" />
+        <Lock className="w-16 h-16 text-blue-600 mb-4" />
         <h1 className="text-3xl font-black text-slate-900 dark:text-white text-center italic tracking-tighter">Acesso Restrito</h1>
         <p className="text-slate-500 text-center max-w-md">Autentique-se no Office Contábil para gerenciar as cobranças recorrentes dos seus clientes.</p>
-        <button onClick={() => window.location.href = '/login'} className="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl hover:scale-105 transition-all">Ir para Login</button>
+        <button onClick={() => window.location.href = '/login'} className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl hover:scale-105 transition-all">Ir para Login</button>
       </div>
     );
   }
@@ -266,7 +266,7 @@ export default function CobraAI() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-16">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
-             <div className="p-3 bg-indigo-600 rounded-2xl shadow-xl shadow-indigo-100 rotate-3">
+             <div className="p-3 bg-blue-600 rounded-2xl shadow-xl shadow-blue-100 rotate-3">
                 <Zap className="w-6 h-6 text-white" />
              </div>
              <h1 className="text-4xl font-black text-slate-900 dark:text-white italic tracking-tighter">Cobra AI</h1>
@@ -286,7 +286,7 @@ export default function CobraAI() {
                className={cn(
                  "flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all",
                  activeTab === tab.id 
-                   ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100" 
+                   ? "bg-blue-600 text-white shadow-lg shadow-blue-100" 
                    : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
                )}
              >
@@ -322,8 +322,8 @@ export default function CobraAI() {
 
                <div className="bg-white dark:bg-slate-900 p-8 rounded-[40px] shadow-sm border border-slate-50 dark:border-slate-800 space-y-4">
                   <div className="flex justify-between items-start">
-                     <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl text-indigo-600"><Clock className="w-6 h-6" /></div>
-                     <span className="text-[10px] font-black text-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1 rounded-full uppercase">A Receber</span>
+                     <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-2xl text-blue-600"><Clock className="w-6 h-6" /></div>
+                     <span className="text-[10px] font-black text-blue-500 bg-blue-50 dark:bg-blue-900/30 px-3 py-1 rounded-full uppercase">A Receber</span>
                   </div>
                   <div>
                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Pendente</p>
@@ -342,7 +342,7 @@ export default function CobraAI() {
                   </div>
                </div>
 
-               <div className="bg-slate-900 dark:bg-indigo-600 p-8 rounded-[40px] shadow-2xl space-y-4 text-white">
+               <div className="bg-slate-900 dark:bg-blue-600 p-8 rounded-[40px] shadow-2xl space-y-4 text-white">
                   <div className="flex justify-between items-start">
                      <div className="p-4 bg-white/10 rounded-2xl"><Users className="w-6 h-6" /></div>
                      <span className="text-[10px] font-black bg-white/20 px-3 py-1 rounded-full uppercase tracking-widest">Inadimplência</span>
@@ -360,7 +360,7 @@ export default function CobraAI() {
                <div className="lg:col-span-2 space-y-8">
                   <div className="flex justify-between items-center">
                      <h3 className="text-xl font-black text-slate-900 dark:text-white italic tracking-tighter">Últimas Cobranças</h3>
-                     <button onClick={() => setActiveTab('bills')} className="text-[10px] font-black text-indigo-600 uppercase tracking-widest hover:underline">Ver todas</button>
+                     <button onClick={() => setActiveTab('bills')} className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline">Ver todas</button>
                   </div>
                   <div className="bg-white dark:bg-slate-900 rounded-[48px] overflow-hidden border border-slate-100 dark:border-slate-800 shadow-sm">
                      <table className="w-full text-left border-collapse">
@@ -408,9 +408,9 @@ export default function CobraAI() {
                <div className="space-y-8">
                   <h3 className="text-xl font-black text-slate-900 dark:text-white italic tracking-tighter">Cobra IA Insights</h3>
                   <div className="space-y-6">
-                     <div className="bg-indigo-600/5 border border-indigo-100 dark:border-indigo-900/50 p-8 rounded-[40px] relative overflow-hidden group">
+                     <div className="bg-blue-600/5 border border-blue-100 dark:border-blue-900/50 p-8 rounded-[40px] relative overflow-hidden group">
                         <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:scale-110 transition-transform"><Bell className="w-12 h-12" /></div>
-                        <h4 className="text-sm font-black text-indigo-600 uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <h4 className="text-sm font-black text-blue-600 uppercase tracking-widest mb-4 flex items-center gap-2">
                            <Bell className="w-4 h-4" /> Alerta de Atraso
                         </h4>
                         <p className="text-sm font-bold text-slate-700 dark:text-slate-300 leading-relaxed italic">
@@ -450,7 +450,7 @@ export default function CobraAI() {
                      placeholder="Buscar empresa ou CNPJ..." 
                      value={searchTerm}
                      onChange={(e) => setSearchTerm(e.target.value)}
-                     className="w-full pl-12 pr-6 py-4 bg-white dark:bg-slate-900 rounded-2xl border-none ring-2 ring-transparent focus:ring-indigo-600 transition-all outline-none font-bold text-sm shadow-sm"
+                     className="w-full pl-12 pr-6 py-4 bg-white dark:bg-slate-900 rounded-2xl border-none ring-2 ring-transparent focus:ring-blue-600 transition-all outline-none font-bold text-sm shadow-sm"
                    />
                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 </div>
@@ -501,7 +501,7 @@ export default function CobraAI() {
                               }
                               setShowConfigModal(true);
                             }}
-                            className="w-full py-4 bg-slate-50 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-500 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group-hover:scale-[1.02]"
+                            className="w-full py-4 bg-slate-50 dark:bg-slate-800 hover:bg-blue-600 hover:text-white text-slate-500 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group-hover:scale-[1.02]"
                           >
                              {config ? 'Editar Configuração' : 'Configurar Cobrança'}
                              <ChevronRight className="w-3 h-3" />
@@ -526,10 +526,10 @@ export default function CobraAI() {
              <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-black text-slate-900 dark:text-white italic tracking-tighter">Controle de Pagamentos</h2>
                 <div className="flex gap-4">
-                   <button className="px-6 py-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 hover:border-indigo-600 transition-all">
+                   <button className="px-6 py-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 hover:border-blue-600 transition-all">
                       <Filter className="w-4 h-4" /> Filtros
                    </button>
-                   <button className="px-6 py-3 bg-indigo-600 rounded-xl text-[10px] font-black text-white uppercase tracking-widest shadow-lg shadow-indigo-100 hover:scale-105 transition-all flex items-center gap-2">
+                   <button className="px-6 py-3 bg-blue-600 rounded-xl text-[10px] font-black text-white uppercase tracking-widest shadow-lg shadow-blue-100 hover:scale-105 transition-all flex items-center gap-2">
                       <Mail className="w-4 h-4" /> Disparar Lembretes
                    </button>
                 </div>
@@ -581,7 +581,7 @@ export default function CobraAI() {
                                         <CheckCircle2 className="w-4 h-4" />
                                      </button>
                                    )}
-                                   <button className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-indigo-600 rounded-xl transition-all">
+                                   <button className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-blue-600 rounded-xl transition-all">
                                       <Mail className="w-4 h-4" />
                                    </button>
                                 </div>
@@ -624,7 +624,7 @@ export default function CobraAI() {
                             type="number" 
                             value={configForm.amount}
                             onChange={(e) => setConfigForm({ ...configForm, amount: parseFloat(e.target.value) })}
-                            className="w-full pl-12 pr-6 py-5 bg-slate-50 dark:bg-slate-800 rounded-3xl border-none ring-2 ring-transparent focus:ring-indigo-600 transition-all outline-none font-black text-2xl"
+                            className="w-full pl-12 pr-6 py-5 bg-slate-50 dark:bg-slate-800 rounded-3xl border-none ring-2 ring-transparent focus:ring-blue-600 transition-all outline-none font-black text-2xl"
                           />
                           <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-300" />
                        </div>
@@ -636,7 +636,7 @@ export default function CobraAI() {
                           <select 
                             value={configForm.billingDay}
                             onChange={(e) => setConfigForm({ ...configForm, billingDay: parseInt(e.target.value) })}
-                            className="w-full p-5 bg-slate-50 dark:bg-slate-800 rounded-3xl border-none ring-2 ring-transparent focus:ring-indigo-600 transition-all outline-none font-bold text-sm"
+                            className="w-full p-5 bg-slate-50 dark:bg-slate-800 rounded-3xl border-none ring-2 ring-transparent focus:ring-blue-600 transition-all outline-none font-bold text-sm"
                           >
                              {[...Array(28)].map((_, i) => <option key={i+1} value={i+1}>Todo dia {i+1}</option>)}
                           </select>
@@ -646,7 +646,7 @@ export default function CobraAI() {
                           <select 
                             value={configForm.type}
                             onChange={(e) => setConfigForm({ ...configForm, type: e.target.value as any })}
-                            className="w-full p-5 bg-slate-50 dark:bg-slate-800 rounded-3xl border-none ring-2 ring-transparent focus:ring-indigo-600 transition-all outline-none font-bold text-sm"
+                            className="w-full p-5 bg-slate-50 dark:bg-slate-800 rounded-3xl border-none ring-2 ring-transparent focus:ring-blue-600 transition-all outline-none font-bold text-sm"
                           >
                              <option value="mensal">Mensal (Recorrente)</option>
                              <option value="pontual">Pontual (Única)</option>
@@ -657,7 +657,7 @@ export default function CobraAI() {
 
                  <button 
                    onClick={saveConfig}
-                   className="w-full py-6 bg-indigo-600 text-white rounded-3xl font-black text-sm uppercase tracking-widest shadow-2xl shadow-indigo-100 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3"
+                   className="w-full py-6 bg-blue-600 text-white rounded-3xl font-black text-sm uppercase tracking-widest shadow-2xl shadow-blue-100 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3"
                  >
                     <CheckCircle2 className="w-5 h-5" /> Ativar Monitoramento IA
                  </button>

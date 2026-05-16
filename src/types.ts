@@ -78,6 +78,7 @@ export interface CheckoutRequest {
   userEmail?: string;
   items: string[]; // slugs
   totalLabel: string;
+  totalValue?: number; // Added for summation
   suggestedBundleSlug?: string;
   status: 'pending' | 'link_sent' | 'paid' | 'rejected';
   createdAt: string;

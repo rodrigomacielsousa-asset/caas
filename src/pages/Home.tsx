@@ -14,13 +14,51 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ProductCard } from '../components/ProductCard';
-import { products } from '../data/products';
+import { productService } from '../services/productService';
 import { cn } from '../lib/utils';
 import { blogService } from '../services/blogService';
-import type { BlogPost } from '../types';
+import type { BlogPost, Product } from '../types';
 
 export default function Home() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [allPosts, allProducts] = await Promise.all([
+          blogService.getPosts(),
+          productService.getProducts()
+        ]);
+        
+        const published = allPosts
+          .filter(p => p.status === 'published')
+          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          .slice(0, 3);
+        
+        setPosts(published);
+        
+        // Ensure we handle potential undefined status gracefully
+        const active = allProducts.filter(p => !p.status || p.status === 'active' || p.status === 'beta');
+        setProducts(active);
+      } catch (err) {
+        console.error("Critical error in loadData:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  const featuredProducts = useMemo(() => 
+    products.filter(p => p.isFeatured || p.badges?.includes('Destaque')).slice(0, 3), 
+  [products]);
+
+  const trendingProducts = useMemo(() => 
+    products.slice(0, 3), 
+  [products]);
+
   // Status messages for Hero Mock
   const [statusIndex, setStatusIndex] = useState(0);
   const statuses = [
@@ -62,16 +100,6 @@ export default function Home() {
   ];
 
   useEffect(() => {
-    async function loadPosts() {
-      const allPosts = await blogService.getPosts();
-      const published = allPosts
-        .filter(p => p.status === 'published')
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-        .slice(0, 3);
-      setPosts(published);
-    }
-    loadPosts();
-
     const statusInterval = setInterval(() => {
       setStatusIndex((prev) => (prev + 1) % statuses.length);
     }, 3000);
@@ -89,11 +117,16 @@ export default function Home() {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todas');
   
-  const categories = useMemo(() => ['Todas', ...Array.from(new Set(products.map(p => p.category)))], []);
+  const categories = useMemo(() => {
+    const cats = products.map(p => p.category).filter(Boolean);
+    return ['Todas', ...Array.from(new Set(cats))];
+  }, [products]);
 
   const filteredProducts = products.filter(p => {
-    const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) || 
-                          (p.subtitle || '').toLowerCase().includes(search.toLowerCase());
+    const s = search.toLowerCase();
+    const matchesSearch = 
+      (p.name?.toLowerCase() || '').includes(s) || 
+      (p.subtitle?.toLowerCase() || '').includes(s);
     const matchesCategory = selectedCategory === 'Todas' || p.category === selectedCategory;
     return matchesSearch && matchesCategory;
   }); // Removed slice to show all if needed, but user might still want it limited for home?
@@ -361,7 +394,7 @@ export default function Home() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {products.filter(p => ['pre-contabil-ai', 'nexus-df', 'extratobr'].includes(p.id)).map(product => (
+            {trendingProducts.map(product => (
               <ProductCard key={product.id} product={{...product, badges: ['Mais usado']}} />
             ))}
           </div>
@@ -375,7 +408,7 @@ export default function Home() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 opacity-90 grayscale-[0.5] hover:grayscale-0 transition-all">
-              {products.filter(p => ['consulta-nfe', 'valida-empresa', 'calculadoras-trabalhistas'].includes(p.id)).map(product => (
+              {featuredProducts.map(product => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>

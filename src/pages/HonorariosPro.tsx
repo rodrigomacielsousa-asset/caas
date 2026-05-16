@@ -213,7 +213,7 @@ export default function HonorariosPro() {
       {/* Header */}
       <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 pt-32 pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-           <Link to="/solucoes" className="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 hover:text-indigo-600 transition-all uppercase tracking-widest mb-12">
+           <Link to="/solucoes" className="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 hover:text-blue-600 transition-all uppercase tracking-widest mb-12">
               <ArrowLeft className="w-4 h-4" /> Catálogo de Soluções
            </Link>
            
@@ -582,7 +582,7 @@ export default function HonorariosPro() {
                            <div className="p-6 bg-white dark:bg-slate-900 rounded-3xl border border-amber-200/50 shadow-sm space-y-2">
                               <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Cenário Premium</div>
                               <div className="text-xl font-black text-slate-900 dark:text-white">{formatCurrency(results.premium)}</div>
-                              <div className="text-[9px] font-bold text-indigo-500 uppercase italic">Margem: +60%</div>
+                              <div className="text-[9px] font-bold text-blue-500 uppercase italic">Margem: +60%</div>
                            </div>
                         </div>
                      </div>

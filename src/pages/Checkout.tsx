@@ -46,28 +46,72 @@ export default function Checkout() {
     return () => unsubscribe();
   }, []);
 
-  const handleFinish = async () => {
+  const handleCheckoutStripe = async () => {
+    if (!email) return alert('Por favor, informe um e-mail.');
     setIsProcessing(true);
     
     try {
-      // Registrar o pedido no "storageService" (ou Firestore)
-      const orderData = {
-        userEmail: email || auth.currentUser?.email || 'anon@example.com',
-        items: items.map(i => i.slug),
-        totalLabel: `R$ ${total.toFixed(2)}`,
-        status: 'pending' as const,
-      };
+      const response = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items,
+          userId: auth.currentUser?.uid || 'guest_' + Date.now(),
+          userEmail: email
+        })
+      });
 
-      await storageService.addCheckoutRequest(orderData);
-      
-      // Simular delay de processamento
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      setIsSuccess(true);
-      clearCart();
-    } catch (err) {
+      const { url, error } = await response.json();
+      if (url) {
+        // Registrar solicitação antes de redirecionar para persistência no admin
+        await storageService.addCheckoutRequest({
+          userEmail: email,
+          items: items.map(i => i.slug),
+          totalLabel: `R$ ${total.toFixed(2)}`,
+          totalValue: total
+        });
+        window.location.href = url;
+      } else {
+        throw new Error(error || 'Erro ao iniciar Stripe');
+      }
+    } catch (err: any) {
       console.error(err);
-      alert('Erro ao processar pedido. Tente novamente.');
+      alert('Erro no checkout: ' + err.message);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleCheckoutMP = async () => {
+    if (!email) return alert('Por favor, informe um e-mail.');
+    setIsProcessing(true);
+    
+    try {
+      const response = await fetch('/api/create-preference', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items,
+          userId: auth.currentUser?.uid || 'guest_' + Date.now(),
+          userEmail: email
+        })
+      });
+
+      const { init_point, error } = await response.json();
+      if (init_point) {
+        await storageService.addCheckoutRequest({
+          userEmail: email,
+          items: items.map(i => i.slug),
+          totalLabel: `R$ ${total.toFixed(2)}`,
+          totalValue: total
+        });
+        window.location.href = init_point;
+      } else {
+        throw new Error(error || 'Erro ao iniciar Mercado Pago');
+      }
+    } catch (err: any) {
+      console.error(err);
+      alert('Erro no checkout: ' + err.message);
     } finally {
       setIsProcessing(false);
     }
@@ -121,8 +165,8 @@ export default function Checkout() {
 
               {/* Progress Bar */}
               <div className="flex gap-2">
-                 <div className={cn("h-1.5 flex-1 rounded-full transition-all duration-500", step >= 1 ? "bg-indigo-600" : "bg-slate-200")} />
-                 <div className={cn("h-1.5 flex-1 rounded-full transition-all duration-500", step >= 2 ? "bg-indigo-600" : "bg-slate-200")} />
+                 <div className={cn("h-1.5 flex-1 rounded-full transition-all duration-500", step >= 1 ? "bg-blue-600" : "bg-slate-200")} />
+                 <div className={cn("h-1.5 flex-1 rounded-full transition-all duration-500", step >= 2 ? "bg-blue-600" : "bg-slate-200")} />
               </div>
 
               {/* Step 1: Identification */}
@@ -133,9 +177,20 @@ export default function Checkout() {
                   className="bg-white dark:bg-slate-900 p-10 rounded-[32px] shadow-sm border border-slate-200 dark:border-slate-800"
                 >
                   <h2 className="text-xl font-bold mb-8 flex items-center gap-3">
-                    <User className="w-5 h-5 text-indigo-600" /> Identificação
+                    <User className="w-5 h-5 text-blue-600" /> Identificação
                   </h2>
                   <div className="space-y-6">
+                    {!auth.currentUser && !localStorage.getItem('mock_user') && (
+                      <div className="p-6 bg-blue-50 dark:bg-blue-900/20 rounded-2xl border border-blue-100 dark:border-blue-900/30 mb-6">
+                        <p className="text-sm font-bold text-blue-800 dark:text-blue-200 mb-4">
+                          Você não está logado. Para uma experiência melhor e vincular suas licenças, recomendamos entrar ou criar uma conta.
+                        </p>
+                        <div className="flex gap-4">
+                          <Link to="/login?redirect=checkout" className="text-xs font-black uppercase bg-blue-600 text-white px-4 py-2 rounded-lg">Entrar</Link>
+                          <Link to="/signup?redirect=checkout" className="text-xs font-black uppercase bg-white text-blue-600 px-4 py-2 rounded-lg border border-blue-200">Criar Conta</Link>
+                        </div>
+                      </div>
+                    )}
                     <div>
                       <label className="text-xs font-bold uppercase tracking-widest text-slate-400 block mb-2">E-mail para Licenciamento</label>
                       <div className="relative">
@@ -145,7 +200,7 @@ export default function Checkout() {
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder="seu@email.com.br"
-                          className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-indigo-500 transition-all font-medium" 
+                          className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-blue-500 transition-all font-medium" 
                         />
                       </div>
                       <p className="text-[10px] text-slate-500 mt-2 font-medium">As licenças serão vinculadas a este e-mail e disponibilizadas no seu painel.</p>
@@ -171,48 +226,48 @@ export default function Checkout() {
                 >
                   <div className="flex justify-between items-center mb-8">
                     <h2 className="text-xl font-bold flex items-center gap-3">
-                      <CreditCard className="w-5 h-5 text-indigo-600" /> Pagamento
+                      <CreditCard className="w-5 h-5 text-blue-600" /> Pagamento
                     </h2>
-                    <button onClick={() => setStep(1)} className="text-xs font-bold text-slate-400 hover:text-indigo-600">Voltar</button>
+                    <button onClick={() => setStep(1)} className="text-xs font-bold text-slate-400 hover:text-blue-600">Voltar</button>
                   </div>
                   
                   <div className="space-y-6">
                     <div className="p-6 bg-slate-50 dark:bg-slate-800 rounded-3xl border border-dashed border-slate-300 dark:border-slate-700">
-                       <h3 className="text-sm font-bold flex items-center gap-2 mb-2">
-                         <ShieldCheck className="w-4 h-4 text-emerald-500" /> Gateways Prontos
-                       </h3>
-                       <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                         Nesta demo, o pagamento é simulado. Em produção real, você será redirecionado para o Stripe ou Mercado Pago via Checkout Transparente.
-                       </p>
+                      <h3 className="text-sm font-bold flex items-center gap-2 mb-2">
+                        <ShieldCheck className="w-4 h-4 text-emerald-500" /> Gateways Prontos
+                      </h3>
+                      <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                        Selecione seu método de pagamento para ser redirecionado aos gateways oficiais.
+                      </p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                       <div className="p-4 border-2 border-indigo-600 rounded-2xl bg-indigo-50/50 flex flex-col items-center gap-2 text-center">
-                          <Zap className="w-6 h-6 text-indigo-600" />
-                          <span className="text-sm font-black text-indigo-900">Checkout Express</span>
-                          <span className="text-[10px] text-indigo-600 font-bold uppercase tracking-widest">Recomendado</span>
-                       </div>
-                       <div className="p-4 border-2 border-slate-100 dark:border-slate-800 rounded-2xl flex flex-col items-center gap-2 text-center opacity-50">
-                          <CreditCard className="w-6 h-6 text-slate-400" />
-                          <span className="text-sm font-bold text-slate-700">Boleto / PIX</span>
-                          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Offline</span>
-                       </div>
+                      <button 
+                        onClick={handleCheckoutStripe}
+                        disabled={isProcessing}
+                        className="p-6 border-2 border-slate-200 hover:border-blue-600 rounded-3xl bg-white hover:bg-blue-50 flex flex-col items-center gap-3 text-center transition-all group disabled:opacity-50"
+                      >
+                        <CreditCard className="w-8 h-8 text-slate-400 group-hover:text-blue-600 transition-colors" />
+                        <div className="flex flex-col">
+                          <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1 italic">Internacional</span>
+                          <span className="text-sm font-black text-slate-900 group-hover:text-blue-900">Cartão via Stripe</span>
+                        </div>
+                      </button>
+                      <button 
+                        onClick={handleCheckoutMP}
+                        disabled={isProcessing}
+                        className="p-6 border-2 border-slate-200 hover:border-blue-600 rounded-3xl bg-white hover:bg-blue-50 flex flex-col items-center gap-3 text-center transition-all group disabled:opacity-50"
+                      >
+                        <Zap className="w-8 h-8 text-slate-400 group-hover:text-blue-600 transition-colors" />
+                        <div className="flex flex-col">
+                          <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1 italic">Nacional</span>
+                          <span className="text-sm font-black text-slate-900 group-hover:text-blue-900">PIX / Cartão via MP</span>
+                        </div>
+                      </button>
                     </div>
 
-                    <button 
-                      onClick={handleFinish}
-                      disabled={isProcessing}
-                      className="w-full btn-primary py-5 rounded-2xl flex items-center justify-center gap-2 font-black text-xl shadow-xl shadow-indigo-200"
-                    >
-                      {isProcessing ? (
-                        <>Processando...</>
-                      ) : (
-                        <>Confirmar Pedido <ArrowRight className="w-5 h-5" /></>
-                      )}
-                    </button>
-
-                    <div className="flex items-center justify-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-widest">
-                       <Lock className="w-3 h-3" /> Transação Criptografada SSL
+                    <div className="flex items-center justify-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-widest pt-4 border-t border-slate-100 dark:border-slate-800">
+                      <Lock className="w-3 h-3" /> Transação Criptografada SSL
                     </div>
                   </div>
                 </motion.div>
@@ -221,9 +276,9 @@ export default function Checkout() {
 
             {/* Right Column: Summary */}
             <div className="space-y-6">
-               <div className="bg-white dark:bg-slate-900 rounded-[32px] p-8 border border-slate-200 dark:border-slate-800 shadow-sm">
+               <div className="bg-white dark:bg-slate-900 rounded-[32px] p-8 border border-slate-200 dark:border-slate-800 shadow-sm text-slate-900 dark:text-white">
                   <h3 className="font-bold flex items-center gap-2 mb-6">
-                    <ShoppingBag className="w-4 h-4 text-indigo-600" /> Resumo do Pedido
+                    <ShoppingBag className="w-4 h-4 text-blue-600" /> Resumo do Pedido
                   </h3>
                   
                   <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
@@ -235,7 +290,7 @@ export default function Checkout() {
                           </div>
                           <div>
                             <p className="text-xs font-bold text-slate-900 dark:text-white line-clamp-1">{item.name}</p>
-                            <span className="text-[10px] text-indigo-600 font-bold uppercase tracking-widest">{item.pricingModel}</span>
+                            <span className="text-[10px] text-blue-600 font-bold uppercase tracking-widest">{item.pricingModel}</span>
                           </div>
                         </div>
                         <span className="text-xs font-black text-slate-900 dark:text-white">{item.priceLabel}</span>
@@ -250,14 +305,14 @@ export default function Checkout() {
                     </div>
                     <div className="flex justify-between items-baseline pt-2">
                        <span className="text-sm font-bold text-slate-400 uppercase tracking-widest">Total</span>
-                       <span className="text-3xl font-black text-indigo-600">R$ {total.toFixed(2)}</span>
+                       <span className="text-3xl font-black text-blue-600">R$ {total.toFixed(2)}</span>
                     </div>
                   </div>
                </div>
 
                <div className="p-6 bg-slate-900 rounded-[32px] text-white">
                   <div className="flex items-center gap-3 mb-4">
-                     <ShieldCheck className="w-6 h-6 text-indigo-400" />
+                     <ShieldCheck className="w-6 h-6 text-blue-400" />
                      <h4 className="font-bold">Segurança CaaS</h4>
                   </div>
                   <p className="text-xs text-slate-400 leading-relaxed font-medium">

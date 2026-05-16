@@ -1,17 +1,7 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { 
-  FileSpreadsheet, 
-  ArrowLeft, 
-  Sparkles, 
-  Map as MapIcon, 
-  Download, 
-  AlertTriangle,
-  AlertCircle,
-  CheckCircle2,
-  Box,
-  ShieldCheck,
-} from 'lucide-react';
+import { FileSpreadsheet, ArrowLeft, Sparkles, Map as MapIcon, Download, AlertTriangle, AlertCircle, CheckCircle2, Box, ShieldCheck, ShoppingCart, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useCart } from '../hooks/useCart';
 import { motion, AnimatePresence } from 'motion/react';
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
@@ -437,6 +427,7 @@ const STRUCTURE = {
 };
 
 export default function NexusDF() {
+  const { addItem } = useCart();
   const [lang, setLang] = useState<'pt' | 'en'>('pt');
   const [activeTab, setActiveTab] = useState<'upload' | 'mapping' | 'statements' | 'notes' | 'export'>('upload');
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -1264,19 +1255,35 @@ const runAutoMapping = useCallback((accs: Account[]) => {
       <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800 p-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <Link to="/microcaas" className="p-2 hover:bg-slate-100 rounded-full text-slate-500">
+            <Link to="/solucoes" className="p-2 hover:bg-slate-100 rounded-full text-slate-500">
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>
               <div className="flex items-center gap-2 mb-0.5">
-                <Box className="w-5 h-5 text-indigo-600" />
+                <Box className="w-5 h-5 text-blue-600" />
                 <h1 className="text-xl font-black">{t.title}</h1>
               </div>
               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{t.subtitle}</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <ShareButtons />
+            <button 
+              onClick={() => {
+                addItem({
+                  id: 'nexusdf',
+                  name: 'Nexus DF',
+                  slug: 'nexus-df',
+                  price: 129.90,
+                  priceLabel: 'R$ 129,90/mês',
+                  pricingModel: 'subscription',
+                  type: 'individual'
+                });
+                alert('Adicionado ao carrinho!');
+              }}
+              className="bg-blue-600 hover:bg-slate-900 px-6 py-2 rounded-2xl text-[10px] font-black uppercase text-white tracking-widest transition-all shadow-xl shadow-blue-100 flex items-center gap-2"
+            >
+              <ShoppingCart className="w-4 h-4" /> Comprar Licença
+            </button>
             <button onClick={() => setLang(l => l === 'pt' ? 'en' : 'pt')} className="text-xs font-bold bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg">{t.lang}</button>
           </div>
         </div>
@@ -1285,7 +1292,7 @@ const runAutoMapping = useCallback((accs: Account[]) => {
       <main className="max-w-7xl mx-auto p-4 lg:p-8">
         <nav className="flex items-center gap-2 mb-8 overflow-x-auto pb-4 no-scrollbar">
           {(Object.keys(t.tabs) as Array<keyof typeof t.tabs>).map((tab) => (
-            <button key={tab} onClick={() => setActiveTab(tab)} className={cn("px-4 md:px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0", activeTab === tab ? "bg-indigo-600 text-white shadow-lg" : "bg-slate-100 dark:bg-slate-900 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800")}>
+            <button key={tab} onClick={() => setActiveTab(tab)} className={cn("px-4 md:px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0", activeTab === tab ? "bg-blue-600 text-white shadow-lg" : "bg-slate-100 dark:bg-slate-900 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800")}>
               {t.tabs[tab]}
             </button>
           ))}
@@ -1297,8 +1304,8 @@ const runAutoMapping = useCallback((accs: Account[]) => {
               {accounts.length > 0 && (
                 <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
                   {/* --- AUDITORIA DO BALANCETE --- */}
-                  <div id="audit-panel" className="bg-white dark:bg-slate-900 border-2 border-indigo-100 dark:border-indigo-900/30 p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] shadow-sm">
-                    <h2 className="text-lg md:text-xl font-black mb-6 flex items-center gap-2 text-indigo-600 uppercase tracking-tighter">
+                  <div id="audit-panel" className="bg-white dark:bg-slate-900 border-2 border-blue-100 dark:border-blue-900/30 p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] shadow-sm">
+                    <h2 className="text-lg md:text-xl font-black mb-6 flex items-center gap-2 text-blue-600 uppercase tracking-tighter">
                        <ShieldCheck className="w-6 h-6" /> AUDITORIA DO BALANCETE (RAW vs BP)
                     </h2>
                     
@@ -1325,7 +1332,7 @@ const runAutoMapping = useCallback((accs: Account[]) => {
 
                        <div className="space-y-1">
                           <span className="text-[10px] font-black text-slate-400 uppercase">Reconciliação DRE x Balancete</span>
-                          <p className="text-sm">Resultado (DRE): <span className="font-bold text-indigo-600">R$ {formatCurrency(statementsState.current.netIncome)}</span></p>
+                          <p className="text-sm">Resultado (DRE): <span className="font-bold text-blue-600">R$ {formatCurrency(statementsState.current.netIncome)}</span></p>
                           <p className="text-sm">Resultado (TB): <span className="font-bold text-slate-600">R$ {formatCurrency(statementsState.current.tbDreResult)}</span></p>
                           <p className={cn("text-xs font-black", statementsState.current.dreReconciled ? "text-emerald-500" : "text-rose-500")}>
                              {statementsState.current.dreReconciled ? "Sincronizado" : "Divergência Detectada"}
@@ -1384,7 +1391,7 @@ const runAutoMapping = useCallback((accs: Account[]) => {
                                          <td className="p-3 text-center">
                                             <span className={cn("px-2 py-0.5 rounded-full text-[9px] font-black uppercase", 
                                                side === 'Ativo' ? "bg-emerald-100 text-emerald-600" : 
-                                               side === 'Passivo' ? "bg-indigo-100 text-indigo-600" :
+                                               side === 'Passivo' ? "bg-blue-100 text-blue-600" :
                                                side === 'PL' ? "bg-purple-100 text-purple-600" : "bg-slate-100 text-slate-600"
                                             )}>
                                                {side}
@@ -1392,7 +1399,7 @@ const runAutoMapping = useCallback((accs: Account[]) => {
                                          </td>
                                          <td className="p-3 italic text-slate-400 text-[10px]">não_mapeado_no_bp</td>
                                          <td className="p-3 text-right">
-                                            <button onClick={() => { setActiveTab('mapping'); setTimeout(() => document.getElementById(`acc-${acc.canonicalCode}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100); }} className="text-[10px] font-black uppercase text-indigo-600 hover:underline">Mapear</button>
+                                            <button onClick={() => { setActiveTab('mapping'); setTimeout(() => document.getElementById(`acc-${acc.canonicalCode}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100); }} className="text-[10px] font-black uppercase text-blue-600 hover:underline">Mapear</button>
                                          </td>
                                       </tr>
                                    )})}
@@ -1432,7 +1439,7 @@ const runAutoMapping = useCallback((accs: Account[]) => {
                                              <td className="p-3 font-mono text-slate-400">{acc.code}</td>
                                              <td className="p-3 text-right font-black">R$ {formatCurrency(acc.end)}</td>
                                              <td className="p-3 text-right">
-                                                <button onClick={() => { setActiveTab('mapping'); setTimeout(() => document.getElementById(`acc-${acc.canonicalCode}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100); }} className="text-[10px] font-black uppercase text-indigo-600 hover:underline">Mapear Manualmente</button>
+                                                <button onClick={() => { setActiveTab('mapping'); setTimeout(() => document.getElementById(`acc-${acc.canonicalCode}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100); }} className="text-[10px] font-black uppercase text-blue-600 hover:underline">Mapear Manualmente</button>
                                              </td>
                                           </tr>
                                         ))}
@@ -1479,7 +1486,7 @@ const runAutoMapping = useCallback((accs: Account[]) => {
                                              <td className="p-3 font-bold">{acc.name}</td>
                                              <td className="p-3 text-right text-amber-600 font-bold">R$ {formatCurrency(acc.end)}</td>
                                              <td className="p-3 text-right">
-                                                <button onClick={() => { setActiveTab('mapping'); setTimeout(() => document.getElementById(`acc-${acc.canonicalCode}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100); }} className="text-[10px] font-black uppercase text-indigo-600 hover:underline">Mapear</button>
+                                                <button onClick={() => { setActiveTab('mapping'); setTimeout(() => document.getElementById(`acc-${acc.canonicalCode}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100); }} className="text-[10px] font-black uppercase text-blue-600 hover:underline">Mapear</button>
                                              </td>
                                           </tr>
                                         ))}
@@ -1541,11 +1548,11 @@ const runAutoMapping = useCallback((accs: Account[]) => {
               <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border-2 border-dashed p-16 text-center border-slate-200 dark:border-slate-800">
                 <input type="file" className="hidden" id="tb-upload" onChange={handleFileUpload} />
                 <label htmlFor="tb-upload" className="cursor-pointer">
-                    <FileSpreadsheet className="w-12 h-12 text-indigo-600 mx-auto mb-4" />
+                    <FileSpreadsheet className="w-12 h-12 text-blue-600 mx-auto mb-4" />
                     <h2 className="text-2xl font-black mb-2">{t.upload.title} </h2>
                     <p className="text-slate-500 mb-8">{t.upload.drop}</p>
                 </label>
-                {isProcessing && <div className="text-indigo-600 animate-pulse font-bold text-xs uppercase tracking-tighter">Sincronizando Base de Dados...</div>}
+                {isProcessing && <div className="text-blue-600 animate-pulse font-bold text-xs uppercase tracking-tighter">Sincronizando Base de Dados...</div>}
                 
                 {accounts.length > 0 && (
                   <div className="mt-8 flex justify-center gap-4">
@@ -1553,7 +1560,7 @@ const runAutoMapping = useCallback((accs: Account[]) => {
                       {accounts.filter(a => a.year === detectedYears[0]).length} Contas {detectedYears[0]} Carregadas
                     </div>
                     {detectedYears[1] && accounts.some(a => a.year === detectedYears[1]) && (
-                      <div className="px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 rounded-full text-[10px] font-black uppercase">
+                      <div className="px-4 py-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-full text-[10px] font-black uppercase">
                         {accounts.filter(a => a.year === detectedYears[1]).length} Contas {detectedYears[1]} Carregadas
                       </div>
                     )}
@@ -1567,7 +1574,7 @@ const runAutoMapping = useCallback((accs: Account[]) => {
             <div id="mapping-root" className="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 p-8 shadow-sm">
                <h2 className="text-xl font-black mb-6 flex items-center justify-between">
                  Mapeamento
-                 <span className="text-[10px] font-black uppercase text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 px-3 py-1 rounded-full">
+                 <span className="text-[10px] font-black uppercase text-blue-600 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 rounded-full">
                     {accounts.filter(a => mapping[a.canonicalCode]).length} / {accounts.length} mapeados
                  </span>
                </h2>
@@ -1622,7 +1629,7 @@ const runAutoMapping = useCallback((accs: Account[]) => {
                   <button 
                      disabled={mappingErrors.length > 0}
                      onClick={() => setActiveTab('statements')} 
-                     className={cn("font-black px-8 py-3 rounded-xl transition-all", mappingErrors.length > 0 ? "bg-slate-200 text-slate-400 cursor-not-allowed" : "bg-indigo-600 text-white shadow-lg")}
+                     className={cn("font-black px-8 py-3 rounded-xl transition-all", mappingErrors.length > 0 ? "bg-slate-200 text-slate-400 cursor-not-allowed" : "bg-blue-600 text-white shadow-lg")}
                   >
                      Próximo
                   </button>
@@ -1633,9 +1640,9 @@ const runAutoMapping = useCallback((accs: Account[]) => {
           {activeTab === 'statements' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
                {/* --- RECONCILIAÇÃO BLOCK --- */}
-               <div id="reconciliation-block" className="bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/30 rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden shadow-sm p-4 md:p-8">
+               <div id="reconciliation-block" className="bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30 rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden shadow-sm p-4 md:p-8">
                   <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
-                    <h2 className="text-indigo-900 dark:text-indigo-100 font-black uppercase text-sm flex items-center gap-2">
+                    <h2 className="text-blue-900 dark:text-blue-100 font-black uppercase text-sm flex items-center gap-2">
                        <ShieldCheck className="w-5 h-5" /> RECONCILIAÇÃO DRE x BALANCETE
                     </h2>
                     <span className={cn("px-4 py-1.5 rounded-full text-[10px] font-black uppercase", statementsState.current.dreReconciled ? "bg-emerald-100 text-emerald-600" : "bg-rose-100 text-rose-600")}>
@@ -1692,11 +1699,11 @@ const runAutoMapping = useCallback((accs: Account[]) => {
 
                <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-2xl w-full md:w-fit border dark:border-slate-800 overflow-x-auto no-scrollbar">
                 {(['BP', 'DRE', 'DRA', 'DMPL', 'DFC', 'INDICES', 'NOTES'] as const).map((st) => (
-                  <button key={st} onClick={() => setActiveStatementTab(st)} className={cn("px-4 md:px-6 py-2 rounded-xl text-[10px] font-black transition-all shrink-0", activeStatementTab === st ? "bg-white dark:bg-slate-800 text-indigo-600 shadow-sm" : "text-slate-400")}>
+                  <button key={st} onClick={() => setActiveStatementTab(st)} className={cn("px-4 md:px-6 py-2 rounded-xl text-[10px] font-black transition-all shrink-0", activeStatementTab === st ? "bg-white dark:bg-slate-800 text-blue-600 shadow-sm" : "text-slate-400")}>
                     {st === 'INDICES' ? 'ÍNDICES' : st}
                   </button>
                 ))}
-                 <button onClick={() => setShowOnlyCurrentYear(!showOnlyCurrentYear)} className={cn("ml-2 md:ml-4 px-3 md:px-4 py-2 rounded-xl text-[10px] font-black transition-all flex items-center gap-2 shrink-0", showOnlyCurrentYear ? "bg-indigo-600 text-white shadow-lg" : "bg-white dark:bg-slate-800 text-slate-500 shadow-sm border border-slate-200 dark:border-slate-700")}>
+                 <button onClick={() => setShowOnlyCurrentYear(!showOnlyCurrentYear)} className={cn("ml-2 md:ml-4 px-3 md:px-4 py-2 rounded-xl text-[10px] font-black transition-all flex items-center gap-2 shrink-0", showOnlyCurrentYear ? "bg-blue-600 text-white shadow-lg" : "bg-white dark:bg-slate-800 text-slate-500 shadow-sm border border-slate-200 dark:border-slate-700")}>
                    {showOnlyCurrentYear ? "Atual" : "Comp."}
                  </button>
                </div>
@@ -1894,13 +1901,13 @@ const runAutoMapping = useCallback((accs: Account[]) => {
                   <div className="space-y-8">
                      {/* Grupo 1 — Liquidez */}
                      <div className="space-y-4">
-                        <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest border-l-4 border-indigo-600 pl-4">Liquidez</h3>
+                        <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest border-l-4 border-blue-600 pl-4">Liquidez</h3>
                         <p className="text-xs text-slate-500 italic">Avalia a capacidade da empresa de honrar suas obrigações de curto prazo.</p>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                            <div className="bg-white dark:bg-slate-900 border border-slate-200 p-8 rounded-[2rem] shadow-sm">
                               <span className="text-[10px] font-black text-slate-400 uppercase">Liquidez Corrente</span>
                               <p className="text-3xl font-black mt-2">{financialRatios.liquidezCorrente.toFixed(2)}</p>
-                              <div className="h-1 bg-slate-100 rounded-full mt-4"><div className="h-full bg-indigo-600 rounded-full" style={{ width: `${Math.min(100, financialRatios.liquidezCorrente * 30)}%` }}></div></div>
+                              <div className="h-1 bg-slate-100 rounded-full mt-4"><div className="h-full bg-blue-600 rounded-full" style={{ width: `${Math.min(100, financialRatios.liquidezCorrente * 30)}%` }}></div></div>
                            </div>
                            <div className="bg-white dark:bg-slate-900 border border-slate-200 p-8 rounded-[2rem] shadow-sm">
                               <span className="text-[10px] font-black text-slate-400 uppercase">Liquidez Seca</span>
@@ -1915,7 +1922,7 @@ const runAutoMapping = useCallback((accs: Account[]) => {
 
                      {/* Grupo 2 — Endividamento */}
                      <div className="space-y-4">
-                        <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest border-l-4 border-indigo-600 pl-4">Endividamento</h3>
+                        <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest border-l-4 border-blue-600 pl-4">Endividamento</h3>
                         <p className="text-xs text-slate-500 italic">Mostra o nível de dependência de capital de terceiros.</p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                            <div className="bg-white dark:bg-slate-900 border border-slate-200 p-8 rounded-[2rem] shadow-sm">
@@ -1932,7 +1939,7 @@ const runAutoMapping = useCallback((accs: Account[]) => {
 
                      {/* Grupo 3 — Margens */}
                      <div className="space-y-4">
-                        <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest border-l-4 border-indigo-600 pl-4">Margens</h3>
+                        <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest border-l-4 border-blue-600 pl-4">Margens</h3>
                         <p className="text-xs text-slate-500 italic">Indica quanto a empresa lucra sobre a receita.</p>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                            <div className="bg-white dark:bg-slate-900 border border-slate-200 p-8 rounded-[2rem] shadow-sm">
@@ -1956,7 +1963,7 @@ const runAutoMapping = useCallback((accs: Account[]) => {
 
                      {/* Grupo 4 — Rentabilidade */}
                      <div className="space-y-4">
-                        <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest border-l-4 border-indigo-600 pl-4">Rentabilidade</h3>
+                        <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest border-l-4 border-blue-600 pl-4">Rentabilidade</h3>
                         <p className="text-xs text-slate-500 italic">Mostra o retorno do capital investido.</p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                            <div className="bg-white dark:bg-slate-900 border border-slate-200 p-8 rounded-[2rem] shadow-sm">
@@ -1972,7 +1979,7 @@ const runAutoMapping = useCallback((accs: Account[]) => {
 
                      {/* Grupo 5 — Performance */}
                      <div className="space-y-4">
-                        <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest border-l-4 border-indigo-600 pl-4">Performance</h3>
+                        <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest border-l-4 border-blue-600 pl-4">Performance</h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                            <div className="bg-white dark:bg-slate-900 border border-slate-200 p-8 rounded-[2rem] shadow-sm">
                               <span className="text-[10px] font-black text-slate-400 uppercase">EBITDA</span>
@@ -2010,8 +2017,8 @@ const runAutoMapping = useCallback((accs: Account[]) => {
              <div className="space-y-8">
                 {/* --- DIAGNÓSTICO NEXUS (DEV PANEL) --- */}
                 {process.env.NODE_ENV === 'development' && (
-                  <div className="bg-slate-900 border-l-4 border-indigo-500 p-8 rounded-3xl text-white font-mono text-xs">
-                    <h3 className="text-indigo-400 font-black mb-4 flex items-center gap-2">
+                  <div className="bg-slate-900 border-l-4 border-blue-500 p-8 rounded-3xl text-white font-mono text-xs">
+                    <h3 className="text-blue-400 font-black mb-4 flex items-center gap-2">
                        <CheckCircle2 className="w-4 h-4" /> DIAGNÓSTICO NEXUS DF
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -2051,36 +2058,47 @@ const runAutoMapping = useCallback((accs: Account[]) => {
                     {!user && (
                       <div className="absolute inset-0 bg-white/60 dark:bg-slate-950/60 backdrop-blur-sm z-10 flex flex-col items-center justify-center p-6 text-center">
                         <div className="bg-white dark:bg-slate-900 p-8 rounded-[3rem] shadow-2xl border border-slate-200 dark:border-slate-800 max-w-sm">
-                           <Lock className="w-12 h-12 text-indigo-600 mb-6 mx-auto" />
+                           <Lock className="w-12 h-12 text-blue-600 mb-6 mx-auto" />
                            <h3 className="text-2xl font-black mb-2">Funcionalidade Premium</h3>
                            <p className="text-slate-600 dark:text-slate-400 mb-8 text-sm">
-                             O uso das ferramentas é gratuito, mas a <b>exportação de relatórios</b> e o <b>salvamento em nuvem</b> são recursos exclusivos para assinantes.
+                              O uso das ferramentas é gratuito, mas a <b>exportação de relatórios</b> e o <b>salvamento em nuvem</b> são recursos exclusivos para assinantes.
                            </p>
                            <div className="space-y-3">
-                              <Link 
-                                to="/login"
-                                className="w-full block bg-indigo-600 hover:bg-indigo-700 text-white font-black px-8 py-3 rounded-xl transition-all shadow-lg"
+                              <button 
+                                onClick={() => {
+                                  addItem({
+                                    id: 'nexusdf',
+                                    name: 'Nexus DF',
+                                    slug: 'nexus-df',
+                                    price: 129.90,
+                                    priceLabel: 'R$ 129,90/mês',
+                                    pricingModel: 'subscription',
+                                    type: 'individual'
+                                  });
+                                  window.location.href = '/carrinho';
+                                }}
+                                className="w-full block bg-blue-600 hover:bg-slate-900 text-white font-black px-8 py-3 rounded-xl transition-all shadow-lg"
                               >
-                                Login / Criar Conta
-                              </Link>
-                              <Link 
-                                to="/pricing"
-                                className="w-full block bg-white dark:bg-slate-800 border border-indigo-100 text-indigo-600 font-bold px-8 py-3 rounded-xl transition-all"
-                              >
-                                Ver Planos
-                              </Link>
+                                Comprar Agora
+                              </button>
+                               <Link 
+                                 to="/login"
+                                 className="w-full block bg-white dark:bg-slate-800 border border-blue-100 text-blue-600 font-bold px-8 py-3 rounded-xl transition-all"
+                               >
+                                 Já sou Assinante? Login
+                               </Link>
                            </div>
                         </div>
                       </div>
                     )}
-                    <Sparkles className="w-12 h-12 text-indigo-600 mx-auto mb-4" />
+                    <Sparkles className="w-12 h-12 text-blue-600 mx-auto mb-4" />
                     <h2 className="text-2xl font-black mb-2">Central de Exportação</h2>
                     <p className="text-slate-500 mb-8 max-w-lg mx-auto">Selecione as demonstrações que deseja exportar. Todos os documentos seguem os padrões contábeis vigentes.</p>
                     
                     <button 
                       onClick={() => handleExportPDF('FULL')}
                       disabled={!user}
-                      className="bg-indigo-600 hover:bg-indigo-700 text-white font-black px-12 py-4 rounded-2xl flex items-center justify-center gap-2 mx-auto transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-black px-12 py-4 rounded-2xl flex items-center justify-center gap-2 mx-auto transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Download className="w-5 h-5" /> Exportar Relatório Completo (PDF)
                     </button>
@@ -2100,12 +2118,12 @@ const runAutoMapping = useCallback((accs: Account[]) => {
                       { id: 'NOTES', label: 'Notas Explicativas' },
                     ].map(item => (
                       <div key={item.id} className="bg-white dark:bg-slate-900 border border-slate-200 p-6 rounded-[2rem] shadow-sm group">
-                        <h3 className="font-black text-sm uppercase tracking-tight mb-4 group-hover:text-indigo-600 transition-colors">{item.label}</h3>
+                        <h3 className="font-black text-sm uppercase tracking-tight mb-4 group-hover:text-blue-600 transition-colors">{item.label}</h3>
                         <div className="grid grid-cols-2 gap-2">
                           <button 
                             onClick={() => handleExportPDF(item.id as any)}
                             disabled={!user}
-                            className="px-4 py-2 bg-slate-50 dark:bg-slate-800 rounded-xl text-[10px] font-black uppercase hover:bg-indigo-50 border border-transparent hover:border-indigo-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-4 py-2 bg-slate-50 dark:bg-slate-800 rounded-xl text-[10px] font-black uppercase hover:bg-blue-50 border border-transparent hover:border-blue-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             PDF
                           </button>

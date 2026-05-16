@@ -359,7 +359,7 @@ export default function PortalCliente() {
   if (loading || loadingAuth) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-8 text-center space-y-6">
-        <Loader2 className="w-12 h-12 animate-spin text-indigo-600" />
+        <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
         <p className="text-slate-500 font-serif italic">Carregando ecossistema do portal...</p>
       </div>
     );
@@ -370,7 +370,7 @@ export default function PortalCliente() {
   if (!user) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-8 text-center space-y-8">
-        <div className="w-24 h-24 bg-indigo-50 dark:bg-slate-900 rounded-[40px] flex items-center justify-center text-indigo-600">
+        <div className="w-24 h-24 bg-blue-50 dark:bg-slate-900 rounded-[40px] flex items-center justify-center text-blue-600">
            <Users className="w-12 h-12" />
         </div>
         <div className="max-w-md space-y-4">
@@ -379,7 +379,7 @@ export default function PortalCliente() {
         </div>
         <button 
           onClick={() => window.location.href = '/login'}
-          className="px-10 py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-indigo-100 hover:scale-105 transition-all"
+          className="px-10 py-4 bg-blue-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-blue-100 hover:scale-105 transition-all"
         >
           Ir para Login
         </button>
@@ -415,13 +415,13 @@ export default function PortalCliente() {
          <div className="max-w-7xl mx-auto space-y-12">
             <div className="flex justify-between items-center bg-white dark:bg-slate-900 p-10 rounded-[48px] border border-slate-100 dark:border-slate-800 shadow-xl">
                <div className="flex items-center gap-6">
-                  <div className="w-20 h-20 bg-indigo-600 rounded-[30px] flex items-center justify-center text-white shadow-xl shadow-indigo-100"><Users className="w-10 h-10" /></div>
+                  <div className="w-20 h-20 bg-blue-600 rounded-[30px] flex items-center justify-center text-white shadow-xl shadow-blue-100"><Users className="w-10 h-10" /></div>
                   <div>
                      <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter italic leading-none">Gestão de Portais</h1>
                      <p className="text-sm font-medium text-slate-500 uppercase tracking-widest mt-2">{clients.length} Clientes Ativos</p>
                   </div>
                </div>
-               <button className="px-8 py-4 bg-slate-900 text-white rounded-2xl font-bold flex items-center gap-3 hover:bg-indigo-600 transition-all">
+               <button className="px-8 py-4 bg-slate-900 text-white rounded-2xl font-bold flex items-center gap-3 hover:bg-blue-600 transition-all">
                   <Plus className="w-5 h-5" /> Adicionar Cliente
                </button>
             </div>
@@ -431,11 +431,11 @@ export default function PortalCliente() {
                  <motion.div 
                    key={client.id}
                    whileHover={{ y: -5 }}
-                   className="bg-white dark:bg-slate-900 p-10 rounded-[48px] border border-slate-100 dark:border-slate-800 shadow-sm space-y-6 group cursor-pointer hover:border-indigo-600 transition-all"
+                   className="bg-white dark:bg-slate-900 p-10 rounded-[48px] border border-slate-100 dark:border-slate-800 shadow-sm space-y-6 group cursor-pointer hover:border-blue-600 transition-all"
                    onClick={() => setSelectedClientId(client.id)}
                  >
                     <div className="flex justify-between items-start">
-                       <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-3xl flex items-center justify-center text-slate-400 group-hover:text-indigo-600 transition-colors">
+                       <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-3xl flex items-center justify-center text-slate-400 group-hover:text-blue-600 transition-colors">
                           <Building2 className="w-8 h-8" />
                        </div>
                        <div className={cn(
@@ -451,7 +451,7 @@ export default function PortalCliente() {
                     </div>
                     <div className="pt-6 border-t border-slate-50 dark:border-slate-800 flex justify-between items-center">
                        <span className="text-xs font-bold text-slate-400 italic">Responsável: {client.responsible}</span>
-                       <ArrowRight className="w-5 h-5 text-indigo-600" />
+                       <ArrowRight className="w-5 h-5 text-blue-600" />
                     </div>
                  </motion.div>
                ))}
@@ -471,9 +471,9 @@ export default function PortalCliente() {
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
              <div className="flex items-center gap-6">
                 {!isClientMode && (
-                  <button onClick={() => setSelectedClientId(null)} className="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl text-slate-400 hover:text-indigo-600"><ArrowLeft className="w-5 h-5" /></button>
+                  <button onClick={() => setSelectedClientId(null)} className="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl text-slate-400 hover:text-blue-600"><ArrowLeft className="w-5 h-5" /></button>
                 )}
-                <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white font-black">{portalClient?.companyName[0]}</div>
+                <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-black">{portalClient?.companyName[0]}</div>
                 <div>
                    <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight leading-none italic">Portal do Cliente</h1>
                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{portalClient?.companyName}</p>
@@ -483,7 +483,7 @@ export default function PortalCliente() {
              {!isClientMode && (
                <button 
                 onClick={() => setIsLinkingUser(!isLinkingUser)}
-                className="px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-100 transition-colors"
+                className="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-100 transition-colors"
               >
                  {portalClient?.portalUserId ? 'Alterar Acesso' : 'Vincular Portal'}
               </button>
@@ -501,7 +501,7 @@ export default function PortalCliente() {
                     onClick={() => setActiveTab(t.id as any)}
                     className={cn(
                       "flex items-center gap-3 px-6 py-3 rounded-[18px] text-[10px] font-black uppercase tracking-widest transition-all",
-                      activeTab === t.id ? "bg-indigo-600 text-white shadow-lg" : "text-slate-400 hover:text-indigo-600"
+                      activeTab === t.id ? "bg-blue-600 text-white shadow-lg" : "text-slate-400 hover:text-blue-600"
                     )}
                   >
                      <t.icon className="w-4 h-4" /> <span className="hidden sm:inline">{t.label}</span>
@@ -510,7 +510,7 @@ export default function PortalCliente() {
              </div>
 
              <div className="flex items-center gap-4">
-                <button className="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl text-slate-400 hover:text-indigo-600"><Bell className="w-5 h-5" /></button>
+                <button className="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl text-slate-400 hover:text-blue-600"><Bell className="w-5 h-5" /></button>
                 <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 hidden md:block" />
                 <div className="hidden md:flex items-center gap-3 text-right">
                    <div>
@@ -530,23 +530,23 @@ export default function PortalCliente() {
               <motion.div 
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mb-8 p-8 bg-white dark:bg-slate-900 rounded-[40px] border border-indigo-100 dark:border-indigo-900 shadow-xl shadow-indigo-100/20"
+                className="mb-8 p-8 bg-white dark:bg-slate-900 rounded-[40px] border border-blue-100 dark:border-blue-900 shadow-xl shadow-blue-100/20"
               >
                 <div className="flex flex-col md:flex-row gap-6 items-end">
                    <div className="flex-1 space-y-2">
-                       <label className="text-[10px] font-black text-indigo-600 uppercase tracking-widest ml-2">Vincular E-mail do Cliente</label>
+                       <label className="text-[10px] font-black text-blue-600 uppercase tracking-widest ml-2">Vincular E-mail do Cliente</label>
                        <input 
                          type="email" 
                          placeholder="digite o e-mail do cliente..."
                          value={portalEmailToLink}
                          onChange={(e) => setPortalEmailToLink(e.target.value)}
-                         className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-6 py-4 font-bold outline-none ring-2 ring-indigo-50 focus:ring-indigo-600 transition-all font-serif italic"
+                         className="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-6 py-4 font-bold outline-none ring-2 ring-blue-50 focus:ring-blue-600 transition-all font-serif italic"
                        />
                    </div>
                    <div className="flex gap-4">
                       <button 
                         onClick={handleLinkPortalUser}
-                        className="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-indigo-200"
+                        className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-blue-200"
                       >
                          Vincular Agora
                       </button>
@@ -568,16 +568,16 @@ export default function PortalCliente() {
                >
                   {/* Status Banner */}
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                     <div className="lg:col-span-2 bg-indigo-600 p-12 rounded-[56px] text-white relative overflow-hidden shadow-2xl shadow-indigo-100">
+                     <div className="lg:col-span-2 bg-blue-600 p-12 rounded-[56px] text-white relative overflow-hidden shadow-2xl shadow-blue-100">
                         <div className="absolute -bottom-20 -right-20 opacity-10"><Sparkles className="w-80 h-80 rotate-12" /></div>
                         <div className="relative z-10 space-y-8">
                            <div className="space-y-2">
                               <h2 className="text-4xl font-black tracking-tighter italic italic leading-tight">Olá, {portalClient?.responsible}!</h2>
-                              <p className="text-lg font-medium text-indigo-100 italic opacity-80">Você tem <span className="text-white font-black">{requests.filter(r => r.status === 'pendente').length} pendências</span> este mês.</p>
+                              <p className="text-lg font-medium text-blue-100 italic opacity-80">Você tem <span className="text-white font-black">{requests.filter(r => r.status === 'pendente').length} pendências</span> este mês.</p>
                            </div>
                            <div className="flex gap-4">
-                              <button onClick={() => setActiveTab('solicitacoes')} className="px-8 py-4 bg-white text-indigo-600 rounded-2xl font-black text-sm uppercase tracking-widest hover:scale-105 transition-all">Ver Pendências</button>
-                              <button onClick={() => setActiveTab('documentos')} className="px-8 py-4 bg-indigo-500 text-white rounded-2xl font-black text-sm uppercase tracking-widest border border-indigo-400 hover:bg-indigo-400 transition-all">Enviar Avulso</button>
+                              <button onClick={() => setActiveTab('solicitacoes')} className="px-8 py-4 bg-white text-blue-600 rounded-2xl font-black text-sm uppercase tracking-widest hover:scale-105 transition-all">Ver Pendências</button>
+                              <button onClick={() => setActiveTab('documentos')} className="px-8 py-4 bg-blue-500 text-white rounded-2xl font-black text-sm uppercase tracking-widest border border-blue-400 hover:bg-blue-400 transition-all">Enviar Avulso</button>
                            </div>
                         </div>
                      </div>
@@ -597,7 +597,7 @@ export default function PortalCliente() {
                   {/* Secondary stats */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                      {[
-                       { label: 'Docs Enviados', value: documents.length, icon: FileText, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+                       { label: 'Docs Enviados', value: documents.length, icon: FileText, color: 'text-blue-600', bg: 'bg-blue-50' },
                        { label: 'Solicitações', value: requests.length, icon: AlertTriangle, color: 'text-amber-500', bg: 'bg-amber-50' },
                        { label: 'Mensagens', value: messages.length, icon: MessageSquare, color: 'text-sky-500', bg: 'bg-sky-50' },
                        { label: 'Dias p/ Finalizar', value: '12', icon: Clock, color: 'text-rose-500', bg: 'bg-rose-50' }
@@ -616,14 +616,14 @@ export default function PortalCliente() {
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                      <div className="space-y-8">
                         <div className="flex justify-between items-center px-4">
-                           <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight italic flex items-center gap-3"><Clock className="w-6 h-6 text-indigo-600" /> Atividade Recente</h3>
-                           <button className="text-[10px] font-black text-indigo-600 uppercase tracking-widest italic">Ver Tudo</button>
+                           <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight italic flex items-center gap-3"><Clock className="w-6 h-6 text-blue-600" /> Atividade Recente</h3>
+                           <button className="text-[10px] font-black text-blue-600 uppercase tracking-widest italic">Ver Tudo</button>
                         </div>
                         <div className="space-y-4">
                            {documents.slice(0, 4).map(doc => (
-                             <div key={doc.id} className="bg-white dark:bg-slate-900 p-6 rounded-[32px] border border-slate-50 dark:border-slate-800 flex items-center justify-between group hover:border-indigo-600 transition-all cursor-pointer">
+                             <div key={doc.id} className="bg-white dark:bg-slate-900 p-6 rounded-[32px] border border-slate-50 dark:border-slate-800 flex items-center justify-between group hover:border-blue-600 transition-all cursor-pointer">
                                 <div className="flex items-center gap-4">
-                                   <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl text-slate-400 group-hover:text-indigo-600 transition-colors"><FileText className="w-5 h-5" /></div>
+                                   <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl text-slate-400 group-hover:text-blue-600 transition-colors"><FileText className="w-5 h-5" /></div>
                                    <div>
                                       <p className="text-sm font-black text-slate-900 dark:text-white">{doc.fileName}</p>
                                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Enviado em {doc.createdAt?.toDate().toLocaleDateString()}</p>
@@ -645,13 +645,13 @@ export default function PortalCliente() {
                         <div className="bg-white dark:bg-slate-900 p-10 rounded-[48px] border border-slate-100 dark:border-slate-800 shadow-sm space-y-6">
                            <div className="space-y-6 max-h-[300px] overflow-y-auto no-scrollbar">
                               {messages.slice(-3).map(msg => (
-                                <div key={msg.id} className={cn("max-w-xs p-4 rounded-3xl text-sm italic", msg.senderUid === user.uid ? "ml-auto bg-indigo-600 text-white rounded-br-none" : "mr-auto bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-bl-none")}>
+                                <div key={msg.id} className={cn("max-w-xs p-4 rounded-3xl text-sm italic", msg.senderUid === user.uid ? "ml-auto bg-blue-600 text-white rounded-br-none" : "mr-auto bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-bl-none")}>
                                    {msg.text}
                                 </div>
                               ))}
                               {messages.length === 0 && <p className="text-center text-slate-300 font-serif italic py-8">Nenhuma mensagem ainda.</p>}
                            </div>
-                           <button onClick={() => setActiveTab('mensagens')} className="w-full py-4 bg-slate-50 dark:bg-slate-800 rounded-2xl text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-indigo-600 transition-colors">Abrir Chat Completo</button>
+                           <button onClick={() => setActiveTab('mensagens')} className="w-full py-4 bg-slate-50 dark:bg-slate-800 rounded-2xl text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-blue-600 transition-colors">Abrir Chat Completo</button>
                         </div>
                      </div>
                   </div>
@@ -671,16 +671,16 @@ export default function PortalCliente() {
                            <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter italic">Pasta de Documentos</h2>
                            <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
                               {['Maio 2026', 'Abril 2026'].map(m => (
-                                <button key={m} className={cn("px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all", m === 'Maio 2026' ? "bg-white text-indigo-600 shadow-sm" : "text-slate-400")}>{m}</button>
+                                <button key={m} className={cn("px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all", m === 'Maio 2026' ? "bg-white text-blue-600 shadow-sm" : "text-slate-400")}>{m}</button>
                               ))}
                            </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                            {['Nota Fiscal', 'Extrato', 'Outro'].map(cat => (
-                             <div key={cat} className="p-8 bg-white dark:bg-slate-900 rounded-[40px] border border-slate-100 dark:border-slate-800 shadow-sm space-y-6 group hover:border-indigo-600 transition-colors">
+                             <div key={cat} className="p-8 bg-white dark:bg-slate-900 rounded-[40px] border border-slate-100 dark:border-slate-800 shadow-sm space-y-6 group hover:border-blue-600 transition-colors">
                                 <div className="flex justify-between items-start">
-                                   <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-3xl flex items-center justify-center text-slate-400 group-hover:text-indigo-600 transition-colors"><FileText className="w-8 h-8" /></div>
+                                   <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-3xl flex items-center justify-center text-slate-400 group-hover:text-blue-600 transition-colors"><FileText className="w-8 h-8" /></div>
                                    <div className="text-right">
                                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">Total</p>
                                       <p className="text-2xl font-black text-slate-900 dark:text-white italic">{documents.filter(d => (cat === 'Nota Fiscal' ? d.type === 'nota_fiscal' : cat === 'Extrato' ? d.type === 'extrato' : d.type === 'outro')).length}</p>
@@ -690,14 +690,14 @@ export default function PortalCliente() {
                                    <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">{cat}</h3>
                                    <p className="text-xs font-serif text-slate-400 italic">Pasta arquivada e organizada pelo portal.</p>
                                 </div>
-                                <button className="w-full py-4 bg-slate-50 dark:bg-slate-800 rounded-2xl text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover:text-indigo-600 transition-colors">Visualizar Arquivos</button>
+                                <button className="w-full py-4 bg-slate-50 dark:bg-slate-800 rounded-2xl text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover:text-blue-600 transition-colors">Visualizar Arquivos</button>
                              </div>
                            ))}
                         </div>
                      </div>
 
                      <div className="space-y-8">
-                        <div className="p-10 bg-indigo-600 rounded-[56px] text-white space-y-8 shadow-2xl shadow-indigo-100">
+                        <div className="p-10 bg-blue-600 rounded-[56px] text-white space-y-8 shadow-2xl shadow-blue-100">
                            <div className="w-16 h-16 bg-white/20 rounded-3xl flex items-center justify-center text-white"><Upload className="w-8 h-8" /></div>
                            <h3 className="text-2xl font-black tracking-tighter leading-tight italic">Upload Rápido<br /> Inteligente.</h3>
                            <div className="space-y-4">
@@ -710,7 +710,7 @@ export default function PortalCliente() {
                                      if (file) handleFileUpload(file, 'outro');
                                    }}
                                  />
-                                 <div className="w-full py-4 bg-white text-indigo-600 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3">
+                                 <div className="w-full py-4 bg-white text-blue-600 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3">
                                     {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Paperclip className="w-5 h-5" />}
                                     {isUploading ? 'Processando...' : 'Selecionar Arquivo'}
                                  </div>
@@ -732,21 +732,21 @@ export default function PortalCliente() {
                >
                   {!isClientMode && (
                     <div className="bg-white dark:bg-slate-900 p-10 rounded-[48px] border border-slate-100 dark:border-slate-800 shadow-sm space-y-8">
-                       <h3 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-3"><Plus className="w-6 h-6 text-indigo-600" /> Nova Solicitação</h3>
+                       <h3 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-3"><Plus className="w-6 h-6 text-blue-600" /> Nova Solicitação</h3>
                        <form onSubmit={createRequest} className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
                           <div className="md:col-span-1">
                              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-2">Título</label>
-                             <input name="title" required placeholder="Ex: Extrato Maio" className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-600 transition-all font-serif italic" />
+                             <input name="title" required placeholder="Ex: Extrato Maio" className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-600 transition-all font-serif italic" />
                           </div>
                           <div className="md:col-span-1">
                              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-2">Vencimento</label>
-                             <input name="dueDate" type="date" required className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-600 transition-all" />
+                             <input name="dueDate" type="date" required className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-600 transition-all" />
                           </div>
                           <div className="md:col-span-1">
                              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 px-2">Competência</label>
-                             <input name="competencia" placeholder="05/2026" className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-600 transition-all font-serif italic" />
+                             <input name="competencia" placeholder="05/2026" className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-600 transition-all font-serif italic" />
                           </div>
-                          <button type="submit" className="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-900 transition-all flex items-center justify-center gap-3">
+                          <button type="submit" className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-900 transition-all flex items-center justify-center gap-3">
                              <Send className="w-4 h-4" /> Enviar p/ Cliente
                           </button>
                        </form>
@@ -754,14 +754,14 @@ export default function PortalCliente() {
                   )}
 
                   <div className="space-y-6">
-                     <h3 className="text-xl font-black text-slate-900 dark:text-white px-4 italic underline decoration-indigo-600/30 underline-offset-8">Acompanhamento de Tarefas</h3>
+                     <h3 className="text-xl font-black text-slate-900 dark:text-white px-4 italic underline decoration-blue-600/30 underline-offset-8">Acompanhamento de Tarefas</h3>
                      <div className="grid grid-cols-1 gap-6">
                         {requests.map(req => (
-                          <div key={req.id} className="bg-white dark:bg-slate-900 p-10 rounded-[48px] border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col md:flex-row justify-between items-center gap-8 group hover:border-indigo-600 transition-colors">
+                          <div key={req.id} className="bg-white dark:bg-slate-900 p-10 rounded-[48px] border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col md:flex-row justify-between items-center gap-8 group hover:border-blue-600 transition-colors">
                              <div className="flex items-center gap-8">
                                 <div className={cn(
                                    "w-16 h-16 rounded-3xl flex items-center justify-center transition-all",
-                                   req.status === 'aprovado' ? "bg-emerald-50 text-emerald-600" : req.status === 'enviado' ? "bg-indigo-50 text-indigo-600" : "bg-amber-50 text-amber-500"
+                                   req.status === 'aprovado' ? "bg-emerald-50 text-emerald-600" : req.status === 'enviado' ? "bg-blue-50 text-blue-600" : "bg-amber-50 text-amber-500"
                                 )}>
                                    {req.status === 'aprovado' ? <CheckCircle2 className="w-8 h-8" /> : <Clock className="w-8 h-8" />}
                                 </div>
@@ -785,7 +785,7 @@ export default function PortalCliente() {
                                          if (file) handleFileUpload(file, req.title.toLowerCase().includes('extrato') ? 'extrato' : 'nota_fiscal', req.id);
                                        }}
                                      />
-                                     <button className="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-3">
+                                     <button className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-3">
                                         <Upload className="w-4 h-4" /> Enviar Documento
                                      </button>
                                   </div>
@@ -814,7 +814,7 @@ export default function PortalCliente() {
                >
                   <div className="p-10 border-b border-slate-50 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
                      <div className="flex items-center gap-6">
-                        <div className="w-16 h-16 bg-indigo-600 rounded-[28px] text-white flex items-center justify-center font-black">?</div>
+                        <div className="w-16 h-16 bg-blue-600 rounded-[28px] text-white flex items-center justify-center font-black">?</div>
                         <div>
                            <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter leading-none italic">Central de Atendimento</h3>
                            <p className="text-xs font-bold text-emerald-500 uppercase tracking-widest mt-2 flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Suporte Online</p>
@@ -831,7 +831,7 @@ export default function PortalCliente() {
                          className={cn(
                            "max-w-md p-8 rounded-[40px] text-sm leading-relaxed shadow-sm italic",
                            msg.senderUid === user.uid 
-                             ? "ml-auto bg-indigo-600 text-white rounded-br-none" 
+                             ? "ml-auto bg-blue-600 text-white rounded-br-none" 
                              : "mr-auto bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-bl-none border border-slate-100 dark:border-slate-700"
                          )}
                        >
@@ -851,17 +851,17 @@ export default function PortalCliente() {
 
                   <div className="p-10 bg-white dark:bg-slate-900 border-t border-slate-50 dark:border-slate-800">
                      <div className="flex gap-6 items-center">
-                        <button className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl text-slate-400 hover:text-indigo-600 transition-colors"><Paperclip className="w-6 h-6" /></button>
+                        <button className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl text-slate-400 hover:text-blue-600 transition-colors"><Paperclip className="w-6 h-6" /></button>
                         <input 
                           value={newMessage}
                           onChange={(e) => setNewMessage(e.target.value)}
                           onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
                           placeholder="Digite aqui sua mensagem..." 
-                          className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-50 dark:border-slate-700 rounded-[32px] px-10 py-5 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-600 transition-all font-serif italic" 
+                          className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-50 dark:border-slate-700 rounded-[32px] px-10 py-5 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-600 transition-all font-serif italic" 
                         />
                         <button 
                           onClick={sendMessage}
-                          className="w-16 h-16 bg-slate-900 text-white rounded-full flex items-center justify-center hover:bg-indigo-600 transition-all shadow-xl hover:scale-110"
+                          className="w-16 h-16 bg-slate-900 text-white rounded-full flex items-center justify-center hover:bg-blue-600 transition-all shadow-xl hover:scale-110"
                         >
                            <Send className="w-6 h-6" />
                         </button>

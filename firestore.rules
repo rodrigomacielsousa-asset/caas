@@ -11,7 +11,11 @@ service cloud.firestore {
     function isSignedIn() { return request.auth != null; }
     function isEmailVerified() { return isSignedIn() && request.auth.token.email_verified == true; }
     function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
-    function isAdmin() { return isSignedIn() && request.auth.token.email == 'rodrigomaciel.sousa@gmail.com' && isEmailVerified(); }
+    function isAdmin() { 
+      return isSignedIn() && 
+             request.auth.token.email == 'rodrigomaciel.sousa@gmail.com' && 
+             isEmailVerified(); 
+    }
     
     function incoming() { return request.resource.data; }
     function existing() { return resource.data; }
@@ -22,71 +26,76 @@ service cloud.firestore {
 
     // --- Entity Validations ---
 
-    function isValidDocument(data) {
-      return data.keys().hasAll(['ownerId', 'chave', 'type']) &&
-             data.ownerId == request.auth.uid &&
-             data.chave is string && data.chave.size() <= 44 &&
-             data.get('valor', 0) is number;
+    function isValidProduct(data) {
+      return data.slug is string && data.slug.size() <= 100 &&
+             data.name is string && data.name.size() <= 100 &&
+             data.priceValue is number;
     }
 
-    function isValidMonitoredClient(data) {
-      return data.keys().hasAll(['ownerId', 'cnpj', 'nome']) &&
-             data.ownerId == request.auth.uid &&
-             data.cnpj is string && data.cnpj.size() <= 18;
+    function isValidSubmission(data) {
+      return data.name is string && data.name.size() <= 100 &&
+             data.email is string && data.email.size() <= 100 &&
+             data.description is string && data.description.size() <= 2000;
+    }
+
+    function isValidCheckoutRequest(data) {
+      return data.userEmail is string && data.items is list &&
+             data.totalValue is number;
     }
 
     // --- Access Rules ---
+
+    match /products/{productId} {
+      allow read: if true; // Public marketplace
+      allow write: if isAdmin();
+    }
+
+    match /posts/{postId} {
+      allow read: if true; // Public blog
+      allow write: if isAdmin();
+    }
+
+    match /submissions/{submissionId} {
+      allow create: if true; // Lead capture
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /checkoutRequests/{requestId} {
+      allow create: if true; // Log checkout attempts (anonymous)
+      allow read, update: if isAdmin();
+      allow list: if isAdmin();
+    }
+
+    match /entitlements/{entitlementId} {
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow write: if isAdmin(); // Server handles this via admin SDK
+    }
 
     match /users/{userId} {
       allow read: if isOwner(userId) || isAdmin();
       allow create: if isOwner(userId);
       allow update: if isOwner(userId) && (
-        incoming().diff(existing()).affectedKeys().hasOnly(['name', 'photoURL', 'updatedAt'])
+        incoming().diff(existing()).affectedKeys().hasOnly(['plano', 'status', 'updatedAt'])
       ) || isAdmin();
     }
 
+    // Legacy or internal paths
     match /documents/{docId} {
       allow get: if isSignedIn() && (existing().ownerId == request.auth.uid || isAdmin());
       allow list: if isSignedIn() && (resource.data.ownerId == request.auth.uid || isAdmin());
-      allow create: if isEmailVerified() && isValidDocument(incoming());
-      allow delete: if isEmailVerified() && existing().ownerId == request.auth.uid;
-    }
-
-    match /nfeMonitoredClients/{clientId} {
-      allow get: if isSignedIn() && (existing().ownerId == request.auth.uid || isAdmin());
-      allow list: if isSignedIn() && (resource.data.ownerId == request.auth.uid || isAdmin());
-      allow create: if isEmailVerified() && isValidMonitoredClient(incoming());
-      allow update: if isEmailVerified() && (
-        existing().ownerId == request.auth.uid && 
-        incoming().ownerId == existing().ownerId &&
-        (
-          incoming().diff(existing()).affectedKeys().hasOnly(['nome', 'status', 'ultNSU', 'lastSync'])
-        )
-      ) || isAdmin();
-      allow delete: if isEmailVerified() && existing().ownerId == request.auth.uid;
+      allow create: if isEmailVerified();
+      allow delete: if isAdmin();
     }
 
     match /trackingEvents/{eventId} {
-      allow create: if true; // Allow anonymous and users to track events
+      allow create: if true; 
       allow read: if isAdmin();
-    }
-
-    match /userMetrics/{userId} {
-      allow read: if isOwner(userId) || isAdmin();
-      // Write handled by server side or automated logic (mocked)
     }
 
     match /userPlans/{userId} {
       allow read: if isOwner(userId) || isAdmin();
-    }
-
-    match /nfeUsage/{userId} {
-      allow read: if isOwner(userId) || isAdmin();
-    }
-    
-    match /nfeEvents/{eventId} {
-      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow create: if isSignedIn() && incoming().userId == request.auth.uid;
+      allow write: if isAdmin();
     }
   }
 }

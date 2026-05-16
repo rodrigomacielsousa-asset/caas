@@ -18,6 +18,7 @@ import {
   Eye,
   FileText,
   FileCode,
+  ShoppingCart,
   AlertTriangle,
   Building2,
   Layers,
@@ -50,7 +51,7 @@ import {
   deleteDoc
 } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import * as XLSX from 'xlsx';
+import { useCart } from '../hooks/useCart';
 
 // Types
 interface Transaction {
@@ -94,6 +95,7 @@ interface UserProfile {
 }
 
 export default function ExtratoBr() {
+  const { addItem } = useCart();
   const [user] = useAuthState(auth);
   const [file, setFile] = useState<File | null>(null);
   const [bank, setBank] = useState('Outros');
@@ -219,13 +221,6 @@ export default function ExtratoBr() {
     setError(null);
 
     const isOfx = file.name.toUpperCase().endsWith('.OFX');
-    const cost = isOfx ? 1 : 3;
-
-    if (profile.credits < cost) {
-      setError(`Créditos insuficientes (${profile.credits}). Este arquivo requer ${cost} créditos.`);
-      setIsProcessing(false);
-      return;
-    }
 
     try {
       if (isOfx) {
@@ -268,10 +263,9 @@ export default function ExtratoBr() {
         });
       }
 
-      // Update Credits
+      // Update Stats
       const userRef = doc(db, 'users', user.uid);
       await setDoc(userRef, {
-        credits: profile.credits - cost,
         usedThisMonth: profile.usedThisMonth + 1,
         lastExtraction: serverTimestamp()
       }, { merge: true });
@@ -333,25 +327,14 @@ export default function ExtratoBr() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col">
-       {/* Paywall Header */}
-       <div className="bg-slate-900 px-6 py-2 flex justify-between items-center text-white z-30">
-          <div className="flex items-center gap-3">
-             <div className="bg-indigo-600 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-1">
-                <Crown className="w-3 h-3" /> {profile?.plan === 'pro' ? 'PRO Plan' : 'Free Plan'}
-             </div>
-             <p className="text-[10px] font-bold opacity-60 uppercase tracking-widest">Saldo: {profile?.credits || 0} Créditos</p>
-          </div>
-          <button className="text-[10px] font-black uppercase tracking-widest hover:text-indigo-400 transition-colors">Upgrade / Comprar Créditos</button>
-       </div>
-
        {/* Extrato Header */}
        <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-8 pt-10 sticky top-0 z-20 shadow-sm">
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
             <div className="flex items-center gap-4">
                <div className="w-14 h-14 bg-emerald-600 rounded-3xl flex items-center justify-center text-white shadow-xl shadow-emerald-100 dark:shadow-none"><BarChart3 className="w-7 h-7" /></div>
                <div>
-                  <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter italic leading-none">Extrato.BR</h1>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">Processamento Inteligente de Fluxo de Caixa</p>
+                  <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter leading-none">Extrato.BR</h1>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Processamento Inteligente de Fluxo de Caixa</p>
                </div>
             </div>
             
@@ -367,6 +350,23 @@ export default function ExtratoBr() {
                      <p className="text-sm font-black text-emerald-500 leading-none">98.2%</p>
                   </div>
                </div>
+               <button 
+                 onClick={() => {
+                    addItem({
+                      id: 'extratobr',
+                      name: 'Extrato.BR',
+                      slug: 'extrato-br',
+                      price: 59.90,
+                      priceLabel: 'R$ 59,90/mês',
+                      pricingModel: 'subscription',
+                      type: 'individual'
+                    });
+                    alert('Adicionado ao carrinho!');
+                 }}
+                 className="bg-blue-600 hover:bg-slate-900 px-6 py-3 rounded-2xl text-[11px] font-black uppercase text-white tracking-widest transition-all shadow-xl shadow-blue-100 flex items-center gap-2"
+               >
+                 <ShoppingCart className="w-4 h-4" /> Comprar Licença
+               </button>
                <button className="p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-400 hover:text-emerald-600 transition-all shadow-sm">
                   <History className="w-6 h-6" />
                </button>
@@ -651,7 +651,7 @@ export default function ExtratoBr() {
                                             <ChevronRight className="w-5 h-5 text-slate-200 group-hover:text-emerald-600" />
                                          </button>
                                          <button className="p-8 bg-white dark:bg-slate-800 rounded-[40px] border border-slate-100 dark:border-slate-800 flex items-center gap-4 hover:border-emerald-600 hover:shadow-xl transition-all group">
-                                            <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all"><Database className="w-6 h-6" /></div>
+                                            <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all"><Database className="w-6 h-6" /></div>
                                             <div className="text-left flex-1">
                                                <p className="text-sm font-black text-slate-900 dark:text-white tracking-widest uppercase">Lançamentos</p>
                                                <p className="text-[10px] font-bold text-slate-400">Pronto p/ Contabilidade</p>
@@ -707,11 +707,27 @@ export default function ExtratoBr() {
                      <AlertTriangle className="w-12 h-12" />
                   </div>
                   <div className="space-y-4">
-                     <h3 className="text-4xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">Canais de Crédito<br />Esgotados.</h3>
-                     <p className="text-sm text-slate-500 leading-relaxed max-w-xs mx-auto font-medium">Seu limite de extratos gratuitos acabou. Mude para o Extrato PRO para processamento ilimitado.</p>
+                     <h3 className="text-4xl font-black text-slate-900 tracking-tighter uppercase leading-none">Limite Atingido.</h3>
+                     <p className="text-sm text-slate-500 leading-relaxed max-w-xs mx-auto font-medium">Você atingiu seu limite de processamentos gratuitos. Adquira a versão PRO para uso ilimitado.</p>
                   </div>
                   <div className="space-y-4">
-                     <button className="w-full py-6 bg-emerald-600 text-white rounded-[32px] font-black text-xl tracking-tighter italic uppercase shadow-2xl shadow-emerald-200">Ativar Extrato PRO</button>
+                     <button 
+                        onClick={() => {
+                          addItem({
+                            id: 'extratobr',
+                            name: 'Extrato.BR',
+                            slug: 'extrato-br',
+                            price: 59.90,
+                            priceLabel: 'R$ 59,90/mês',
+                            pricingModel: 'subscription',
+                            type: 'individual'
+                          });
+                          window.location.href = '/carrinho';
+                        }}
+                        className="w-full py-6 bg-blue-600 text-white rounded-[32px] font-black text-xl tracking-tighter uppercase shadow-2xl shadow-blue-200"
+                     >
+                        Comprar agora
+                     </button>
                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">A partir de R$ 59,90/mês</p>
                   </div>
                   <button onClick={() => window.location.reload()} className="text-xs font-bold text-slate-400 hover:text-slate-900 transition-colors">Voltar</button>

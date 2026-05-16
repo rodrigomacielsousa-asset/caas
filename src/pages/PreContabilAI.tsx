@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import * as XLSX from 'xlsx';
 import { 
   FileSearch, 
   Upload, 
@@ -23,13 +24,14 @@ import {
   FileCode,
   Layers,
   Percent,
-  Receipt
+  Receipt,
+  ShoppingCart
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { analyzeInvoice } from '../services/geminiService';
-import * as XLSX from 'xlsx';
+import { useCart } from '../hooks/useCart';
 
 // Types
 interface Documento {
@@ -48,6 +50,7 @@ interface Documento {
 }
 
 export default function PreContabilAI() {
+  const { addItem } = useCart();
   const [documents, setDocuments] = useState<Documento[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [dragActive, setDragActive] = useState(false);
@@ -74,11 +77,7 @@ export default function PreContabilAI() {
   };
 
   const processFile = async (file: File) => {
-    if (!isPremium && documents.length >= 10) {
-      alert("Limite de 10 documentos atingido no plano FREE. Faça o upgrade para ilimitado!");
-      return;
-    }
-
+    // O usuário solicitou que não haja menção a upgrade ou limites de plano free
     setIsProcessing(true);
     const newDoc: Documento = {
       id: Math.random().toString(36).substr(2, 9),
@@ -206,14 +205,14 @@ export default function PreContabilAI() {
       {/* Sidebar Navigation */}
       <div className="w-24 md:w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col pt-32 pb-10 fixed h-full z-20">
         <div className="px-6 mb-12 hidden md:block">
-           <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest italic flex items-center gap-2">
-             <Brain className="w-5 h-5 text-indigo-600" /> Pré-Contábil AI
+           <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-2">
+             <Brain className="w-5 h-5 text-blue-600" /> Pré-Contábil AI
            </h2>
            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Entrada de Documentos</p>
         </div>
 
         <nav className="flex-1 px-4 space-y-2">
-           <button className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl bg-indigo-600 text-white shadow-lg transition-all">
+           <button className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl bg-blue-600 text-white shadow-lg transition-all">
               <Layers className="w-6 h-6 flex-shrink-0" />
               <span className="font-bold text-sm hidden md:block">Processamento</span>
            </button>
@@ -224,22 +223,26 @@ export default function PreContabilAI() {
         </nav>
 
         <div className="px-4 mt-auto space-y-4">
-           {!isPremium && (
-             <div className="bg-indigo-50 dark:bg-indigo-900/30 p-6 rounded-3xl border border-indigo-100 dark:border-indigo-800 hidden md:block">
-                <Crown className="w-8 h-8 text-indigo-600 mb-3" />
-                <h4 className="text-xs font-black uppercase text-indigo-600 mb-1">Upgrade Pro</h4>
-                <p className="text-[10px] font-medium text-indigo-400 mb-4 items-center gap-1 flex">
-                   <ShieldCheck className="w-3 h-3" /> Processamento Ilimitado
-                </p>
-                <button 
-                   onClick={() => setIsPremium(true)}
-                   className="w-full py-2 bg-indigo-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-900 transition-all"
-                >
-                   Upgrade
-                </button>
-             </div>
-           )}
-           <Link to="/solucoes" className="flex items-center gap-4 px-4 py-4 text-slate-400 hover:text-indigo-600 transition-all">
+           <button 
+              onClick={() => {
+                addItem({
+                  id: 'precontabilai',
+                  name: 'Pré-Contábil AI',
+                  slug: 'pre-contabil-ai',
+                  price: 89.90,
+                  priceLabel: 'R$ 89,90/mês',
+                  pricingModel: 'subscription',
+                  type: 'individual'
+                });
+                alert('Adicionado ao carrinho!');
+              }}
+              className="w-full p-6 bg-blue-600 hover:bg-slate-900 text-white rounded-[32px] shadow-2xl flex flex-col items-center gap-2 transition-all group"
+           >
+              <ShoppingCart className="w-6 h-6" />
+              <span className="text-[10px] font-black uppercase tracking-widest hidden md:block">Comprar Agora</span>
+           </button>
+           
+           <Link to="/solucoes" className="flex items-center gap-4 px-4 py-4 text-slate-400 hover:text-blue-600 transition-all">
               <ArrowLeft className="w-6 h-6" />
               <span className="font-bold text-sm hidden md:block">Voltar</span>
            </Link>
@@ -259,7 +262,7 @@ export default function PreContabilAI() {
                   </div>
                </div>
                <h1 className="text-5xl font-black text-slate-900 dark:text-white tracking-tighter leading-none">
-                  Gestão <span className="text-indigo-600 italic">Documental.</span>
+                  Gestão <span className="text-blue-600">Documental.</span>
                </h1>
                <p className="text-lg text-slate-500 font-serif italic max-w-md leading-relaxed">
                  Automatize a leitura de XML, PDF e Recibos com classificação contábil automática por IA.
@@ -271,7 +274,7 @@ export default function PreContabilAI() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {[
               { label: 'Processados', val: stats.total - stats.pending, icon: CheckCircle2, color: 'text-emerald-500' },
-              { label: 'Receitas', val: `R$ ${stats.receita.toLocaleString()}`, icon: ArrowRight, color: 'text-indigo-600' },
+              { label: 'Receitas', val: `R$ ${stats.receita.toLocaleString()}`, icon: ArrowRight, color: 'text-blue-600' },
               { label: 'Despesas', val: `R$ ${stats.despesa.toLocaleString()}`, icon: ArrowLeft, color: 'text-rose-500' },
               { label: 'Total Impostos', val: `R$ ${stats.taxes.toLocaleString()}`, icon: Percent, color: 'text-amber-500' },
             ].map(k => (
@@ -285,6 +288,30 @@ export default function PreContabilAI() {
             ))}
           </div>
 
+          <div className="bg-blue-50 border border-blue-100 p-8 rounded-[40px] flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="space-y-1">
+              <h3 className="text-xl font-black text-blue-600 tracking-tight uppercase">Licença Ativa necessária</h3>
+              <p className="text-sm font-medium text-blue-500">Esta é uma demonstração do Pré-Contábil AI. Para uso em produção, adquira uma licença.</p>
+            </div>
+            <button 
+              onClick={() => {
+                addItem({
+                  id: 'precontabilai',
+                  name: 'Pré-Contábil AI',
+                  slug: 'pre-contabil-ai',
+                  price: 89.90,
+                  priceLabel: 'R$ 89,90/mês',
+                  pricingModel: 'subscription',
+                  type: 'individual'
+                });
+                window.location.href = '/carrinho';
+              }}
+              className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-blue-200 hover:bg-slate-900 transition-all"
+            >
+              Comprar Licença Completa
+            </button>
+          </div>
+
           {/* Upload Zone */}
           <div 
             onDragEnter={handleDrag}
@@ -293,10 +320,10 @@ export default function PreContabilAI() {
             onDrop={handleDrop}
             className={cn(
               "p-12 md:p-20 bg-white dark:bg-slate-900 rounded-[56px] border-4 border-dashed transition-all text-center flex flex-col items-center justify-center space-y-8 relative overflow-hidden group",
-              dragActive ? "border-indigo-600 bg-indigo-50/10" : "border-slate-200 dark:border-slate-800"
+              dragActive ? "border-blue-600 bg-blue-50/10" : "border-slate-200 dark:border-slate-800"
             )}
           >
-            <div className="w-24 h-24 bg-slate-50 dark:bg-slate-800 rounded-[32px] flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-500">
+            <div className="w-24 h-24 bg-slate-50 dark:bg-slate-800 rounded-[32px] flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
                <Upload className="w-12 h-12" />
             </div>
             
@@ -322,7 +349,7 @@ export default function PreContabilAI() {
 
             {isProcessing && (
               <div className="absolute inset-0 bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center space-y-4">
-                 <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
+                 <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
                  <p className="text-xs font-black uppercase tracking-widest">IA Operando no Lote...</p>
               </div>
             )}
@@ -332,7 +359,7 @@ export default function PreContabilAI() {
           <div className="space-y-8">
              <div className="flex flex-col md:flex-row justify-between items-center gap-6">
                 <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest italic flex items-center gap-2">
-                   <Table className="w-4 h-4 text-indigo-500" /> Lista de Processamento
+                   <Table className="w-4 h-4 text-blue-500" /> Lista de Processamento
                 </h3>
                 <div className="flex items-center gap-4">
                    <div className="flex bg-white dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800">
@@ -342,14 +369,14 @@ export default function PreContabilAI() {
                           onClick={() => setFilterType(t)}
                           className={cn(
                             "px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-                            filterType === t ? "bg-indigo-600 text-white shadow-lg" : "text-slate-400 hover:text-slate-900"
+                            filterType === t ? "bg-blue-600 text-white shadow-lg" : "text-slate-400 hover:text-slate-900"
                           )}
                         >
                            {t}
                         </button>
                       ))}
                    </div>
-                   <button onClick={exportToExcel} className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-400 hover:text-indigo-600 transition-all">
+                   <button onClick={exportToExcel} className="p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-400 hover:text-blue-600 transition-all">
                       <Download className="w-5 h-5" />
                    </button>
                 </div>
@@ -381,8 +408,8 @@ export default function PreContabilAI() {
                              >
                                 <td className="px-8 py-6">
                                    <div className="flex items-center gap-3">
-                                      <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-600 transition-colors">
-                                         {doc.type === 'XML' ? <FileCode className="w-5 h-5 text-indigo-500 group-hover:text-white" /> : <FileText className="w-5 h-5 text-slate-400 group-hover:text-white" />}
+                                      <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-600 transition-colors">
+                                         {doc.type === 'XML' ? <FileCode className="w-5 h-5 text-blue-500 group-hover:text-white" /> : <FileText className="w-5 h-5 text-slate-400 group-hover:text-white" />}
                                       </div>
                                       <div>
                                          <p className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">{doc.name}</p>
@@ -399,7 +426,7 @@ export default function PreContabilAI() {
                                    <select 
                                      value={doc.category}
                                      onChange={(e) => updateDoc(doc.id, { category: e.target.value as any })}
-                                     className="bg-slate-50 dark:bg-slate-800 border-none rounded-lg px-3 py-1.5 text-[10px] font-black uppercase tracking-widest outline-none focus:ring-1 focus:ring-indigo-600"
+                                     className="bg-slate-50 dark:bg-slate-800 border-none rounded-lg px-3 py-1.5 text-[10px] font-black uppercase tracking-widest outline-none focus:ring-1 focus:ring-blue-600"
                                    >
                                       <option>Receita</option>
                                       <option>Despesa</option>
@@ -410,7 +437,7 @@ export default function PreContabilAI() {
                                 <td className="px-8 py-6">
                                    <div className={cn(
                                      "inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest",
-                                     doc.operation === 'Entrada' ? "bg-emerald-50 text-emerald-600" : "bg-indigo-50 text-indigo-600"
+                                     doc.operation === 'Entrada' ? "bg-emerald-50 text-emerald-600" : "bg-blue-50 text-blue-600"
                                    )}>
                                       {doc.operation || '---'}
                                    </div>
@@ -428,7 +455,7 @@ export default function PreContabilAI() {
                                    {doc.taxes > 0 ? `R$ ${doc.taxes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '---'}
                                 </td>
                                 <td className="px-8 py-6 text-right space-x-2">
-                                   <button className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl text-slate-300 hover:text-indigo-600 transition-colors"><Edit2 className="w-4 h-4" /></button>
+                                   <button className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl text-slate-300 hover:text-blue-600 transition-colors"><Edit2 className="w-4 h-4" /></button>
                                    <button onClick={() => handleDelete(doc.id)} className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl text-slate-300 hover:text-rose-600 transition-colors"><Trash2 className="w-4 h-4" /></button>
                                 </td>
                              </motion.tr>
@@ -452,9 +479,9 @@ export default function PreContabilAI() {
 
           {/* Integration & Future Info */}
           <div className="bg-slate-900 rounded-[56px] p-12 md:p-20 text-white overflow-hidden relative">
-             <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none scale-150"><Zap className="w-64 h-64 text-indigo-400" /></div>
+             <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none scale-150"><Zap className="w-64 h-64 text-blue-400" /></div>
              <div className="max-w-3xl space-y-8 relative z-10">
-                <div className="w-20 h-20 bg-indigo-600 rounded-[32px] flex items-center justify-center shadow-2xl mb-8"><Sparkles className="w-10 h-10" /></div>
+                <div className="w-20 h-20 bg-blue-600 rounded-[32px] flex items-center justify-center shadow-2xl mb-8"><Sparkles className="w-10 h-10" /></div>
                 <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-[0.85] uppercase italic">Integremos sua <br />Produtividade.</h2>
                 <p className="text-lg text-slate-400 font-medium leading-relaxed italic">
                   O Pré-Contábil AI se conecta ao Office Contábil para amarrar os documentos aos seus clientes automaticamente. 
