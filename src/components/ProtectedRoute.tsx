@@ -44,7 +44,9 @@ export default function ProtectedRoute({ children, adminOnly = false, requiredMo
     return <Navigate to={`/login?redirect=${encodeURIComponent(location.pathname.substring(1))}`} replace />;
   }
 
-  if (adminOnly && user.email !== 'rodrigomaciel.sousa@gmail.com') {
+  const isAdmin = user.email?.toLowerCase() === 'rodrigomaciel.sousa@gmail.com';
+
+  if (adminOnly && !isAdmin) {
     return <Navigate to="/dashboard" replace />;
   }
 

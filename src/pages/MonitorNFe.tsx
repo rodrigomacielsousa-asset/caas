@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   Lock,
   ArrowRight,
+  ArrowLeft,
   RefreshCw,
   FileText,
   Upload,
@@ -150,6 +151,11 @@ export default function MonitorNFe() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-32">
+       <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 mt-12 mb-[-100px] relative z-30">
+          <Link to="/solucoes" className="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 hover:text-white transition-all uppercase tracking-widest">
+            <ArrowLeft className="w-4 h-4" /> Catálogo de Soluções
+          </Link>
+       </div>
       <div className="bg-slate-900 pt-32 pb-20 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-[600px] h-full bg-blue-600/10 blur-[150px]" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

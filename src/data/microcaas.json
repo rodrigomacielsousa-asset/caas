@@ -1,25 +1,5 @@
 [
   {
-    "id": "nexus-df",
-    "name": "Nexus DF",
-    "slug": "nexus-df",
-    "area": "Contábil",
-    "version": "1.0.0",
-    "description": "Demonstrações Financeiras + Notas Explicativas automáticas (CPC PME/Full) em PT-BR e EN.",
-    "features": ["BP/DRE/DRA/DMPL/DFC", "Notas Explicativas Bilíngues", "Importação de Balancete"],
-    "status": "active",
-    "pricingModel": "one_time",
-    "price": 497.00,
-    "priceLabel": "R$ 497,00",
-    "checkoutUrl": "/carrinho",
-    "liveUrl": "/app/nexus-df",
-    "paymentProvider": "mercadopago",
-    "paymentStatus": "mock",
-    "statusBadge": "Novo",
-    "tags": ["df", "contabilidade", "cpc", "ifrs", "notas-explicativas"],
-    "lastUpdated": "2024-05-03"
-  },
-  {
     "id": "extratobr",
     "name": "ExtratoBR",
     "slug": "extrato-br",

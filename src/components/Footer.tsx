@@ -26,7 +26,6 @@ export function Footer() {
             <ul className="space-y-4">
               <li><Link to="/solucoes" className="text-slate-600 hover:text-blue-600 text-sm font-bold uppercase tracking-tight flex items-center gap-2 group"><Zap className="w-3 h-3 text-blue-400 group-hover:fill-current" /> Marketplace</Link></li>
               <li><Link to="/reforma-hub" className="text-slate-600 hover:text-blue-600 text-sm font-bold uppercase tracking-tight flex items-center gap-2 group"><Zap className="w-3 h-3 text-blue-400 group-hover:fill-current" /> Reforma Hub</Link></li>
-              <li><Link to="/nexus-df" className="text-slate-600 hover:text-blue-600 text-sm font-bold uppercase tracking-tight flex items-center gap-2 group"><Zap className="w-3 h-3 text-blue-400 group-hover:fill-current" /> Nexus DF</Link></li>
               <li><Link to="/ecossistema" className="text-slate-600 hover:text-blue-600 text-sm font-bold uppercase tracking-tight flex items-center gap-2 group"><Zap className="w-3 h-3 text-blue-400 group-hover:fill-current" /> Ecossistema CaaS</Link></li>
             </ul>
           </div>
@@ -54,7 +53,7 @@ export function Footer() {
               </div>
               <div className="flex items-center gap-4">
                 <Phone className="w-5 h-5 text-blue-600 shrink-0" />
-                <p className="text-xs font-bold text-slate-700 uppercase">+55 (65) 99205-8727</p>
+                <p className="text-xs font-bold text-slate-700 uppercase">+55 11 99455-5471</p>
               </div>
             </div>
           </div>

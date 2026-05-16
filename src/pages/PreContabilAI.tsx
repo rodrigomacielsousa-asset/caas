@@ -253,6 +253,10 @@ export default function PreContabilAI() {
       <div className="flex-1 ml-24 md:ml-72 pt-32 pb-20 px-4 md:px-12">
         <div className="max-w-6xl mx-auto space-y-12">
           
+          <Link to="/solucoes" className="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 hover:text-blue-600 transition-all uppercase tracking-widest mb-4">
+            <ArrowLeft className="w-4 h-4" /> Catálogo de Soluções
+          </Link>
+
           {/* Dashboard Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-slate-100 dark:border-slate-800 pb-10">
             <div className="space-y-4">

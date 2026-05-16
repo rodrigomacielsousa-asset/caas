@@ -55,7 +55,7 @@ export default function Contato() {
             <div>
               <h3 className="text-2xl font-bold mb-2">WhatsApp</h3>
               <p className="text-slate-500 mb-6 font-medium">Atendimento dinâmico para suporte e vendas.</p>
-              <a href="https://wa.me/5565992058727" target="_blank" rel="noopener noreferrer" className="text-emerald-600 font-black text-lg hover:underline block">+55 (65) 99205-8727</a>
+              <a href="https://wa.me/5511994555471" target="_blank" rel="noopener noreferrer" className="text-emerald-600 font-black text-lg hover:underline block">+55 (11) 99455-5471</a>
             </div>
           </motion.div>
 

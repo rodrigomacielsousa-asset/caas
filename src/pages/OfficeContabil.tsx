@@ -53,7 +53,7 @@ interface Client {
 const INITIAL_CLIENTS: Client[] = [
   {
     id: '1',
-    companyName: 'Nexus Tech Solutions',
+    companyName: 'Prime Tech Solutions',
     cnpj: '12.345.678/0001-90',
     responsible: 'Diego Silveira',
     status: 'active',
@@ -211,6 +211,10 @@ export default function OfficeContabil() {
       <div className="flex-1 ml-24 md:ml-72 pt-32 pb-20 px-4 md:px-12">
         <div className="max-w-6xl mx-auto space-y-12">
           
+          <Link to="/solucoes" className="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 hover:text-blue-600 transition-all uppercase tracking-widest mb-4">
+            <ArrowLeft className="w-4 h-4" /> Catálogo de Soluções
+          </Link>
+
           {/* Dashboard View */}
           {activeView === 'dashboard' && (
             <motion.div 

@@ -59,60 +59,12 @@ export default function Home() {
     products.slice(0, 3), 
   [products]);
 
-  // Status messages for Hero Mock
-  const [statusIndex, setStatusIndex] = useState(0);
-  const statuses = [
-    "Processando balancete...",
-    "Gerando DRE...",
-    "Calculando indicadores...",
-    "Validando conformidade...",
-    "Finalizando relatório..."
-  ];
-
-  // Hero Rotating Messages
-  const [heroIndex, setHeroIndex] = useState(0);
-  const heroMessages = [
-    {
-      overline: "Plataforma de Inteligência Contábil",
-      title: "Ecossistema de Micro-Soluções",
-      subtitle: "A revolução CaaS (Accounting as a Service) chegou. Ferramentas cirúrgicas para contadores que não aceitam o \"tamanho único\" dos ERPs gigantes."
-    },
-    {
-      overline: "O Futuro é Modular",
-      title: "Automatize tarefas contábeis em minutos, não horas.",
-      subtitle: "Micro-soluções cirúrgicas para resolver dores fiscais, contábeis e financeiras com alta performance."
-    },
-    {
-      overline: "Soluções Contábeis de Alta Performance",
-      title: "Descubra erros fiscais e economize impostos em minutos.",
-      subtitle: "Pare de perder tempo com processos manuais. Use micro-soluções cirúrgicas para automatizar sua rotina fiscal, contábil e financeira."
-    },
-    {
-      overline: "O Futuro da Contabilidade",
-      title: "Contabilidade como Serviço Modular.",
-      subtitle: "Não mais um software pesado e lento, mas um ecossistema de micro-soluções que resolvem dores atômicas com precisão cirúrgica."
-    },
-    {
-      overline: "A Nova Era da Contabilidade",
-      title: "Pare de usar sistemas contábeis complexos.",
-      subtitle: "Resolva tarefas do dia a dia com ferramentas simples e rápidas. Ferramentas práticas para resolver problemas contábeis sem complicação."
-    }
-  ];
-
-  useEffect(() => {
-    const statusInterval = setInterval(() => {
-      setStatusIndex((prev) => (prev + 1) % statuses.length);
-    }, 3000);
-
-    const heroInterval = setInterval(() => {
-      setHeroIndex((prev) => (prev + 1) % heroMessages.length);
-    }, 6000);
-    
-    return () => {
-      clearInterval(statusInterval);
-      clearInterval(heroInterval);
-    };
-  }, []);
+  // Hero Message
+  const heroContent = {
+    overline: "Plataforma de Inteligência Contábil",
+    title: "Ecossistema de Micro-Soluções",
+    subtitle: "A revolução CaaS (Accounting as a Service) chegou. Ferramentas cirúrgicas para contadores que não aceitam o \"tamanho único\" dos ERPs gigantes."
+  };
 
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todas');
@@ -150,26 +102,17 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               className="space-y-6 max-w-4xl"
             >
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={heroIndex}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.5 }}
-                  className="space-y-6"
-                >
-                  <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-slate-100 border border-slate-200 rounded-full text-xs font-bold uppercase tracking-widest text-slate-600">
-                    <Sparkles className="w-3 h-3 text-blue-600" /> {heroMessages[heroIndex].overline}
-                  </div>
-                  <h1 className="text-6xl md:text-8xl font-black text-slate-900 tracking-tighter leading-[0.9]">
-                    {heroMessages[heroIndex].title}
-                  </h1>
-                  <p className="text-xl md:text-2xl text-slate-500 max-w-3xl mx-auto font-medium leading-relaxed">
-                    {heroMessages[heroIndex].subtitle}
-                  </p>
-                </motion.div>
-              </AnimatePresence>
+              <div className="space-y-6">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-slate-100 border border-slate-200 rounded-full text-xs font-bold uppercase tracking-widest text-slate-600">
+                  <Sparkles className="w-3 h-3 text-blue-600" /> {heroContent.overline}
+                </div>
+                <h1 className="text-6xl md:text-8xl font-black text-slate-900 tracking-tighter leading-[0.9]">
+                  {heroContent.title}
+                </h1>
+                <p className="text-xl md:text-2xl text-slate-500 max-w-3xl mx-auto font-medium leading-relaxed">
+                  {heroContent.subtitle}
+                </p>
+              </div>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 text-left">
                 {[
@@ -200,144 +143,6 @@ export default function Home() {
               <Link to="/ecossistema" className="bg-white border border-slate-200 py-5 px-12 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-slate-50 transition-all shadow-sm text-slate-900">
                  Como funciona
               </Link>
-            </motion.div>
-
-            {/* Dashboard Mockup/Preview */}
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="w-full relative mt-12 group"
-            >
-              <div className="relative mx-auto max-w-5xl rounded-[40px] overflow-hidden border border-slate-200 shadow-2xl bg-white aspect-video flex items-center justify-center p-2 hover:shadow-blue-200 transition-all duration-700">
-                 <div className="w-full h-full bg-slate-50 rounded-[32px] p-8 flex flex-col items-start text-left overflow-hidden relative">
-                    {/* Fake App Layout Header */}
-                    <div className="w-full border-b border-slate-200 pb-4 mb-8 flex justify-between items-center">
-                       <div className="flex gap-2">
-                          <div className="w-3 h-3 rounded-full bg-rose-400" />
-                          <div className="w-3 h-3 rounded-full bg-amber-400" />
-                          <div className="w-3 h-3 rounded-full bg-emerald-400" />
-                       </div>
-                       <div className="flex items-center gap-4">
-                          <div className="h-4 w-48 bg-slate-100 rounded-full flex items-center px-3 gap-2">
-                             <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                             <AnimatePresence mode="wait">
-                               <motion.span 
-                                 key={statusIndex}
-                                 initial={{ opacity: 0, y: 5 }}
-                                 animate={{ opacity: 1, y: 0 }}
-                                 exit={{ opacity: 0, y: -5 }}
-                                 className="text-[9px] font-black uppercase tracking-tighter text-slate-400"
-                               >
-                                 {statuses[statusIndex]}
-                               </motion.span>
-                             </AnimatePresence>
-                          </div>
-                          <div className="h-6 w-6 bg-slate-200 rounded-lg" />
-                       </div>
-                    </div>
-
-                    <div className="grid grid-cols-12 gap-8 w-full">
-                       {/* Left Content */}
-                       <div className="col-span-8 space-y-6">
-                          {/* Main Metric Card */}
-                          <div className="h-48 w-full bg-white rounded-[32px] border border-slate-100 p-8 flex flex-col justify-between relative overflow-hidden group/card shadow-sm hover:shadow-md transition-all">
-                             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover/card:rotate-12 transition-transform duration-500">
-                                <BarChart3 className="w-32 h-32 text-blue-600" />
-                             </div>
-                             
-                             <div className="space-y-2 relative z-10">
-                                <div className="h-5 w-32 bg-blue-50 rounded-lg flex items-center px-2 gap-2">
-                                   <Activity className="w-3 h-3 text-blue-600" />
-                                   <span className="text-[9px] font-bold text-blue-600 uppercase">Analítico Geral</span>
-                                </div>
-                                <h3 className="text-3xl font-black text-slate-900 mt-4">R$ 2.482.190,00</h3>
-                                <p className="text-xs text-slate-400 font-medium">Receita Consolidada • Março 2026</p>
-                             </div>
-
-                             <div className="relative z-10 flex items-center gap-4">
-                                <div className="h-2 flex-grow bg-slate-100 rounded-full overflow-hidden">
-                                   <motion.div 
-                                      initial={{ width: 0 }}
-                                      animate={{ width: "82%" }}
-                                      transition={{ duration: 2, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
-                                      className="h-full bg-blue-600 rounded-full relative"
-                                   >
-                                      <div className="absolute inset-0 bg-white/20 animate-shimmer" />
-                                   </motion.div>
-                                </div>
-                                <span className="text-[10px] font-black text-blue-600">82%</span>
-                             </div>
-                          </div>
-
-                          {/* Secondary Metrics */}
-                          <div className="grid grid-cols-3 gap-6">
-                             {[
-                                { label: "Lucro Líquido", val: "R$ 542k", icon: DollarSign, color: "text-emerald-500", bg: "bg-emerald-50" },
-                                { label: "Margem", val: "22.5%", icon: TrendingUp, color: "text-amber-500", bg: "bg-amber-50" },
-                                { label: "ROE", val: "18.2%", icon: Activity, color: "text-blue-500", bg: "bg-blue-50" }
-                             ].map((metric, i) => (
-                                <motion.div 
-                                  key={i}
-                                  whileHover={{ y: -5 }}
-                                  className="bg-white rounded-3xl border border-slate-100 p-5 flex flex-col gap-3 shadow-sm"
-                                >
-                                   <div className={`w-8 h-8 ${metric.bg} rounded-xl flex items-center justify-center ${metric.color}`}>
-                                      <metric.icon className="w-4 h-4" />
-                                   </div>
-                                   <div className="space-y-1">
-                                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{metric.label}</p>
-                                      <p className="text-sm font-black text-slate-900">{metric.val}</p>
-                                   </div>
-                                </motion.div>
-                             ))}
-                          </div>
-                       </div>
-
-                       {/* Right Content */}
-                       <div className="col-span-4 space-y-6">
-                          <div className="h-full bg-blue-600 rounded-[40px] p-8 flex flex-col justify-between shadow-2xl shadow-blue-200 relative overflow-hidden group/cta">
-                             <div className="absolute top-0 right-0 -translate-y-8 translate-x-8 w-48 h-48 bg-white opacity-10 rounded-full blur-3xl group-hover/cta:scale-150 transition-transform duration-1000" />
-                             
-                             <div className="relative z-10 space-y-4">
-                                <div className="h-10 w-10 bg-white rounded-2xl flex items-center justify-center text-blue-600 shadow-xl">
-                                   <Zap className="w-5 h-5 fill-blue-600" />
-                                </div>
-                                <h4 className="text-2xl font-black text-white tracking-tight leading-none">Status do <br />Balanceamento</h4>
-                                <div className="flex gap-1.5 flex-wrap">
-                                   {['#NEXUS', '#AUDIT', '#2026'].map(tag => (
-                                      <span key={tag} className="text-[8px] font-black px-2 py-1 bg-white/20 text-white rounded-full uppercase">{tag}</span>
-                                   ))}
-                                </div>
-                             </div>
-
-                             <div className="relative z-10 space-y-4 mt-auto">
-                                <div className="space-y-2">
-                                   <div className="flex justify-between text-[10px] font-bold text-white/60">
-                                      <span>Sync Cloud</span>
-                                      <span>94%</span>
-                                   </div>
-                                   <div className="h-1.5 w-full bg-white/20 rounded-full overflow-hidden">
-                                      <motion.div 
-                                        initial={{ width: 0 }}
-                                        animate={{ width: "94%" }}
-                                        transition={{ duration: 1.5, delay: 1 }}
-                                        className="h-full bg-white"
-                                      />
-                                   </div>
-                                </div>
-                                <button className="w-full py-4 bg-white text-blue-600 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl">
-                                   Liberar Fluxo
-                                </button>
-                             </div>
-                          </div>
-                       </div>
-                    </div>
-
-                    {/* Gradient Overlay for modern look */}
-                    <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-50 to-transparent pointer-events-none" />
-                 </div>
-              </div>
             </motion.div>
           </div>
         </div>

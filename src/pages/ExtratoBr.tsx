@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   BarChart3, 
   Upload, 
@@ -327,6 +328,11 @@ export default function ExtratoBr() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col">
+       <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 mt-12 mb-[-40px]">
+          <Link to="/solucoes" className="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 hover:text-emerald-600 transition-all uppercase tracking-widest">
+            <ArrowLeft className="w-4 h-4" /> Catálogo de Soluções
+          </Link>
+       </div>
        {/* Extrato Header */}
        <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-8 pt-10 sticky top-0 z-20 shadow-sm">
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">

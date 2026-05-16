@@ -24,7 +24,6 @@ export default function SmokeTest() {
     { id: 'router-solutions', name: 'Rota: Soluções', status: 'testing', path: '/solucoes' },
     { id: 'router-caas', name: 'Rota: MicroCaaS', status: 'testing', path: '/solucoes/caas' },
     { id: 'router-reforma', name: 'Rota: Reforma Hub', status: 'testing', path: '/reforma-hub' },
-    { id: 'router-nexus', name: 'Rota: Nexus DF', status: 'testing', path: '/app/nexus-df' },
     { id: 'router-admin', name: 'Rota: Admin', status: 'testing', path: '/admin' },
     { id: 'router-cart', name: 'Rota: Carrinho', status: 'testing', path: '/carrinho' },
   ]);

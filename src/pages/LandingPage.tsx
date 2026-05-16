@@ -68,7 +68,6 @@ export default function LandingPage() {
          </div>
          <div className="hidden md:flex items-center gap-10">
             <a href="#features" className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-blue-600">Recursos</a>
-            <a href="#pricing" className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-blue-600">Preços</a>
             <Link to="/login" className="px-6 py-3 bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-800 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-slate-50 transition-all">Login</Link>
             <Link to="/signup" className="px-6 py-3 bg-blue-600 text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-100 dark:shadow-none hover:bg-slate-900 transition-all">Começar Grátis</Link>
          </div>
@@ -140,51 +139,6 @@ export default function LandingPage() {
                  </div>
                ))}
             </div>
-         </div>
-      </section>
-
-      {/* Pricing */}
-      <section id="pricing" className="w-full max-w-7xl px-8 py-48 space-y-24">
-         <div className="text-center space-y-4">
-            <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Nossos Planos</h2>
-            <p className="text-5xl font-black text-slate-900 dark:text-white italic tracking-tighter">Escolha o tamanho do seu crescimento.</p>
-         </div>
-
-         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-            {plans.map(p => (
-               <div key={p.name} className={cn(
-                 "p-12 rounded-[56px] border flex flex-col space-y-10 relative overflow-hidden",
-                 p.highlight ? "bg-blue-600 text-white border-blue-700 shadow-3xl shadow-blue-200" : "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800"
-               )}>
-                  {p.highlight && <div className="absolute top-0 right-0 p-8 opacity-10 rotate-12"><Crown className="w-32 h-32" /></div>}
-                  
-                  <div className="space-y-4">
-                     <h3 className="text-[10px] font-black uppercase tracking-widest italic opacity-60">{p.name}</h3>
-                     <div className="flex items-baseline gap-1">
-                        <span className="text-5xl font-black italic tracking-tighter">{p.price}</span>
-                        {p.period && <span className="text-lg font-bold opacity-60">{p.period}</span>}
-                     </div>
-                  </div>
-
-                  <div className="flex-1 space-y-4">
-                     {p.features.map(f => (
-                       <div key={f} className="flex items-center gap-3">
-                          <CheckCircle2 className={cn("w-5 h-5", p.highlight ? "text-blue-200" : "text-blue-600")} />
-                          <span className="text-xs font-black uppercase italic italic opacity-80">{f}</span>
-                       </div>
-                     ))}
-                  </div>
-
-                  <Link 
-                    to={p.tier === 'free' ? '/signup' : `/login?redirect=dashboard&plan=${p.tier}`}
-                    className={cn(
-                    "w-full py-6 rounded-2xl font-black text-xs uppercase tracking-widest text-center transition-all",
-                    p.highlight ? "bg-white text-blue-600 hover:bg-slate-50" : "bg-slate-900 text-white hover:bg-blue-600"
-                  )}>
-                     {p.cta}
-                  </Link>
-               </div>
-            ))}
          </div>
       </section>
 

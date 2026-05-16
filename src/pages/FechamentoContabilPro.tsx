@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   ClipboardCheck, 
   Plus, 
@@ -8,6 +9,7 @@ import {
   Clock, 
   AlertTriangle, 
   ArrowRight, 
+  ArrowLeft,
   Search, 
   Filter, 
   MoreVertical, 
@@ -249,6 +251,11 @@ export default function FechamentoContabilPro() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col">
+       <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 mt-12 mb-[-40px]">
+          <Link to="/solucoes" className="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 hover:text-blue-600 transition-all uppercase tracking-widest">
+            <ArrowLeft className="w-4 h-4" /> Catálogo de Soluções
+          </Link>
+       </div>
        {/* Premium Sub-Header */}
        <div className="bg-blue-600 px-6 py-2 flex justify-between items-center text-white border-b border-blue-500 shadow-sm z-30">
           <div className="flex items-center gap-3">

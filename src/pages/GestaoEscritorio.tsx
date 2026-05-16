@@ -21,7 +21,7 @@ import { cn } from '../lib/utils';
 
 const TASKS = [
   { id: 1, title: 'Fechamento Fiscal - Cliente A', responsible: 'Diego S.', deadline: '2h restantes', status: 'In Progress', priority: 'High' },
-  { id: 2, title: 'Abertura de Empresa - Nexus', responsible: 'Cássio A.', deadline: 'Hoje', status: 'Pending', priority: 'Medium' },
+  { id: 2, title: 'Abertura de Empresa - Prime', responsible: 'Cássio A.', deadline: 'Hoje', status: 'Pending', priority: 'Medium' },
   { id: 3, title: 'Revisão Societária', responsible: 'Ana B.', deadline: 'Amanhã', status: 'Done', priority: 'Low' },
   { id: 4, title: 'Conciliação Bancária Q1', responsible: 'Diego S.', deadline: '15/05', status: 'In Progress', priority: 'High' },
 ];

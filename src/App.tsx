@@ -51,7 +51,6 @@ import SmokeTest from './pages/SmokeTest';
 import ValidaEmpresa from './pages/ValidaEmpresa';
 import Checkout from './pages/Checkout';
 import GrowthDashboard from './pages/GrowthDashboard';
-import NexusDF from './pages/NexusDF';
 import ConsultaCNAE from './pages/ConsultaCNAE';
 import Register from './pages/Register';
 import ConsultaNFe from './pages/ConsultaNFe';
@@ -85,7 +84,6 @@ export default function App() {
             <Route path="/solucao/:slug" element={<ProductDetail />} />
             <Route path="/micro/:slug" element={<ProductDetail />} />
             <Route path="/microcaas" element={<MicroCaaSPage />} />
-            <Route path="/nexus-df" element={<NexusDF />} />
             <Route path="/simulador" element={<SimuladorRegime />} />
             <Route path="/fator-r" element={<SimuladorFatorR />} />
             <Route path="/honorarios" element={<SimuladorHonorarios />} />

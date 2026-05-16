@@ -139,42 +139,7 @@ export const products: Product[] = [
     },
     status: "beta",
     liveUrl: "/fechamento",
-    relatedProducts: ["nexus-df", "indicadores-tabelas-2026"]
-  },
-  {
-    id: "nexus-df",
-    name: "Gere demonstrações contábeis em minutos",
-    subtitle: "Nexus DF",
-    impactPhrase: "Economize 10h de digitação por relatório",
-    slug: "nexus-df",
-    category: "Contábil",
-    badges: ["Pagamento Único", "Destaque"],
-    modelBadge: "PAGAMENTO ÚNICO",
-    usageImpact: "Resultado em 15 min",
-    integrationInfo: "Exportação PDF Oficial",
-    dors: ["Documentos", "Fechamento", "Demonstrações"],
-    shortDescription: "Demonstrações + notas explicativas automáticas (CPC PME/Full).",
-    longDescription: "O Nexus DF automatiza o Balanço, DRE e Notas Explicativas garantindo total conformidade com as normas contábeis.",
-    howToUse: [
-      "Importe o balancete em Excel",
-      "Realize o mapeamento das contas (Bridge)",
-      "Configure as notas explicativas inteligentes",
-      "Exporte o relatório completo em PDF"
-    ],
-    inputs: ["Balancete de verificação", "Mapeamento de plano de contas"],
-    outputs: ["Balanço Patrimonial", "DRE", "Notas Explicativas", "Fluxo de Caixa (DFC)"],
-    pricingModel: "one_time",
-    pricing: {
-      priceLabel: "R$ 497,00",
-      priceValue: 497,
-      currency: "BRL",
-      includes: ["Acesso vitalício ao módulo", "Atualizações CPC inclusas", "Suporte técnico"],
-      ctaText: "Testar agora",
-      ctaAction: "open_app"
-    },
-    status: "active",
-    liveUrl: "/nexus-df",
-    relatedProducts: ["fechamento-contabil-pro", "finance-insight"]
+    relatedProducts: ["indicadores-tabelas-2026"]
   },
   {
     id: "consulta-nfe",

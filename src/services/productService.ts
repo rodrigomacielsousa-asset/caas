@@ -13,22 +13,39 @@ export const productService = {
       const q = query(collection(db, PRODUCTS_COLLECTION));
       const querySnapshot = await getDocs(q);
       
-      let products = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Product));
+      const allProducts = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Product));
       
+      const filterFn = (p: Product) => {
+        const name = p.name?.toLowerCase() || '';
+        const subtitle = p.subtitle?.toLowerCase() || '';
+        const slug = p.slug?.toLowerCase() || '';
+        return !name.includes('nexus') && !name.includes('sibre') && 
+               !subtitle.includes('nexus') && !subtitle.includes('sibre') &&
+               !slug.includes('nexus') && !slug.includes('sibre');
+      };
+
       // If DB is empty or contains invalid data, fallback to canonical
-      const validProducts = products.filter(p => p.name && p.slug);
+      const validProducts = allProducts.filter(p => p.name && p.slug).filter(filterFn);
       
       if (validProducts.length === 0) {
         console.log('Product collection empty or invalid, falling back to static data');
-        return canonicalProducts;
+        return canonicalProducts.filter(filterFn);
       }
       
       return validProducts;
     } catch (error) {
       console.warn("Product collection issue, falling back to static data", error);
       // Log for platform but don't crash the fallback
+      const filterFn = (p: Product) => {
+        const name = p.name?.toLowerCase() || '';
+        const subtitle = p.subtitle?.toLowerCase() || '';
+        const slug = p.slug?.toLowerCase() || '';
+        return !name.includes('nexus') && !name.includes('sibre') && 
+               !subtitle.includes('nexus') && !subtitle.includes('sibre') &&
+               !slug.includes('nexus') && !slug.includes('sibre');
+      };
       try { handleFirestoreError(error, OperationType.LIST, PRODUCTS_COLLECTION); } catch(e) {}
-      return canonicalProducts;
+      return canonicalProducts.filter(filterFn);
     }
   },
 

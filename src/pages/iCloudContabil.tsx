@@ -33,7 +33,7 @@ interface CloudFile {
 }
 
 const INITIAL_FILES: CloudFile[] = [
-  { id: '1', name: 'Contrato Social - Nexus.pdf', type: 'application/pdf', size: '2.4 MB', updatedAt: '08/05/2026', category: 'Legal' },
+  { id: '1', name: 'Contrato Social - Prime.pdf', type: 'application/pdf', size: '2.4 MB', updatedAt: '08/05/2026', category: 'Legal' },
   { id: '2', name: 'Folha de Pagamento - Abr2026.xlsx', type: 'application/vnd.ms-excel', size: '1.1 MB', updatedAt: '07/05/2026', category: 'RH' },
   { id: '3', name: 'Nota Fiscal 2024-05.pdf', type: 'application/pdf', size: '840 KB', updatedAt: '09/05/2026', category: 'Fiscal' },
 ];
