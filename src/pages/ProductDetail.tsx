@@ -251,7 +251,8 @@ const fetchCNPJProfile = async (cnpjNumeros: string): Promise<NormalizedCNPJProf
 
 export default function ProductDetail() {
   const { slug } = useParams();
-  const { addItem } = useCart();
+  const { cart, addToCart } = useCart();
+  const { items } = cart;
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeUploadId, setActiveUploadId] = useState<string | null>(null);
@@ -488,21 +489,46 @@ export default function ProductDetail() {
     };
   }, [cnpjData, connectorResults]);
 
-  const handleUnlockPremium = () => {
-    setIsPremium(true);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+
+  const handleUnlockPremium = async () => {
+    if (cnpjData) {
+      setIsAddingToCart(true);
+      try {
+        await addToCart({
+          sku: "cnpj_dossier",
+          title: `Dossiê Completo CNPJ: ${cnpjData.cnpj}`,
+          price: 4.99,
+          metadata: { cnpj: cnpjData.cnpj, companyName: cnpjData.razaoSocial, type: 'search' }
+        }, { cnpj: cnpjData.cnpj, companyName: cnpjData.razaoSocial }, false);
+        navigate('/checkout');
+      } catch (err) {
+        console.error("Unlock error", err);
+        navigate('/checkout');
+      } finally {
+        setIsAddingToCart(false);
+      }
+    } else {
+      handleAddToCart();
+    }
   };
 
-  const handleAddToCart = () => {
-    addItem({
-      id: product.id,
-      slug: product.slug,
-      name: product.name,
-      price: product.pricing.priceValue || 0,
-      priceLabel: product.pricing.priceLabel,
-      type: 'individual',
-      pricingModel: product.pricingModel
-    });
-    navigate('/checkout');
+  const handleAddToCart = async () => {
+    setIsAddingToCart(true);
+    try {
+      await addToCart({
+        sku: product.slug,
+        title: product.name,
+        price: product.pricing.priceValue || 0,
+        metadata: { type: 'individual' }
+      }, {}, false);
+      navigate('/checkout');
+    } catch (err) {
+      console.error("Add to cart error", err);
+      navigate('/checkout');
+    } finally {
+      setIsAddingToCart(false);
+    }
   };
 
   const handleCTA = () => {
@@ -624,11 +650,21 @@ export default function ProductDetail() {
                         {product.pricingModel !== 'free' && (
                           <button 
                             onClick={handleAddToCart}
-                            className="w-full bg-blue-600 text-white py-6 rounded-3xl font-black text-xl flex items-center justify-center gap-3 hover:bg-slate-900 transition-all shadow-xl shadow-blue-100 active:scale-95 group/btn"
+                            disabled={isAddingToCart}
+                            className={cn(
+                              "w-full bg-blue-600 text-white py-6 rounded-3xl font-black text-xl flex items-center justify-center gap-3 hover:bg-slate-900 transition-all shadow-xl shadow-blue-100 active:scale-95 group/btn",
+                              isAddingToCart && "opacity-50 cursor-not-allowed"
+                            )}
                           >
-                            <ShoppingCart className="w-6 h-6" />
-                            Comprar Agora
-                            <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+                            {isAddingToCart ? (
+                              "Processando..."
+                            ) : (
+                              <>
+                                <ShoppingCart className="w-6 h-6" />
+                                Comprar Agora
+                                <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+                              </>
+                            )}
                           </button>
                         )}
                         
@@ -638,7 +674,7 @@ export default function ProductDetail() {
                             className="w-full bg-slate-900 text-white py-6 rounded-3xl font-black text-xl flex items-center justify-center gap-3 hover:bg-blue-600 transition-all active:scale-95"
                           >
                             <Play className="w-6 h-6 fill-current" />
-                            Acessar Exemplo
+                            Acessar APP
                           </button>
                         )}
 

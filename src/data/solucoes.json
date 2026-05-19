@@ -343,5 +343,23 @@
     "statusBadge": "Automático",
     "tags": ["monitoramento", "fiscal", "nsu", "dfe"],
     "lastUpdated": "2024-05-13"
+  },
+  {
+    "id": "nexus-df",
+    "name": "NEXUS DF",
+    "slug": "nexus-df",
+    "area": "Fiscal",
+    "status": "active",
+    "description": "Inteligência Avançada em Documentos Fiscais.",
+    "longDescription": "O NEXUS DF é a plataforma definitiva para gestão e auditoria de documentos fiscais eletrônicos. Centralize NF-e, NFS-e e CT-e, realize auditorias automáticas e garanta o compliance total do seu escritório.",
+    "features": ["Auditoria de Impostos Automatizada", "Custódia Jurídica", "Integração via API/ERP", "Dashboard de Conformidade"],
+    "pricingModel": "subscription",
+    "price": 597,
+    "priceLabel": "R$ 597/mês",
+    "checkoutUrl": "/carrinho",
+    "liveUrl": "/nexus-df",
+    "statusBadge": "Premium",
+    "tags": ["nexus", "fiscal", "compliance", "nfe"],
+    "lastUpdated": "2024-05-15"
   }
 ]

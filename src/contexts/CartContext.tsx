@@ -1,13 +1,34 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import type { CartItem } from '../types';
+import { v4 as uuidv4 } from 'uuid';
+
+interface CartItem {
+  sku: string;
+  title: string;
+  price: number;
+  qty: number;
+  metadata?: any;
+}
+
+interface Cart {
+  cartId: string;
+  items: CartItem[];
+  context?: {
+    cnpj?: string;
+    companyName?: string;
+  };
+  totals: {
+    total: number;
+  };
+}
 
 interface CartContextType {
-  items: CartItem[];
-  addItem: (item: CartItem) => void;
-  removeItem: (slug: string) => void;
-  clearCart: () => void;
-  total: number;
-  count: number;
+  cart: Cart;
+  addToCart: (item: Omit<CartItem, 'qty'>, context?: any, openDrawer?: boolean) => Promise<void>;
+  removeFromCart: (index: number) => Promise<void>;
+  clearCart: () => Promise<void>;
+  isDrawerOpen: boolean;
+  setIsDrawerOpen: (open: boolean) => void;
+  loading: boolean;
 }
 
 export const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -21,50 +42,141 @@ export function useCart() {
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>(() => {
-    try {
-      const saved = localStorage.getItem('caas_cart');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
-
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [cart, setCart] = useState<Cart>({ cartId: '', items: [], totals: { total: 0 } });
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('caas_cart', JSON.stringify(items));
-  }, [items]);
+    const savedCartId = localStorage.getItem('cartId');
+    const initialCartId = savedCartId || uuidv4();
+    if (!savedCartId) localStorage.setItem('cartId', initialCartId);
 
-  const addItem = (item: CartItem) => {
-    setItems(prev => {
-      if (prev.find(i => i.slug === item.slug)) return prev;
-      return [...prev, item];
-    });
+    // Initial load from localStorage for speed and fallback
+    const localCart = localStorage.getItem('microcaas_cart');
+    if (localCart) {
+      try {
+        setCart(JSON.parse(localCart));
+      } catch (e) {}
+    }
+
+    fetchCart(initialCartId);
+  }, []);
+
+  const saveLocal = (newCart: Cart) => {
+    localStorage.setItem('microcaas_cart', JSON.stringify(newCart));
+    setCart(newCart);
+  };
+
+  const fetchCart = async (id: string) => {
+    setLoading(true);
+    try {
+      const resp = await fetch(`/api/cart/get?cartId=${id}`);
+      if (resp.ok) {
+        const data = await resp.json();
+        const updatedCart = {
+          cartId: id,
+          items: data.items || [],
+          totals: data.totals || { total: 0 }
+        };
+        saveLocal(updatedCart);
+      }
+    } catch (e) {
+      console.error("Fetch cart error", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addToCart = async (item: Omit<CartItem, 'qty'>, context?: any, openDrawer = true) => {
+    setLoading(true);
+    // Optimistic / Fallback Update
+    const currentItems = [...cart.items];
+    const existingIndex = currentItems.findIndex(i => i.sku === item.sku && JSON.stringify(i.metadata) === JSON.stringify(item.metadata));
     
-    setToastMessage(`Adicionado: ${item.name}`);
-    setTimeout(() => setToastMessage(null), 3000);
+    if (existingIndex > -1) {
+      currentItems[existingIndex].qty += 1;
+    } else {
+      currentItems.push({ ...item, qty: 1 });
+    }
+    
+    const newTotal = currentItems.reduce((acc, i) => acc + (i.price * i.qty), 0);
+    const optimisticCart = { ...cart, items: currentItems, totals: { total: newTotal } };
+    saveLocal(optimisticCart);
+
+    try {
+      const resp = await fetch('/api/cart/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cartId: cart.cartId,
+          ...item,
+          qty: 1,
+          context: context || {}
+        })
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        saveLocal(data);
+      }
+    } catch (e) {
+      console.error("Add to cart error", e);
+      // We already updated local state optimistically
+    } finally {
+      setLoading(false);
+      if (openDrawer) {
+        setIsDrawerOpen(true);
+      }
+    }
   };
 
-  const removeItem = (slug: string) => {
-    setItems(prev => prev.filter(i => i.slug !== slug));
+  const removeFromCart = async (index: number) => {
+    setLoading(true);
+    // Optimistic Update
+    const currentItems = [...cart.items];
+    currentItems.splice(index, 1);
+    const newTotal = currentItems.reduce((acc, i) => acc + (i.price * i.qty), 0);
+    const optimisticCart = { ...cart, items: currentItems, totals: { total: newTotal } };
+    saveLocal(optimisticCart);
+
+    try {
+      const resp = await fetch('/api/cart/remove', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cartId: cart.cartId,
+          index
+        })
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        saveLocal(data);
+      }
+    } catch (e) {
+      console.error("Remove from cart error", e);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const clearCart = () => {
-    setItems([]);
+  const clearCart = async () => {
+    setLoading(true);
+    saveLocal({ ...cart, items: [], totals: { total: 0 } });
+    try {
+      await fetch('/api/cart/clear', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cartId: cart.cartId })
+      });
+    } catch (e) {
+      console.error("Clear cart error", e);
+    } finally {
+      setLoading(false);
+    }
   };
-
-  const total = items.reduce((acc, item) => acc + (item.price || 0), 0);
 
   return (
-    <CartContext.Provider value={{ items, addItem, removeItem, clearCart, total, count: items.length }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart, isDrawerOpen, setIsDrawerOpen, loading }}>
       {children}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-[100] bg-slate-900 dark:bg-emerald-600 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-5">
-          <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-          <span className="font-bold text-sm">{toastMessage}</span>
-        </div>
-      )}
     </CartContext.Provider>
   );
 }

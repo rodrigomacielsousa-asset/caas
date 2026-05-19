@@ -64,7 +64,7 @@ export default function LandingPage() {
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-xl">
                <Zap className="w-6 h-6" />
             </div>
-            <span className="text-xl font-black italic tracking-tighter uppercase dark:text-white">MicroCaaS</span>
+            <span className="text-xl font-black tracking-tighter uppercase dark:text-white">MicroCaaS</span>
          </div>
          <div className="hidden md:flex items-center gap-10">
             <a href="#features" className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-blue-600">Recursos</a>
@@ -126,11 +126,11 @@ export default function LandingPage() {
       <section className="w-full bg-slate-900 py-48">
          <div className="max-w-7xl mx-auto px-8 space-y-24">
             <div className="text-center space-y-4">
-               <h2 className="text-[10px] font-black text-blue-400 uppercase tracking-widest italic">A Suíte Completa</h2>
-               <p className="text-5xl font-black text-white italic tracking-tighter">Um ecossistema, infinitos módulos.</p>
+               <h2 className="text-[10px] font-black text-blue-400 uppercase tracking-widest">A Suíte Completa</h2>
+               <p className="text-5xl font-black text-white tracking-tighter">Um ecossistema, infinitos módulos.</p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-               {products.slice(0, 6).map(p => (
+               {[...products].sort(() => Math.random() - 0.5).slice(0, 6).map(p => (
                  <div key={p.id} className="p-8 bg-slate-800 rounded-[32px] border border-slate-700/50 space-y-4 group hover:bg-blue-600 transition-all cursor-pointer">
                     <div className="text-slate-400 group-hover:text-white transition-colors">
                        <LayoutGrid className="w-8 h-8" />
@@ -147,7 +147,7 @@ export default function LandingPage() {
          <div className="max-w-7xl mx-auto flex flex-col md:row justify-between items-center gap-10">
             <div className="flex items-center gap-3">
                <div className="w-8 h-8 bg-slate-900 dark:bg-white rounded-lg flex items-center justify-center text-white dark:text-slate-900 font-bold">M</div>
-               <span className="font-black uppercase tracking-tighter italic dark:text-white">MicroCaaS</span>
+               <span className="font-black uppercase tracking-tighter dark:text-white">MicroCaaS</span>
             </div>
             <div className="flex gap-10">
                <a href="#" className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-blue-600">Termos</a>

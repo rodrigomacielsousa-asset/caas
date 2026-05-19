@@ -34,6 +34,8 @@ export const products: Product[] = [
       ctaAction: "open_app"
     },
     status: "active",
+    liveUrl: "/pre-contabil",
+    shareMessage: "Você já conhece o Pré-Contábil AI? Ela reduz o tempo de digitação manual, ajusta o fluxo de documentos e resolve a dor de fechamentos demorados via IA. Conheça agora!",
     relatedProducts: ["receiptorbr", "extratobr"]
   },
   {
@@ -69,6 +71,8 @@ export const products: Product[] = [
       ctaAction: "open_app"
     },
     status: "active",
+    liveUrl: "/receiptor",
+    shareMessage: "Já conhece o ReceiptorBR? Ela reduz o tempo de captura de notas, ajusta o lançamento automático e resolve a dor da classificação fiscal manual. Veja aqui!",
     relatedProducts: ["pre-contabil-ai", "extratobr"]
   },
   {
@@ -103,6 +107,7 @@ export const products: Product[] = [
     },
     status: "active",
     liveUrl: "/extrato",
+    shareMessage: "Conhece o ExtratoBR? Ela reduz o tempo de conciliação bancária, ajusta a leitura de PDFs e resolve a dor de planilhas infinitas operando via IA. Confira!",
     relatedProducts: ["pre-contabil-ai", "finance-insight"]
   },
   {
@@ -139,6 +144,7 @@ export const products: Product[] = [
     },
     status: "beta",
     liveUrl: "/fechamento",
+    shareMessage: "Conhece o Fechamento Contábil Pro? Ela reduz o tempo de encerramento, ajusta checklists de auditoria e resolve a dor de erros no balanço via automação baseada em CPC. Confira!",
     relatedProducts: ["indicadores-tabelas-2026"]
   },
   {
@@ -173,6 +179,7 @@ export const products: Product[] = [
     },
     status: "active",
     liveUrl: "/consulta-nfe",
+    shareMessage: "Já usou a Consulta NF-e da MicroCaaS? Ela reduz o tempo de busca de documentos, ajusta o download de XML/DANFE e resolve a dor de notas perdidas instantaneamente. Teste agora!",
     relatedProducts: ["monitor-nfe", "receiptorbr"]
   },
   {
@@ -208,6 +215,7 @@ export const products: Product[] = [
     },
     status: "active",
     liveUrl: "/monitor-nfe",
+    shareMessage: "Você já conhece o Monitor NF-e? Ela reduz o tempo de gestão fiscal, ajusta a detecção de notas e resolve a dor de desconhecimento de emissões contra seu CNPJ 24/7. Saiba mais!",
     relatedProducts: ["consulta-nfe", "office-contabil"]
   },
   {
@@ -243,6 +251,7 @@ export const products: Product[] = [
     },
     status: "active",
     liveUrl: "/growth-dashboard",
+    shareMessage: "Conheça o Growth Engine SaaS! Ela reduz o churn, ajusta o funil de conversão e resolve a dor de baixa retenção em produtos digitais via IA. Veja as métricas!",
     relatedProducts: ["office-contabil", "data-hub"]
   },
   {
@@ -277,6 +286,8 @@ export const products: Product[] = [
       ctaAction: "open_app"
     },
     status: "beta",
+    liveUrl: "/imob-facil",
+    shareMessage: "Já conhece o IMOB Fácil? Ela reduz o tempo de gestão imobiliária, ajusta a tributação de aluguéis e resolve a dor de burocracia em Dimob e corretagem. Confira o beta!",
     relatedProducts: []
   },
   {
@@ -312,6 +323,7 @@ export const products: Product[] = [
     },
     status: "active",
     liveUrl: "/office",
+    shareMessage: "Conhece o iCloud Contábil? Ela reduz o tempo de organização do escritório, ajusta a relação com o cliente e resolve a dor de perda de documentos em nuvem segura. Acesso agora!",
     relatedProducts: []
   },
   {
@@ -346,6 +358,7 @@ export const products: Product[] = [
     },
     status: "active",
     liveUrl: "/consulta-cnae",
+    shareMessage: "Você já conhece a Consulta CNAE Inteligente? Ela reduz o tempo de busca fiscal, ajusta o enquadramento do Simples Nacional/Fator R e resolve a dor de erros de CNAE. Teste grátis!",
     relatedProducts: []
   },
   {
@@ -381,6 +394,7 @@ export const products: Product[] = [
     },
     status: "active",
     liveUrl: "/finance-insight",
+    shareMessage: "Conhece o Finance Insight? Ela reduz o tempo de análise financeira, ajusta o forecast de caixa e resolve a dor de falta de visibilidade sobre o lucro via IA. Veja como funciona!",
     relatedProducts: []
   },
   {
@@ -416,6 +430,7 @@ export const products: Product[] = [
     },
     status: "active",
     liveUrl: "/cobra-ai",
+    shareMessage: "Já conhece o Cobra AI? Ela reduz o tempo de cobrança, ajusta a régua de inadimplentes e resolve a dor de recebíveis atrasados via automação multimeios. Saiba mais!",
     relatedProducts: []
   },
   {
@@ -451,6 +466,7 @@ export const products: Product[] = [
     },
     status: "active",
     liveUrl: "/portal",
+    shareMessage: "Conhece o Portal do Cliente? Ela reduz o tempo de atendimento, ajusta a troca de documentos e resolve a dor de e-mails em excesso na relação contador-cliente. Veja o portal!",
     relatedProducts: []
   },
   {
@@ -486,6 +502,7 @@ export const products: Product[] = [
     },
     status: "active",
     liveUrl: "/gestao-escritorio",
+    shareMessage: "Já conhece a Gestão de Escritório? Ela reduz o tempo de controle de prazos, ajusta o workflow da equipe e resolve a dor de multas e atrasos via visão Kanban. Confira!",
     relatedProducts: []
   },
   {
@@ -521,6 +538,7 @@ export const products: Product[] = [
     },
     status: "active",
     liveUrl: "/solucoes/propostas-contratos",
+    shareMessage: "Conhece o Propostas & Contratos? Ela reduz o tempo de fechamento comercial, ajusta a segurança jurídica e resolve a dor de contratos manuais com assinatura digital integrados. Saiba mais!",
     relatedProducts: []
   },
   {
@@ -555,6 +573,7 @@ export const products: Product[] = [
     },
     status: "active",
     liveUrl: "/ferramentas/calculadoras",
+    shareMessage: "Já usou as Calculadoras Trabalhistas? Ela reduz o tempo de orçamentos de folha, ajusta cálculos de rescisão/férias e resolve a dor de cálculos complexos instantaneamente. Use grátis!",
     relatedProducts: []
   },
   {
@@ -589,6 +608,7 @@ export const products: Product[] = [
     },
     status: "active",
     liveUrl: "/simulador",
+    shareMessage: "Conhece o Simulador de Regime Tributário? Ela reduz o tempo de planejamento fiscal, ajusta a comparação Simples/Real/Presumido e resolve a dor de pagar impostos a mais. Teste agora!",
     relatedProducts: []
   },
   {
@@ -623,6 +643,7 @@ export const products: Product[] = [
     },
     status: "active",
     liveUrl: "/ferramentas/indicadores",
+    shareMessage: "Já viu os Indicadores e Tabelas 2026? Ela reduz o tempo de consulta a alíquotas de INSS/IRPF, ajusta o cálculo de pró-labore e resolve a dor de tabelas desatualizadas. Confira grátis!",
     relatedProducts: []
   },
   {
@@ -657,6 +678,7 @@ export const products: Product[] = [
     },
     status: "active",
     liveUrl: "/fator-r",
+    shareMessage: "Conhece o Simulador de Fator R? Ela reduz a carga tributária em serviços, ajusta a relação folha/faturamento e resolve a dor do Anexo V do Simples Nacional. Simule grátis!",
     relatedProducts: []
   },
   {
@@ -691,6 +713,7 @@ export const products: Product[] = [
     },
     status: "active",
     liveUrl: "/honorarios",
+    shareMessage: "Já usou o Simulador de Honorários? Ela reduz o tempo de precificação, ajusta a margem de lucro e resolve a dor de cobrar barato demais por serviços complexos. Teste grátis!",
     relatedProducts: []
   },
   {
@@ -725,6 +748,7 @@ export const products: Product[] = [
     },
     status: "active",
     liveUrl: "/ferramentas/checklist-abertura",
+    shareMessage: "Conhece o Checklist de Abertura? Ela reduz o tempo de legalização, ajusta o roteiro burocrático e resolve a dor de esquecer etapas no registro de empresas. Use o checklist!",
     relatedProducts: []
   },
   {
@@ -760,6 +784,7 @@ export const products: Product[] = [
     },
     status: "active",
     liveUrl: "/ap-inteligente",
+    shareMessage: "Já conhece o AP Inteligente? Ela reduz o tempo de aprovação de contas, ajusta o fluxo de alçadas e resolve a dor de pagamentos sem autorização com BI integrado. Saiba mais!",
     relatedProducts: []
   },
   {
@@ -795,6 +820,7 @@ export const products: Product[] = [
     },
     status: "active",
     liveUrl: "/forecast-relatorios",
+    shareMessage: "Conhece o Forecast & Estratégico? Ela reduz o tempo de consultoria, ajusta a projeção de caixa e resolve a dor de relatórios contábeis sem insights financeiros. Veja o dashboard!",
     relatedProducts: []
   },
   {
@@ -829,6 +855,7 @@ export const products: Product[] = [
     },
     status: "active",
     liveUrl: "/check-cnpj",
+    shareMessage: "Já usou o ValidaEmpresa 360? Ela reduz o tempo de compliance cadastral, ajusta a visão de QSA/Dívidas e resolve a dor de prospectar empresas irregulares. Consulte grátis!",
     relatedProducts: []
   },
   {
@@ -863,6 +890,80 @@ export const products: Product[] = [
       ctaAction: "open_app"
     },
     status: "active",
+    liveUrl: "/extrato-cartoes",
+    shareMessage: "Conhece o Extrato de Cartões? Ela reduz o tempo de conciliação de adquirentes, ajusta o controle de taxas e resolve a dor de conferência manual de Stone/PagSeguro/Getnet. Confira!",
     relatedProducts: []
+  },
+  {
+    id: "cnpj-lookup-completo",
+    name: "Dossiê completo de qualquer empresa",
+    subtitle: "Consulta CNPJ Completa",
+    impactPhrase: "Dados cadastrais, QSA e CNAEs em segundos",
+    slug: "cnae-radar",
+    category: "Compliance",
+    badges: ["Big Data", "Freemium", "Oficial"],
+    modelBadge: "PAGAMENTO POR CONSULTA",
+    usageImpact: "Resultado Imediato",
+    integrationInfo: "Multi-Source Tech",
+    dors: ["Compliance", "Legalização", "Empresas"],
+    shortDescription: "Consulte a ficha completa de qualquer CNPJ. Veja o básico grátis e desbloqueie o dossiê completo.",
+    longDescription: "A ferramenta de Consulta CNPJ Completa orquestra consultas em tempo real para entregar o perfil mais atualizado de uma empresa, incluindo situação cadastral, quadro societário, atividades econômicas (CNAE) e contatos.",
+    howToUse: [
+      "Informe o CNPJ da empresa",
+      "Consulte os dados básicos e de governo gratuitamente",
+      "Desbloqueie o dossiê completo (CNAE, QSA, Contatos)",
+      "Exporte ou visualize o JSON bruto"
+    ],
+    inputs: ["CNPJ (14 dígitos)"],
+    outputs: ["Ficha Cadastral", "Quadro Societário", "Atividades Econômicas"],
+    pricingModel: "freemium",
+    pricing: {
+      priceLabel: "R$ 4,99/CNPJ",
+      currency: "BRL",
+      includes: ["Dossiê Completo", "QSA + CNAE", "Relação com Órgãos Grátis"],
+      ctaText: "Consultar Grátis",
+      ctaAction: "open_app"
+    },
+    status: "active",
+    liveUrl: "/solucoes/cnae-radar",
+    shareMessage: "Já conhece a Consulta CNPJ Completa? Ela reduz o tempo de auditoria cadastral, ajusta o dossiê de parceiros e resolve a dor de informações incompletas via Big Data. Veja o dossiê!",
+    relatedProducts: ["check-cnpj", "growth-engine"]
+  },
+  {
+    id: "nexus-df",
+    name: "NEXUS DF - Inteligência em Documentos Fiscais",
+    subtitle: "NEXUS DF",
+    impactPhrase: "Auditoria e organização total do seu fluxo fiscal",
+    slug: "nexus-df",
+    category: "Fiscal",
+    badges: ["Destaque", "Premium"],
+    modelBadge: "PRO",
+    usageImpact: "Redução de 90% em erros fiscais",
+    integrationInfo: "API Nativa de Documentos",
+    dors: ["Fiscal", "Compliance", "Documentos"],
+    shortDescription: "Plataforma avançada para gestão, auditoria e custódia de documentos fiscais eletrônicos (NF-e, NFS-e, CT-e).",
+    longDescription: "O NEXUS DF é a solução definitiva para grandes volumes de documentos fiscais. Realiza auditoria automática de impostos, verifica a validade jurídica de cada XML e organiza tudo em uma estrutura de dados pronta para o seu ERP.",
+    howToUse: [
+      "Conecte sua conta ou faça upload em lote",
+      "Aguarde a auditoria por IA",
+      "Visualize o dashboard de conformidade",
+      "Exporte os dados estruturados"
+    ],
+    inputs: ["XML (NF-e, NFS-e, CT-e)", "PDF (NFS-e)", "Chaves de Acesso"],
+    outputs: ["Relatórios de Auditoria", "Dados Estruturados JSON/XLS", "Arquivos Organizados"],
+    pricingModel: "subscription",
+    pricing: {
+      priceLabel: "R$ 597/mês",
+      priceValue: 597,
+      currency: "BRL",
+      trialDays: 7,
+      includes: ["Auditoria Automática", "Custódia por 5 anos", "Suporte VIP"],
+      ctaText: "Acessar Nexus",
+      ctaAction: "open_app"
+    },
+    status: "active",
+    liveUrl: "/nexus-df",
+    shareMessage: "Você já conhece a NEXUS DF? Ela reduz o tempo de auditoria fiscal, ajusta o compliance de documentos e resolve a dor de multas e erros em NF-e/NFS-e/CT-e via IA. Conheça agora!",
+    relatedProducts: ["monitor-nfe", "receiptorbr"]
   }
 ];

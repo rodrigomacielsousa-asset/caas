@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   Receipt, 
   Upload, 
@@ -120,7 +120,9 @@ interface UserProfile {
 
 export default function ReceiptorBr() {
   const [user] = useAuthState(auth);
-  const { addItem } = useCart();
+  const { cart, addToCart } = useCart();
+  const navigate = useNavigate();
+  const { items } = cart;
   const [file, setFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState<ExtractedData | null>(null);
@@ -248,15 +250,15 @@ export default function ReceiptorBr() {
     e?.preventDefault();
     if (!file) return;
 
-    if (!user) {
-      setError("Você precisa estar logado para processar documentos.");
-      return;
-    }
+    // if (!user) {
+    //   setError("Você precisa estar logado para processar documentos.");
+    //   return;
+    // }
 
-    if (!profile) {
-      setError("Carregando seu perfil fiscal... Tente novamente em 2 segundos.");
-      return;
-    }
+    // if (!profile) {
+    //   setError("Carregando seu perfil fiscal... Tente novamente em 2 segundos.");
+    //   return;
+    // }
 
     setIsProcessing(true);
     setError(null);
@@ -323,11 +325,13 @@ export default function ReceiptorBr() {
       }
 
       // Update Usage Stats
-      const userRef = doc(db, 'users', user.uid);
-      await setDoc(userRef, {
-        usedThisMonth: profile.usedThisMonth + 1,
-        lastExtraction: serverTimestamp()
-      }, { merge: true });
+      if (user && profile) {
+        const userRef = doc(db, 'users', user.uid);
+        await setDoc(userRef, {
+          usedThisMonth: profile.usedThisMonth + 1,
+          lastExtraction: serverTimestamp()
+        }, { merge: true });
+      }
 
     } catch (err: any) {
       console.error("Upload/Processing error:", err);
@@ -418,17 +422,14 @@ export default function ReceiptorBr() {
           </div>
         </div>
         <button 
-          onClick={() => {
-            addItem({
-               id: 'receiptorbr',
-               name: 'Receiptor.BR',
-               slug: 'receiptor-br',
+          onClick={async () => {
+            await addToCart({
+               sku: 'receiptor-br',
+               title: 'Receiptor.BR',
                price: 59.90,
-               priceLabel: 'R$ 59,90/mês',
-               pricingModel: 'subscription',
-               type: 'individual'
-            });
-            alert('Adicionado ao carrinho!');
+               metadata: { type: 'individual' }
+            }, {}, false);
+            navigate('/checkout');
           }}
           className="bg-blue-600 hover:bg-slate-900 px-6 py-3 rounded-2xl text-[11px] font-black uppercase text-white tracking-widest transition-all shadow-xl shadow-blue-100 flex items-center gap-2"
         >
@@ -828,14 +829,11 @@ export default function ReceiptorBr() {
                   <div className="space-y-4">
                      <button 
                         onClick={() => {
-                           addItem({
-                              id: 'receiptorbr',
-                              name: 'Receiptor.BR',
-                              slug: 'receiptor-br',
+                           addToCart({
+                              sku: 'receiptor-br',
+                              title: 'Receiptor.BR',
                               price: 59.90,
-                              priceLabel: 'R$ 59,90/mês',
-                              pricingModel: 'subscription',
-                              type: 'individual'
+                              metadata: { type: 'individual' }
                            });
                            window.location.href = '/carrinho';
                         }}

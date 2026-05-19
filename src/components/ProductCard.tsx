@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { ShoppingCart, ArrowRight, Zap, Heart, CheckCircle, Star, ShieldCheck } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ShoppingCart, ArrowRight, Zap, Heart, CheckCircle, Star, ShieldCheck, MessageCircle } from 'lucide-react';
 import { cn } from '../lib/utils';
 import type { Product } from '../types';
 import { useCart } from '../hooks/useCart';
@@ -10,7 +10,9 @@ interface CardProps {
 }
 
 export const ProductCard: React.FC<CardProps> = ({ product }) => {
-  const { addItem, items } = useCart();
+  const { cart, addToCart } = useCart();
+  const navigate = useNavigate();
+  const { items } = cart;
   const [isFavorite, setIsFavorite] = useState(false);
   const [rating] = useState(() => Math.floor(Math.random() * (5 - 4 + 1) + 4)); // 4-5 stars
   const [reviews] = useState(() => Math.floor(Math.random() * (200 - 20 + 1) + 20));
@@ -35,33 +37,65 @@ export const ProductCard: React.FC<CardProps> = ({ product }) => {
     localStorage.setItem('microcaas_favorites', JSON.stringify(newFavorites));
   };
 
-  const detailPath = `/solucoes/${product.slug}`;
-  const appPath = product.liveUrl || `/solucoes/${product.slug}`;
-  const isInCart = items.some(i => i.id === product.id);
-
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const shareOnWhatsApp = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addItem({
-      id: product.id,
-      name: product.name,
-      slug: product.slug,
-      price: product.pricing.priceValue,
-      priceLabel: product.pricing.priceLabel,
-      pricingModel: product.pricingModel,
-      type: 'individual'
-    });
+    
+    const prodName = product.subtitle || product.name;
+    const url = `${window.location.origin}/solucoes/${product.slug}`;
+    const dores = product.dors?.join(', ') || 'gestão e automação';
+    
+    const defaultText = `Olá! Você já conhece o ${prodName}? Ela reduz o tempo, ajusta processos e resolve dores como: ${dores}. Conheça mais em: ${url}`;
+    const text = product.shareMessage || defaultText;
+    
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  };
+
+  const detailPath = `/solucoes/${product.slug}`;
+  const appPath = product.liveUrl || `/solucoes/${product.slug}`;
+  const isInCart = items.some(i => i.sku === product.slug);
+
+  const [isAdding, setIsAdding] = useState(false);
+
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsAdding(true);
+    try {
+      await addToCart({
+        sku: product.slug,
+        title: product.name,
+        price: product.pricing.priceValue || 0,
+        metadata: {}
+      }, {}, false);
+      navigate('/checkout');
+    } catch (err) {
+      console.error("Card add error", err);
+      navigate('/checkout');
+    } finally {
+      setIsAdding(false);
+    }
   };
 
   return (
     <div className="group bg-white rounded-[2.5rem] border border-slate-200 p-8 flex flex-col shadow-sm hover:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] transition-all duration-500 relative overflow-hidden h-full">
-      {/* Favorite Button */}
-      <button 
-        onClick={toggleFavorite}
-        className="absolute top-6 right-6 z-10 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm border border-slate-100 flex items-center justify-center shadow-sm hover:scale-110 transition-all group/fav"
-      >
-        <Heart className={cn("w-5 h-5 transition-colors", isFavorite ? "fill-rose-500 text-rose-500" : "text-slate-300 group-hover/fav:text-rose-400")} />
-      </button>
+      {/* Top Buttons */}
+      <div className="absolute top-6 right-6 z-10 flex flex-col gap-2">
+        <button 
+          onClick={toggleFavorite}
+          className="w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm border border-slate-100 flex items-center justify-center shadow-sm hover:scale-110 transition-all group/fav"
+        >
+          <Heart className={cn("w-5 h-5 transition-colors", isFavorite ? "fill-rose-500 text-rose-500" : "text-slate-300 group-hover/fav:text-rose-400")} />
+        </button>
+        
+        <button 
+          onClick={shareOnWhatsApp}
+          className="w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm border border-slate-100 flex items-center justify-center shadow-sm hover:scale-110 transition-all hover:bg-emerald-50 hover:border-emerald-200 group/share"
+          title="Compartilhar no WhatsApp"
+        >
+          <MessageCircle className="w-5 h-5 text-slate-300 group-hover/share:text-emerald-500 transition-colors" />
+        </button>
+      </div>
 
       <div className="flex justify-between items-start mb-6 pr-12">
         <div className="flex flex-col gap-2">

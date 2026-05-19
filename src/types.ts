@@ -1,4 +1,4 @@
-export type PricingModel = 'free' | 'subscription' | 'one_time' | 'quote' | 'usage';
+export type PricingModel = 'free' | 'subscription' | 'one_time' | 'quote' | 'usage' | 'freemium';
 export type ProductStatus = 'active' | 'inactive' | 'beta' | 'coming_soon';
 
 export interface Product {
@@ -11,7 +11,7 @@ export interface Product {
   legacySlugs?: string[];
   category: "Fiscal" | "Contábil" | "Financeiro" | "Automação" | "Gestão" | "Compliance" | "Simulação";
   badges: string[]; // ["Destaque", "Novo", "Beta"]
-  modelBadge?: "ASSINATURA" | "PAGAMENTO ÚNICO" | "GRATUITO" | "DEMO" | "PRO";
+  modelBadge?: "ASSINATURA" | "PAGAMENTO ÚNICO" | "GRATUITO" | "DEMO" | "PRO" | "PAGAMENTO POR CONSULTA";
   usageImpact?: string; // "Configuração em 2 min" / "Resultado em 30s"
   integrationInfo?: string; // "Sem instalação" / "Importação via XML"
   dors?: string[]; // Tags de dor (Ex: ["NF-e/XML", "Conciliação", "Fechamento"])
@@ -33,6 +33,7 @@ export interface Product {
   status: ProductStatus;
   isFeatured?: boolean;
   liveUrl?: string;
+  shareMessage?: string;
   relatedProducts: string[]; // Slugs
   faq?: { q: string; a: string }[];
 }

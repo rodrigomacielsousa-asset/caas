@@ -1,4 +1,4 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Package, CheckCircle2, ShoppingCart, ArrowLeft, Zap, Sparkles, ShieldCheck, Heart } from 'lucide-react';
 import { useCart } from '../hooks/useCart';
@@ -9,7 +9,9 @@ import { cn } from '../lib/utils';
 export default function BundleDetail() {
   const { slug } = useParams();
   const bundle = bundlesData.find(b => b.slug === slug);
-  const { addItem, items } = useCart();
+  const { cart, addToCart } = useCart();
+  const navigate = useNavigate();
+  const { items } = cart;
 
   if (!bundle) {
     return (
@@ -24,7 +26,7 @@ export default function BundleDetail() {
 
   // Get full objects for items in this bundle
   const includedItems = microcaasData.filter(p => bundle.bundleItems.includes(p.slug));
-  const isInCart = items.some(item => item.slug === bundle.slug);
+  const isInCart = items.some(item => item.sku === bundle.slug);
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 pb-24">
@@ -119,15 +121,15 @@ export default function BundleDetail() {
 
               <div className="space-y-4">
                 <button
-                  onClick={() => addItem({
-                    id: bundle.id,
-                    slug: bundle.slug,
-                    name: bundle.name,
-                    price: bundle.price,
-                    priceLabel: bundle.priceLabel,
-                    type: 'bundle',
-                    pricingModel: bundle.pricingModel as any
-                  })}
+                  onClick={async () => {
+                    await addToCart({
+                      sku: bundle.slug,
+                      title: bundle.name,
+                      price: bundle.price,
+                      metadata: {}
+                    }, {}, false);
+                    navigate('/checkout');
+                  }}
                   disabled={isInCart}
                   className={cn(
                     "w-full py-5 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all text-lg shadow-lg",

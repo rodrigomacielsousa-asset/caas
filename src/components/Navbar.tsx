@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Rocket, Box, Database, Calculator, Info, ShoppingCart, User, Search, Zap, Globe, Lightbulb, BookOpen } from 'lucide-react';
+import { Menu, X, Box, Rocket, Globe, Lightbulb, BookOpen, Info, ShoppingCart, User, Calculator, Zap } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useCart } from '../hooks/useCart';
 import { cn } from '../lib/utils';
@@ -18,7 +18,8 @@ const navItems = [
 ];
 
 export function Navbar() {
-  const { count } = useCart();
+  const { cart, setIsDrawerOpen } = useCart();
+  const count = cart.items.length;
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -69,7 +70,7 @@ export function Navbar() {
               M
             </div>
             <div className="flex flex-col">
-                      <span className="font-black text-xl tracking-tighter leading-none text-slate-800">Micro<span className="text-blue-600">CaaS</span></span>
+              <span className="font-black text-xl tracking-tighter leading-none text-slate-800">Micro<span className="text-blue-600">CaaS</span></span>
               <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Ecossistema Contábil</span>
             </div>
           </Link>
@@ -132,10 +133,11 @@ export function Navbar() {
                 </div>
               )}
             </div>
-              <div className="flex items-center space-x-4 border-l border-slate-200 pl-8">
-              <Link 
-                to="/carrinho" 
-                className="relative p-2 text-slate-600 hover:bg-slate-100 rounded-full transition-all"
+            
+            <div className="flex items-center space-x-4 border-l border-slate-200 pl-8">
+              <button 
+                onClick={() => setIsDrawerOpen(true)}
+                className="relative p-2 text-slate-600 hover:bg-slate-100 rounded-full transition-all block cursor-pointer"
               >
                 <ShoppingCart className="w-5 h-5" />
                 {count > 0 && (
@@ -143,7 +145,8 @@ export function Navbar() {
                     {count}
                   </span>
                 )}
-              </Link>
+              </button>
+
               {!user && (
                 <Link 
                   to="/login" 
@@ -157,6 +160,17 @@ export function Navbar() {
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center space-x-4">
+            <button 
+              onClick={() => setIsDrawerOpen(true)}
+              className="relative p-2 text-slate-600"
+            >
+              <ShoppingCart className="w-6 h-6" />
+              {count > 0 && (
+                <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full border-2 border-white">
+                  {count}
+                </span>
+              )}
+            </button>
             <button onClick={() => setIsOpen(!isOpen)} className="text-slate-600">
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -192,11 +206,6 @@ export function Navbar() {
                   <Link to="/dashboard" className="block px-3 py-3 text-base font-medium text-slate-700">
                     Dashboard
                   </Link>
-                  {user.email?.toLowerCase() === 'rodrigomaciel.sousa@gmail.com' && (
-                    <Link to="/admin" className="block px-3 py-3 text-base font-medium text-blue-600">
-                      Painel Admin
-                    </Link>
-                  )}
                   <Link to="/minhas-compras" className="block px-3 py-3 text-base font-medium text-slate-700">
                     Minhas Compras
                   </Link>
@@ -213,7 +222,7 @@ export function Navbar() {
                   <span>Login</span>
                 </Link>
               )}
-              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

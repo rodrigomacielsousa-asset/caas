@@ -5,6 +5,8 @@ import { blogService } from '../services/blogService';
 import type { BlogPost } from '../types';
 import { ArrowRight, BookOpen, Calendar, Clock } from 'lucide-react';
 
+import { HeroPadrao } from '../components/HeroPadrao';
+
 export default function Blog() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,19 +33,15 @@ export default function Blog() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 pt-32 pb-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest mb-4">
-            <BookOpen className="w-3 h-3" /> Blog Oficial
-          </div>
-          <h1 className="text-5xl md:text-7xl font-black text-slate-900 tracking-tighter leading-none mb-6">
-            Conteúdos para <span className="text-blue-600">contadores.</span>
-          </h1>
-          <p className="text-xl text-slate-500 font-medium">
-            Dicas práticas, tendências e novas formas de evoluir no dia a dia contábil com o uso de tecnologia.
-          </p>
-        </div>
+    <div className="min-h-screen bg-slate-50">
+      {/* Hero Section */}
+      <HeroPadrao 
+        badge="Blog Oficial"
+        title={<>Conteúdos para <span className="text-blue-600">contadores.</span></>}
+        description="Dicas práticas, tendências e novas formas de evoluir no dia a dia contábil com o uso de tecnologia."
+      />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {posts.map((post, idx) => (

@@ -6,7 +6,9 @@ import bundlesData from '../data/bundles.json';
 import { cn } from '../lib/utils';
 
 export default function Cart() {
-  const { items, removeItem, total } = useCart();
+  const { cart, removeFromCart, clearCart } = useCart();
+  const { items, totals } = cart;
+  const total = totals.total;
 
   const suggestedBundle = total > 50 ? bundlesData[0] : null;
 
@@ -39,43 +41,44 @@ export default function Cart() {
             <h1 className="text-4xl font-bold text-slate-900 dark:text-white flex items-center gap-4 tracking-tight">
               Meu Carrinho <span className="text-lg font-normal text-slate-400 bg-slate-100 dark:bg-slate-900 px-3 py-1 rounded-full">{items.length}</span>
             </h1>
-            <Link to="/microcaas" className="text-sm font-bold text-blue-600 hover:underline">Continuar comprando</Link>
+            <div className="flex items-center gap-6">
+               <button onClick={() => { if(confirm('Limpar todo o carrinho?')) clearCart() }} className="text-sm font-bold text-slate-400 hover:text-rose-600 transition-colors">Limpar Carrinho</button>
+               <Link to="/solutions" className="text-sm font-bold text-blue-600 hover:underline">Continuar comprando</Link>
+            </div>
           </div>
 
           <div className="space-y-4">
-            {items.map((item) => (
+            {items.map((item, index) => (
               <motion.div
                 layout
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                key={item.id}
+                key={`${item.sku}-${index}`}
                 className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all group flex items-center gap-6"
               >
                 <div className="w-20 h-20 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
-                   {item.type === 'bundle' ? <Zap className="w-10 h-10 text-amber-500" /> : <ShoppingBag className="w-10 h-10 text-blue-600" />}
+                   {item.metadata?.type === 'bundle' ? <Zap className="w-10 h-10 text-amber-500" /> : <ShoppingBag className="w-10 h-10 text-blue-600" />}
                 </div>
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{item.type === 'bundle' ? 'Bundle' : 'Individual'}</span>
-                    <span className="w-1 h-1 bg-slate-200 rounded-full" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600">{item.pricingModel}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{item.metadata?.type === 'bundle' ? 'Bundle' : 'Individual'}</span>
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white truncate">{item.name}</h3>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white truncate">{item.title}</h3>
                   <div className="mt-4 flex items-center gap-4 lg:hidden">
-                     <span className="font-bold text-blue-600">{item.priceLabel}</span>
-                     <button onClick={() => removeItem(item.id)} className="text-rose-500 font-bold text-xs">Remover</button>
+                     <span className="font-bold text-blue-600">{item.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                     <button onClick={() => removeFromCart(index)} className="text-rose-500 font-bold text-xs">Remover</button>
                   </div>
                 </div>
 
                 <div className="hidden lg:flex items-center gap-12">
                   <div className="text-right">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Valor</span>
-                    <span className="text-xl font-bold text-slate-900 dark:text-white leading-none">{item.priceLabel}</span>
+                    <span className="text-xl font-bold text-slate-900 dark:text-white leading-none">{item.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
                   </div>
                   <button
-                    onClick={() => removeItem(item.id)}
+                    onClick={() => removeFromCart(index)}
                     className="p-3 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
                     title="Remover"
                   >

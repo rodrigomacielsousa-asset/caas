@@ -93,7 +93,7 @@ export default function Dashboard() {
               </div>
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
-                   <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter leading-none italic">
+                   <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter leading-none">
                       Comandante {user?.email?.split('@')[0]}
                    </h1>
                    <span className="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-[9px] font-black uppercase tracking-widest border border-blue-100 dark:border-blue-800">
@@ -129,7 +129,7 @@ export default function Dashboard() {
           
           <div className="lg:col-span-2 space-y-12">
             <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-6">
-              <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-3 tracking-tighter uppercase italic">
+              <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-3 tracking-tighter uppercase">
                 Meus Sistemas <span className="text-[10px] font-black bg-blue-600 text-white px-3 py-1 rounded-full not-italic tracking-widest">{accessibleProducts.length}</span>
               </h2>
             </div>
@@ -173,7 +173,7 @@ export default function Dashboard() {
 
             {lockedProducts.length > 0 && (
               <div className="space-y-8 pt-12">
-                 <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic flex items-center gap-2 underline decoration-blue-600/30 underline-offset-4">
+                 <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 underline decoration-blue-600/30 underline-offset-4">
                     Sugestões de Expansão
                  </h3>
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 opacity-60 hover:opacity-100 transition-opacity">
@@ -199,8 +199,8 @@ export default function Dashboard() {
                <div className="absolute top-0 right-0 p-12 opacity-5 rotate-12 scale-150"><Zap className="w-64 h-64" /></div>
                
                <div className="space-y-4 relative z-10">
-                  <h4 className="text-[10px] font-black text-blue-400 uppercase tracking-widest italic">Hub da Empresa</h4>
-                  <p className="text-3xl font-black italic tracking-tighter leading-none">Status da <br /> Organização</p>
+                  <h4 className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Hub da Empresa</h4>
+                  <p className="text-3xl font-black tracking-tighter leading-none">Status da <br /> Organização</p>
                </div>
 
                <div className="space-y-6 relative z-10">
@@ -225,7 +225,7 @@ export default function Dashboard() {
             </div>
 
             <div className="bg-white dark:bg-slate-900 p-10 rounded-[48px] border border-slate-100 dark:border-slate-800 space-y-8">
-               <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic flex items-center gap-2 shadow-sm"><Star className="w-4 h-4 text-amber-400" /> Benefícios do Plano</h4>
+               <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 shadow-sm"><Star className="w-4 h-4 text-amber-400" /> Benefícios do Plano</h4>
                <div className="space-y-4">
                   {userPlan?.limits && (
                     <>

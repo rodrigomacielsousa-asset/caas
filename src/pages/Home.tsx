@@ -51,19 +51,70 @@ export default function Home() {
     loadData();
   }, []);
 
-  const featuredProducts = useMemo(() => 
-    products.filter(p => p.isFeatured || p.badges?.includes('Destaque')).slice(0, 3), 
-  [products]);
+  const trendingProducts = useMemo(() => {
+    // Shuffle products to ensure variety on each visit
+    return [...products].sort(() => Math.random() - 0.5).slice(0, 3);
+  }, [products]);
 
-  const trendingProducts = useMemo(() => 
-    products.slice(0, 3), 
-  [products]);
+  const featuredProducts = useMemo(() => {
+    const trendingIds = new Set(trendingProducts.map(p => p.id));
+    // Filter candidates that are NOT already in trending
+    const candidates = products.filter(p => !trendingIds.has(p.id));
+    
+    // Sort randomly as well to vary
+    return [...candidates].sort(() => Math.random() - 0.5).slice(0, 3);
+  }, [products, trendingProducts]);
 
   // Hero Message
-  const heroContent = {
-    overline: "Plataforma de Inteligência Contábil",
-    title: "Ecossistema de Micro-Soluções",
-    subtitle: "A revolução CaaS (Accounting as a Service) chegou. Ferramentas cirúrgicas para contadores que não aceitam o \"tamanho único\" dos ERPs gigantes."
+  const banners = [
+    {
+      badge: "PLATAFORMA DE INTELIGÊNCIA CONTÁBIL",
+      title: "Ecossistema de Micro-Soluções",
+      description: "A nova forma de resolver problemas contábeis com precisão, velocidade e foco na dor real do cliente."
+    },
+    {
+      badge: "ALTA PERFORMANCE CONTÁBIL",
+      title: "Menos esforço. Mais resultado.",
+      description: "Automatize tarefas repetitivas e foque no que realmente gera valor para o seu escritório."
+    },
+    {
+      badge: "OTIMIZAÇÃO DE PROCESSOS",
+      title: "Corte retrabalho. Ganhe escala.",
+      description: "Reduza erros, padronize fluxos e aumente a eficiência sem aumentar equipe."
+    },
+    {
+      badge: "DECISÃO BASEADA EM DADOS",
+      title: "Pare de operar no escuro.",
+      description: "Tenha insights claros para tomar decisões mais rápidas e seguras no dia a dia contábil."
+    },
+    {
+      badge: "NOVA ERA CONTÁBIL",
+      title: "Menos sistema. Mais solução.",
+      description: "Substitua processos complexos por ferramentas diretas, simples e orientadas à execução."
+    }
+  ];
+
+  const [currentBanner, setCurrentBanner] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  useEffect(() => {
+    if (isPaused) return;
+    const timer = setInterval(() => {
+      setCurrentBanner(prev => (prev + 1) % banners.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [isPaused, banners.length]);
+
+  const nextBanner = () => {
+    setCurrentBanner(prev => (prev + 1) % banners.length);
+    setIsPaused(true);
+    setTimeout(() => setIsPaused(false), 5000);
+  };
+
+  const prevBanner = () => {
+    setCurrentBanner(prev => (prev - 1 + banners.length) % banners.length);
+    setIsPaused(true);
+    setTimeout(() => setIsPaused(false), 5000);
   };
 
   const [search, setSearch] = useState('');
@@ -90,60 +141,76 @@ export default function Home() {
     <div className="min-h-screen bg-white">
       
       {/* Hero Section */}
-      <section className="relative pt-20 pb-32 overflow-hidden">
-        {/* Background blobs */}
-        <div className="absolute top-1/4 -left-20 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] -z-10 animate-pulse" />
-        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[100px] -z-10" />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col items-center text-center space-y-10">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-6 max-w-4xl"
-            >
-              <div className="space-y-6">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-slate-100 border border-slate-200 rounded-full text-xs font-bold uppercase tracking-widest text-slate-600">
-                  <Sparkles className="w-3 h-3 text-blue-600" /> {heroContent.overline}
+      <section 
+        className="relative pt-20 pb-12 overflow-hidden bg-slate-900 min-h-[480px] flex items-center"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
+        <div className="absolute top-0 right-0 w-[600px] h-full bg-blue-600/5 blur-[120px] -z-0" />
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="relative min-h-[340px] flex flex-col items-center justify-center text-center">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentBanner}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.5 }}
+                className="space-y-6 max-w-4xl"
+              >
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/10 border border-blue-500/20 text-blue-400 rounded-full text-[10px] font-black uppercase tracking-widest">
+                  <Sparkles className="w-3 h-3" /> {banners[currentBanner].badge}
                 </div>
-                <h1 className="text-6xl md:text-8xl font-black text-slate-900 tracking-tighter leading-[0.9]">
-                  {heroContent.title}
+                <h1 className="text-5xl md:text-7xl font-black text-white tracking-tighter leading-[0.9]">
+                  {banners[currentBanner].title}
                 </h1>
-                <p className="text-xl md:text-2xl text-slate-500 max-w-3xl mx-auto font-medium leading-relaxed">
-                  {heroContent.subtitle}
+                <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto font-medium leading-relaxed">
+                  {banners[currentBanner].description}
                 </p>
-              </div>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 text-left">
-                {[
-                  { title: "Experimente antes", desc: "Use ferramentas reais sem nem precisar de login inicial." },
-                  { title: "Soluções modulares", desc: "Contrate apenas o que você usa, sem mensalidades pesadas." },
-                  { title: "Zero retrabalho", desc: "Elimine planilhas e digitação manual hoje mesmo." },
-                  { title: "Escalabilidade", desc: "Atenda mais clientes com a mesma infraestrutura atual." }
-                ].map((item, i) => (
-                  <div key={i} className="space-y-1 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                     <div className="text-[10px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3" /> {item.title}
-                     </div>
-                     <p className="text-[10px] font-medium text-slate-500 leading-tight">{item.desc}</p>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
+                
+                <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                  <Link to="/solucoes" className="group inline-flex items-center gap-3 px-8 py-4 bg-blue-600 text-white rounded-2xl font-black text-sm hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20">
+                    Explorar Soluções <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                  <Link to="/ecossistema" className="px-8 py-4 bg-white/5 border border-white/10 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-white/10 transition-all">
+                    Como funciona
+                  </Link>
+                </div>
+              </motion.div>
+            </AnimatePresence>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto"
-            >
-              <Link to="/solucoes" className="btn-primary py-5 px-12 text-lg group shadow-2xl shadow-blue-200">
-                Explorar Soluções <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link to="/ecossistema" className="bg-white border border-slate-200 py-5 px-12 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-slate-50 transition-all shadow-sm text-slate-900">
-                 Como funciona
-              </Link>
-            </motion.div>
+            {/* Slider Navigation */}
+            <div className="absolute inset-y-0 left-0 flex items-center">
+               <button 
+                onClick={prevBanner}
+                className="p-3 rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all -ml-4 lg:-ml-12"
+               >
+                 <ArrowRight className="w-5 h-5 rotate-180" />
+               </button>
+            </div>
+            <div className="absolute inset-y-0 right-0 flex items-center">
+               <button 
+                onClick={nextBanner}
+                className="p-3 rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all -mr-4 lg:-mr-12"
+               >
+                 <ArrowRight className="w-5 h-5" />
+               </button>
+            </div>
+
+            {/* Dots */}
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-2">
+              {banners.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => { setCurrentBanner(i); setIsPaused(true); }}
+                  className={cn(
+                    "w-2 h-2 rounded-full transition-all",
+                    currentBanner === i ? "bg-blue-600 w-6" : "bg-slate-700 hover:bg-slate-600"
+                  )}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -151,15 +218,15 @@ export default function Home() {
       {/* Micro-Onboarding: Qual a sua dor hoje? */}
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-           <div className="bg-slate-900 rounded-[3rem] p-12 md:p-20 text-center relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-12 opacity-10"><Brain className="w-64 h-64 text-blue-500" /></div>
+           <div className="bg-[#0039A6] rounded-[3rem] p-12 md:p-20 text-center relative overflow-hidden shadow-2xl">
+              <div className="absolute top-0 right-0 p-12 opacity-10"><Brain className="w-64 h-64 text-white" /></div>
               
               <div className="relative z-10 space-y-8">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/10 text-blue-400 rounded-full text-[10px] font-black uppercase tracking-widest">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/20 text-white rounded-full text-[10px] font-black uppercase tracking-widest">
                   Quick Start Onboarding
                 </div>
                 <h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter">Qual a sua dor hoje?</h2>
-                <p className="text-blue-100/60 max-w-2xl mx-auto font-medium">Escolha uma opção e veja a solução ideal agora</p>
+                <p className="text-white/80 max-w-2xl mx-auto font-medium">Escolha uma opção e veja a solução ideal agora</p>
                 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8">
                   {[
@@ -170,10 +237,10 @@ export default function Home() {
                   ].map((pain, i) => (
                     <Link 
                       key={i} 
-                      to={`/solucoes/${pain.slug}`}
-                      className="group bg-white/5 hover:bg-white/10 border border-white/10 p-6 rounded-2xl flex flex-col items-center gap-4 transition-all hover:scale-105"
+                      to="/solucoes"
+                      className="group bg-white/5 hover:bg-white/10 border border-white/20 p-6 rounded-2xl flex flex-col items-center gap-4 transition-all hover:scale-105"
                     >
-                      <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-all">
+                      <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-white group-hover:bg-white group-hover:text-blue-600 transition-all">
                         <pain.icon className="w-6 h-6" />
                       </div>
                       <span className="text-xs font-black text-white uppercase tracking-tighter">{pain.label}</span>

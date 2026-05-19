@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { 
   Search, 
+  X,
   ArrowRight, 
   Zap, 
   Sparkles, 
@@ -19,6 +20,7 @@ import { ProductCard } from '../components/ProductCard';
 import { productService } from '../services/productService';
 import { cn } from '../lib/utils';
 import type { Product, PricingModel } from '../types';
+import { HeroPadrao } from '../components/HeroPadrao';
 import { Link } from 'react-router-dom';
 
 export default function Solutions() {
@@ -73,73 +75,45 @@ export default function Solutions() {
     });
   }, [products, search, selectedCategory, selectedPricing]);
 
+  const recentReleases = useMemo(() => {
+    if (products.length === 0) return [];
+    // Prioritize new products but shuffle to keep it dynamic
+    const novos = products.filter(p => p.badges?.includes('Novo'));
+    const others = products.filter(p => !p.badges?.includes('Novo'));
+    const pool = novos.length > 0 ? novos : others;
+    return [...pool].sort(() => Math.random() - 0.5).slice(0, 3);
+  }, [products]);
+
   return (
     <div className="min-h-screen bg-slate-50 pb-32">
       {/* Hero Section */}
-      <div className="bg-slate-900 pt-32 pb-24 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-[800px] h-full bg-blue-600/10 blur-[150px] -z-0" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center flex flex-col items-center">
-           <div className="max-w-4xl space-y-8">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/10 border border-blue-500/20 text-blue-400 rounded-full text-[10px] font-black uppercase tracking-widest mx-auto">
-                 <Crown className="w-3 h-3" /> Marketplace Oficial de MicroCaaS Contábeis
-              </div>
-              <h1 className="text-5xl md:text-8xl font-black text-white tracking-tighter leading-[0.85]">
-                Soluções que <span className="text-blue-500">Contadores</span> Amam.
-              </h1>
-              <p className="text-xl text-slate-400 font-medium leading-relaxed font-serif max-w-2xl mx-auto">
-                Compre ferramentas prontas para usar. Sem setup complexo, sem contratos leoninos. Apenas produtividade.
-              </p>
-              
-              <div className="relative max-w-3xl mx-auto">
-                <Search className="w-6 h-6 absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input 
-                  type="text" 
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="O que você precisa automatizar hoje?"
-                  className="w-full bg-white border-2 border-transparent rounded-[40px] pl-16 pr-6 py-7 text-slate-900 placeholder-slate-400 focus:border-blue-600 outline-none transition-all text-xl font-bold tracking-tight shadow-2xl" 
-                />
-              </div>
-           </div>
-        </div>
-      </div>
+      <HeroPadrao 
+        badge="Marketplace Oficial de MicroCaaS Contábeis"
+        title={<>Micro-soluções que viram <span className="text-blue-500">produtividade.</span></>}
+        description="Compre ferramentas prontas para usar. Sem setup complexo, sem contratos leoninos. Apenas produtividade."
+        visualContent={
+          <div className="relative max-w-3xl mx-auto">
+            <Search className="w-6 h-6 absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input 
+              type="text" 
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="O que você precisa automatizar hoje?"
+              className="w-full bg-white border-2 border-transparent rounded-[40px] pl-16 pr-14 py-5 text-slate-900 placeholder-slate-400 focus:border-blue-600 outline-none transition-all text-xl font-bold tracking-tight shadow-2xl" 
+            />
+            {search && (
+              <button 
+                onClick={() => setSearch('')}
+                className="absolute right-6 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-full transition-all"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        }
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Featured Banners */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-20">
-          <div className="md:col-span-8 bg-blue-600 rounded-[56px] p-12 md:p-16 text-white relative overflow-hidden group min-h-[400px] flex flex-col justify-end shadow-2xl">
-             <div className="absolute top-0 right-0 p-16 opacity-10 group-hover:rotate-12 transition-transform duration-1000"><Sparkles className="w-64 h-64" /></div>
-             <div className="relative z-10 space-y-6">
-                <span className="px-3 py-1 bg-white/20 border border-white/20 rounded-full text-[10px] font-black uppercase tracking-widest w-fit">Sazonal: IRPF 2026</span>
-                <h2 className="text-5xl font-black tracking-tighter leading-none italic">
-                   Mega Combo: <br /> Pack Tributário PRO.
-                </h2>
-                <p className="text-xl text-blue-100 font-medium max-w-md">
-                   5 ferramentas essenciais em um único licenciamento com 40% de desconto.
-                </p>
-                <Link to="/solucoes/combo-pro" className="inline-flex items-center gap-3 px-10 py-5 bg-white text-blue-600 rounded-3xl font-black uppercase text-xs tracking-widest shadow-xl hover:scale-105 transition-all w-fit">
-                   Aproveitar Oferta <ArrowRight className="w-5 h-5" />
-                </Link>
-             </div>
-          </div>
-          
-          <div className="md:col-span-4 bg-slate-900 rounded-[56px] p-12 text-white relative overflow-hidden group flex flex-col justify-between shadow-xl">
-             <div className="absolute -right-4 -top-4 opacity-10"><Zap className="w-40 h-40 text-blue-500" /></div>
-             <div className="space-y-4 pt-12">
-                <h3 className="text-3xl font-black tracking-tighter leading-tight">Lançamentos <br /> da Semana</h3>
-                <p className="text-slate-400 font-medium text-sm">Novas MicroCaaS aprovadas no comitê técnico.</p>
-             </div>
-             <ul className="space-y-4">
-                {products.slice(0, 3).map(p => (
-                  <li key={p.id} className="flex items-center justify-between group/item">
-                     <span className="text-sm font-bold text-slate-300 group-hover/item:text-blue-400 transition-colors uppercase tracking-tight">{p.name}</span>
-                     <ChevronRight className="w-4 h-4 text-slate-600 group-hover/item:text-blue-400 transition-transform group-hover/item:translate-x-1" />
-                  </li>
-                ))}
-             </ul>
-          </div>
-        </div>
-
         {/* Filter Navigation */}
         <div className="flex flex-col gap-8 mb-12">
           <div className="flex flex-wrap items-center justify-between gap-6">

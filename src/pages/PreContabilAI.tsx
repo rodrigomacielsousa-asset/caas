@@ -28,7 +28,7 @@ import {
   ShoppingCart
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { analyzeInvoice } from '../services/geminiService';
 import { useCart } from '../hooks/useCart';
@@ -50,7 +50,9 @@ interface Documento {
 }
 
 export default function PreContabilAI() {
-  const { addItem } = useCart();
+  const { cart, addToCart } = useCart();
+  const navigate = useNavigate();
+  const { items } = cart;
   const [documents, setDocuments] = useState<Documento[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [dragActive, setDragActive] = useState(false);
@@ -224,17 +226,14 @@ export default function PreContabilAI() {
 
         <div className="px-4 mt-auto space-y-4">
            <button 
-              onClick={() => {
-                addItem({
-                  id: 'precontabilai',
-                  name: 'Pré-Contábil AI',
-                  slug: 'pre-contabil-ai',
+              onClick={async () => {
+                await addToCart({
+                  sku: 'pre-contabil-ai',
+                  title: 'Pré-Contábil AI',
                   price: 89.90,
-                  priceLabel: 'R$ 89,90/mês',
-                  pricingModel: 'subscription',
-                  type: 'individual'
-                });
-                alert('Adicionado ao carrinho!');
+                  metadata: { type: 'individual' }
+                }, {}, false);
+                navigate('/checkout');
               }}
               className="w-full p-6 bg-blue-600 hover:bg-slate-900 text-white rounded-[32px] shadow-2xl flex flex-col items-center gap-2 transition-all group"
            >
@@ -298,17 +297,14 @@ export default function PreContabilAI() {
               <p className="text-sm font-medium text-blue-500">Esta é uma demonstração do Pré-Contábil AI. Para uso em produção, adquira uma licença.</p>
             </div>
             <button 
-              onClick={() => {
-                addItem({
-                  id: 'precontabilai',
-                  name: 'Pré-Contábil AI',
-                  slug: 'pre-contabil-ai',
+              onClick={async () => {
+                await addToCart({
+                  sku: 'pre-contabil-ai',
+                  title: 'Pré-Contábil AI',
                   price: 89.90,
-                  priceLabel: 'R$ 89,90/mês',
-                  pricingModel: 'subscription',
-                  type: 'individual'
-                });
-                window.location.href = '/carrinho';
+                  metadata: { type: 'individual' }
+                }, {}, false);
+                navigate('/checkout');
               }}
               className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-blue-200 hover:bg-slate-900 transition-all"
             >

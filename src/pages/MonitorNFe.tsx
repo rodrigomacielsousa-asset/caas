@@ -31,6 +31,7 @@ import { nfeService, NFeClient } from '../services/nfeService';
 export default function MonitorNFe() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isDemo, setIsDemo] = useState(false);
   const [clients, setClients] = useState<NFeClient[]>([]);
   const [documents, setDocuments] = useState<any[]>([]);
   const [activeClientId, setActiveClientId] = useState<string | null>(null);
@@ -44,7 +45,7 @@ export default function MonitorNFe() {
     const unsubscribeAuth = onAuthStateChanged(auth, (u) => {
       setUser(u);
       if (u) {
-        // Real-time clients
+        setIsDemo(false);
         const qClients = query(collection(db, 'nfeMonitoredClients'), where('ownerId', '==', u.uid));
         const unsubClients = onSnapshot(qClients, (snap) => {
           const fetchedClients = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as NFeClient));
@@ -55,7 +56,6 @@ export default function MonitorNFe() {
           setLoading(false);
         });
 
-        // Real-time documents
         const qDocs = query(
           collection(db, 'documents'), 
           where('ownerId', '==', u.uid),
@@ -71,6 +71,16 @@ export default function MonitorNFe() {
           unsubDocs();
         };
       } else {
+        setIsDemo(true);
+        setClients([
+          { id: 'demo1', nome: 'Empresa Teste A', cnpj: '00.000.000/0001-91', status: 'ativo' },
+          { id: 'demo2', nome: 'Sebrae Demo', cnpj: '12.345.678/0001-00', status: 'ativo' }
+        ]);
+        setDocuments([
+          { id: 'd1', chave: '43210599000101550010000012341234567891234567', emitente: 'Fornecedor A', valor: 4500.00, origem: 'monitor', timestamp: new Date() },
+          { id: 'd2', chave: '98765432101234567890123456789012345678901234', emitente: 'Distribuidora B', valor: 120.00, origem: 'monitor', timestamp: new Date() }
+        ]);
+        setActiveClientId('demo1');
         setLoading(false);
       }
     });
@@ -80,6 +90,11 @@ export default function MonitorNFe() {
 
   const handleAddClient = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isDemo) {
+      alert("A funcionalidade de salvar está desativada no modo demonstração.");
+      setShowAddModal(false);
+      return;
+    }
     if (!user) return;
 
     try {
@@ -97,6 +112,10 @@ export default function MonitorNFe() {
   };
 
   const handleSync = async (clientId: string) => {
+    if (isDemo) {
+      alert("Simulando gatilho de busca na SEFAZ...");
+      return;
+    }
     if (!user) return;
     try {
       await nfeService.fetchNewNFEs(user.uid, clientId);
@@ -113,44 +132,15 @@ export default function MonitorNFe() {
     );
   }
 
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-md w-full bg-white dark:bg-slate-900 rounded-[48px] p-12 text-center shadow-2xl border border-slate-100 dark:border-slate-800"
-        >
-          <div className="w-20 h-20 bg-blue-600 text-white rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-blue-100 dark:shadow-none">
-            <Lock className="w-10 h-10" />
-          </div>
-          <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter mb-4">Acesso Restrito</h2>
-          <p className="text-slate-500 font-medium italic font-serif leading-relaxed mb-8">
-            O Monitor NF-e é uma ferramenta Pro. Faça login para monitorar seus CNPJs automaticamente 24/7.
-          </p>
-          <div className="space-y-4">
-            <Link 
-              to="/login" 
-              className="block w-full py-5 bg-blue-600 text-white rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-slate-900 transition-all"
-            >
-              Fazer Login agora
-            </Link>
-            <Link 
-              to="/solucoes" 
-              className="block text-xs font-black text-slate-400 uppercase tracking-widest hover:text-blue-600 transition-all"
-            >
-              Voltar ao catálogo
-            </Link>
-          </div>
-        </motion.div>
-      </div>
-    );
-  }
-
   const activeClient = clients.find(c => c.id === activeClientId);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-32">
+       {isDemo && (
+         <div className="bg-amber-500 text-white py-2 px-4 text-center text-[10px] font-black uppercase tracking-widest">
+           Modo Demonstração Ativo - Teste livremente as funcionalidades
+         </div>
+       )}
        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 mt-12 mb-[-100px] relative z-30">
           <Link to="/solucoes" className="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 hover:text-white transition-all uppercase tracking-widest">
             <ArrowLeft className="w-4 h-4" /> Catálogo de Soluções
@@ -348,7 +338,7 @@ export default function MonitorNFe() {
                          <div className="space-y-4">
                             <h2 className="text-4xl font-black tracking-tighter leading-tight italic">Configuração de <br />Certificado Digital.</h2>
                             <p className="text-lg text-blue-200/60 font-medium font-serif italic leading-relaxed">
-                               Para capturar as notas diretamente da SEFAZ, precisamos do seu certificado A1 (.pfx). A segurança é garantida por criptografia de ponta-a-ponta.
+                                Para capturar as notas diretamente da SEFAZ, precisamos do seu certificado A1 (.pfx). A segurança é garantida por criptografia de ponta-a-ponta.
                             </p>
                          </div>
                          

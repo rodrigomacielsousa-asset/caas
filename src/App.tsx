@@ -33,6 +33,9 @@ import Signup from './pages/Signup';
 import DashboardPage from './pages/Dashboard';
 import ExtratoBr from './pages/ExtratoBr';
 import ReceiptorBr from './pages/ReceiptorBr';
+import NexusDF from './pages/NexusDF';
+import ExtratoCartoes from './pages/ExtratoCartoes';
+import ImobFacil from './pages/ImobFacil';
 import FechamentoContabilPro from './pages/FechamentoContabilPro';
 import HonorariosPro from './pages/HonorariosPro';
 import PropostasContratosPro from './pages/PropostasContratosPro';
@@ -58,22 +61,26 @@ import MonitorNFe from './pages/MonitorNFe';
 import LandingPage from './pages/LandingPage';
 import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
+import CNAERadar from './pages/CNAERadar';
 
 const NotFound = () => (
   <div className="min-h-screen flex items-center justify-center bg-slate-50">
     <div className="text-center space-y-4">
       <h1 className="text-9xl font-black text-slate-200">404</h1>
-      <p className="text-xl font-bold text-slate-500 italic">Página não encontrada no ecossistema.</p>
+      <p className="text-xl font-bold text-slate-500">Página não encontrada no ecossistema.</p>
       <button onClick={() => window.location.href = '/'} className="px-8 py-3 bg-blue-600 text-white rounded-2xl font-bold">Voltar ao Início</button>
     </div>
   </div>
 );
+
+import { CartDrawer } from './components/CartDrawer';
 
 export default function App() {
   return (
     <CartProvider>
       <Router>
         <Layout>
+          <CartDrawer />
           <Routes>
             {/* Public Routes - No login required */}
             <Route path="/" element={<Home />} />
@@ -104,32 +111,34 @@ export default function App() {
             <Route path="/landing" element={<LandingPage />} />
             <Route path="/vendas" element={<LandingPage />} />
             <Route path="/check-cnpj" element={<ValidaEmpresa />} />
+            <Route path="/solucoes/cnae-radar" element={<CNAERadar />} />
+            <Route path="/checkout" element={<Checkout />} />
             
             {/* Freemium & Demo Routes - Open, but internal check */}
             <Route path="/receiptor" element={<ReceiptorBr />} />
             <Route path="/extrato" element={<ExtratoBr />} />
             <Route path="/pre-contabil" element={<PreContabilAI />} />
+            <Route path="/nexus-df" element={<NexusDF />} />
+            <Route path="/extrato-cartoes" element={<ExtratoCartoes />} />
+            <Route path="/imob-facil" element={<ImobFacil />} />
+            <Route path="/fechamento" element={<FechamentoContabilPro />} />
+            <Route path="/monitore" element={<MonitorNFe />} />
+            <Route path="/monitor-nfe" element={<MonitorNFe />} />
+            <Route path="/office" element={<OfficeContabil />} />
             <Route path="/solucoes/receiptorbr" element={<ReceiptorBr />} />
             <Route path="/solucoes/extratobr" element={<ExtratoBr />} />
             <Route path="/solucoes/pre-contabil-ai" element={<PreContabilAI />} />
+            <Route path="/solucoes/office-contabil" element={<OfficeContabil />} />
+            <Route path="/solucoes/fechamento-contabil-pro" element={<FechamentoContabilPro />} />
             
             {/* Private Routes - Login required */}
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/checkout" element={<Checkout />} />
               <Route path="/growth-dashboard" element={<GrowthDashboard />} />
               
-              {/* Private Solutions */}
-              <Route path="/office" element={<OfficeContabil />} />
-              <Route path="/fechamento" element={<FechamentoContabilPro />} />
+              {/* Private Management */}
               <Route path="/portal" element={<PortalCliente />} />
               <Route path="/cliente" element={<PortalCliente />} />
-              <Route path="/monitore" element={<MonitorNFe />} />
-              <Route path="/monitor-nfe" element={<MonitorNFe />} />
-              
-              {/* Nested URLs for backward compatibility */}
-              <Route path="/solucoes/office-contabil" element={<OfficeContabil />} />
-              <Route path="/solucoes/fechamento-contabil-pro" element={<FechamentoContabilPro />} />
               <Route path="/solucoes/portal-cliente" element={<PortalCliente />} />
               <Route path="/solucoes/valida-empresa" element={<ValidaEmpresa />} />
               <Route path="/solucoes/honorarios-pro" element={<HonorariosPro />} />

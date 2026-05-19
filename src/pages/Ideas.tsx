@@ -21,6 +21,8 @@ import {
 import { products } from '../data/products';
 import { Link } from 'react-router-dom';
 
+import { HeroPadrao } from '../components/HeroPadrao';
+
 interface Comment {
   id: string;
   userName: string;
@@ -193,21 +195,11 @@ export default function Ideas() {
   return (
     <div className="min-h-screen bg-slate-50 pb-32">
       {/* Hero Section */}
-      <section className="bg-white pt-32 pb-20 border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-[0.2em]">
-              Laboratório de Inovação
-            </div>
-            <h1 className="text-5xl md:text-6xl font-black text-slate-900 tracking-tighter leading-none">
-              Sugestões e <span className="text-blue-600">Ideias</span>
-            </h1>
-            <p className="text-xl text-slate-500 font-medium leading-relaxed">
-              O ecossistema é movido pela sua necessidade. Pesquise, vote e contribua com as próximas ferramentas do mercado.
-            </p>
-          </div>
-        </div>
-      </section>
+      <HeroPadrao 
+        badge="Laboratório de Inovação"
+        title={<>Sugestões e <span className="text-blue-600">Ideias</span></>}
+        description="O ecossistema é movido pela sua necessidade. Pesquise, vote e contribua com as próximas ferramentas do mercado."
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 grid grid-cols-1 lg:grid-cols-3 gap-12">
         {/* Main Feed */}

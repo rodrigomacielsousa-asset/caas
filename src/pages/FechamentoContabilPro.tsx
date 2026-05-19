@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   ClipboardCheck, 
   Plus, 
@@ -34,7 +34,8 @@ import {
   Unlock,
   Check,
   X,
-  Loader2
+  Loader2,
+  ShoppingCart
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
@@ -56,6 +57,7 @@ import {
   runTransaction
 } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import { useCart } from '../hooks/useCart';
 import * as XLSX from 'xlsx';
 
 // Types
@@ -106,6 +108,8 @@ const DEFAULT_TASKS = [
 
 export default function FechamentoContabilPro() {
   const [user] = useAuthState(auth);
+  const navigate = useNavigate();
+  const { addToCart } = useCart();
   const [activeTab, setActiveTab] = useState<'checklist' | 'evidencias' | 'gargalos' | 'aprovacoes' | 'relatorios'>('checklist');
   const [selectedPeriod, setSelectedPeriod] = useState(new Date().toISOString().slice(0, 7));
   const [selectedClientId, setSelectedClientId] = useState<string>('');
@@ -114,25 +118,41 @@ export default function FechamentoContabilPro() {
   const [tasks, setTasks] = useState<CloseTask[]>([]);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const [isDemo, setIsDemo] = useState(false);
 
   // Fetch Data
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      // Demo Data
+      setIsDemo(true);
+      setProfile({ credits: 100, plan: 'pro', usedThisMonth: 12 });
+      setClients([
+        { id: 'c1', companyName: 'Indústria Alpha LTDA', cnpj: '00.111.222/0001-33' },
+        { id: 'c2', companyName: 'Varejo Beta S/A', cnpj: '44.555.666/0001-77' }
+      ]);
+      const demoPeriodId = 'demo-p1';
+      setPeriods([
+        { id: demoPeriodId, period: selectedPeriod, status: 'em_andamento', progress: { done: 2, total: 5 }, createdAt: new Date() }
+      ]);
+      setTasks([
+        { id: 't1', clientId: 'c1', periodId: demoPeriodId, title: 'Conciliação Bancária', description: 'Conferir extrato', status: 'aprovado', ownerUserId: 'demo', dueDate: '2026-05-20', tags: ['Banco'], evidence: [{ type: 'url', name: 'Extrato_PDF', value: '#', uploadedAt: new Date().toISOString() }] },
+        { id: 't2', clientId: 'c1', periodId: demoPeriodId, title: 'Upload NF-e', description: 'Notas da Sefaz', status: 'aguardando_revisao', ownerUserId: 'demo', dueDate: '2026-05-22', tags: ['Fiscal'] },
+        { id: 't3', clientId: 'c2', periodId: demoPeriodId, title: 'Fechamento Folha', description: 'Holerites', status: 'pendente', ownerUserId: 'demo', dueDate: '2026-05-25', tags: ['Folha'] }
+      ]);
+      return;
+    };
 
-    // Fetch Clients
+    setIsDemo(false);
     const qClients = query(collection(db, 'clients'), where('userId', '==', user.uid));
     const unsubClients = onSnapshot(qClients, (snap) => {
       setClients(snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Client)));
     });
 
-    // Fetch Periods
     const qPeriods = query(collection(db, 'closePeriods'), where('userId', '==', user.uid), orderBy('period', 'desc'));
     const unsubPeriods = onSnapshot(qPeriods, (snap) => {
       setPeriods(snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ClosePeriod)));
     });
 
-    // Fetch Profile
     const unsubProfile = onSnapshot(doc(db, 'users', user.uid), (snap) => {
       if (snap.exists()) {
         const data = snap.data();
@@ -151,11 +171,11 @@ export default function FechamentoContabilPro() {
       unsubPeriods();
       unsubProfile();
     };
-  }, [user]);
+  }, [user, selectedPeriod]);
 
-  // Fetch Tasks for Selected Period/Client
+  // Fetch Tasks for Selected Period/Client (Authenticated only)
   useEffect(() => {
-    if (!user) return;
+    if (!user || isDemo) return;
     const currentPeriod = periods.find(p => p.period === selectedPeriod);
     if (!currentPeriod) {
       setTasks([]);
@@ -172,15 +192,17 @@ export default function FechamentoContabilPro() {
     });
 
     return () => unsubTasks();
-  }, [user, selectedPeriod, periods, selectedClientId]);
+  }, [user, selectedPeriod, periods, selectedClientId, isDemo]);
 
   const handleCreatePeriod = async () => {
+    if (isDemo) {
+      alert("Ação desativada no modo demonstração.");
+      return;
+    }
     if (!user || !profile) return;
     
-    // O usuário solicitou remover limites compulsórios de plano free
     setIsProcessing(true);
     try {
-      // 1. Create Period
       const periodRef = await addDoc(collection(db, 'closePeriods'), {
         userId: user.uid,
         period: selectedPeriod,
@@ -189,7 +211,6 @@ export default function FechamentoContabilPro() {
         createdAt: serverTimestamp()
       });
 
-      // 2. Create Tasks from Template for all clients (or current)
       const clientsToProcess = selectedClientId ? [clients.find(c => c.id === selectedClientId)!] : clients;
       
       const batchPromises = [];
@@ -218,11 +239,14 @@ export default function FechamentoContabilPro() {
     }
   };
 
-   const updateTaskStatus = async (taskId: string, newStatus: CloseTask['status']) => {
+  const updateTaskStatus = async (taskId: string, newStatus: CloseTask['status']) => {
+    if (isDemo) {
+      setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status: newStatus } : t));
+      return;
+    }
     if (!user) return;
     try {
       await updateDoc(doc(db, 'closeTasks', taskId), { status: newStatus });
-      
       const task = tasks.find(t => t.id === taskId);
       if (newStatus === 'aprovado' && task?.clientId) {
         await hubService.updateClientHubSummary(task.clientId, user.uid);
@@ -233,6 +257,10 @@ export default function FechamentoContabilPro() {
   };
 
   const addEvidence = async (taskId: string, name: string, value: string) => {
+    if (isDemo) {
+      setTasks(prev => prev.map(t => t.id === taskId ? { ...t, evidence: [...(t.evidence || []), { type: 'url', name, value, uploadedAt: new Date().toISOString() }] } : t));
+      return;
+    }
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
     const newEvidence = [...(task.evidence || []), { type: 'url' as const, name, value, uploadedAt: new Date().toISOString() }];
@@ -251,6 +279,11 @@ export default function FechamentoContabilPro() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col">
+       {isDemo && (
+         <div className="bg-amber-500 text-white py-2 px-4 text-center text-[10px] font-black uppercase tracking-widest z-50">
+           Modo Demonstração Ativo - Explore o Fechamento.PRO
+         </div>
+       )}
        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 mt-12 mb-[-40px]">
           <Link to="/solucoes" className="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 hover:text-blue-600 transition-all uppercase tracking-widest">
             <ArrowLeft className="w-4 h-4" /> Catálogo de Soluções
@@ -638,6 +671,20 @@ export default function FechamentoContabilPro() {
                       ))}
                    </div>
                 </div>
+                
+                <button 
+                  onClick={async () => {
+                    await addToCart({
+                      sku: 'fechamento-pro',
+                      title: 'Fechamento.PRO - Mensal',
+                      price: 197.00
+                    }, {}, false);
+                    navigate('/checkout');
+                  }}
+                  className="w-full py-6 bg-slate-900 dark:bg-blue-600 text-white rounded-[32px] font-black text-xs uppercase tracking-widest shadow-2xl flex items-center justify-center gap-2"
+                >
+                   <ShoppingCart className="w-5 h-5" /> Adicionar ao Carrinho
+                </button>
              </div>
           </div>
 
@@ -652,8 +699,6 @@ export default function FechamentoContabilPro() {
              </div>
           </div>
        </div>
-
-       {/* O usuário solicitou remover o overlay de paywall */}
     </div>
   );
 }

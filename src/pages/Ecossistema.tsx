@@ -2,57 +2,19 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Box, Zap, Globe, Cpu, ArrowRight, CheckCircle2, Layers, ShieldCheck, Rocket } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { HeroPadrao } from '../components/HeroPadrao';
 
 export default function Ecossistema() {
   return (
     <div className="min-h-screen bg-white pb-32">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-24 overflow-hidden border-b border-slate-100">
-        <div className="absolute top-0 right-0 p-24 opacity-5 rotate-12 -z-10">
-          <Globe className="w-96 h-96 text-blue-600" />
-        </div>
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-4"
-          >
-            A Nova Era da Contabilidade
-          </motion.div>
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-5xl md:text-7xl font-black text-slate-900 tracking-tighter leading-[0.9]"
-          >
-            Pare de depender de <br />
-            <span className="text-blue-600">sistemas contábeis complexos.</span>
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-xl md:text-2xl text-slate-500 max-w-3xl mx-auto font-medium"
-          >
-            Use ferramentas simples e diretas para resolver tarefas do dia a dia em segundos.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="pt-4"
-          >
-            <Link 
-              to="/solucoes" 
-              className="inline-flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-10 py-5 rounded-[2rem] font-black text-sm uppercase tracking-widest transition-all shadow-xl hover:shadow-blue-200 hover:-translate-y-1 active:scale-95"
-            >
-              Ver soluções disponíveis <ArrowRight className="w-5 h-5" />
-            </Link>
-          </motion.div>
-        </div>
-      </section>
+      <HeroPadrao 
+        badge="A Nova Era da Contabilidade"
+        title={<>Pare de depender de <br /><span className="text-blue-600">sistemas contábeis complexos.</span></>}
+        description="Use ferramentas simples e diretas para resolver tarefas do dia a dia em segundos. O ecossistema CaaS transforma micro-dores em soluções ágeis."
+        ctaText="Ver soluções disponíveis"
+        ctaLink="/solucoes"
+      />
 
       {/* Simple Explanation Section */}
       <section className="py-24 bg-slate-50/50">

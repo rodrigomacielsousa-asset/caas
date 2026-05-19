@@ -1,29 +1,18 @@
 import { Mail, Phone, MapPin, Globe, Linkedin, Youtube, Instagram, MessageCircle, ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
 
+import { HeroPadrao } from '../components/HeroPadrao';
+
 export default function Contato() {
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
       {/* Hero Section */}
-      <div className="bg-slate-50 dark:bg-slate-900/50 py-24 border-b border-slate-100 dark:border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-6"
-          >
-            <h1 className="text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
-              Vamos conversar sobre o <br /> 
-              <span className="text-blue-600">futuro da contabilidade.</span>
-            </h1>
-            <p className="text-xl text-slate-500 max-w-2xl mx-auto font-medium">
-              Dúvidas sobre o ecossistema, propostas de parcerias ou suporte técnico? Nossa equipe está pronta para ajudar.
-            </p>
-          </motion.div>
-        </div>
-      </div>
+      <HeroPadrao 
+        title={<>Vamos conversar sobre o <br /><span className="text-blue-600">futuro da contabilidade.</span></>}
+        description="Dúvidas sobre o ecossistema, propostas de parcerias ou suporte técnico? Nossa equipe está pronta para ajudar."
+      />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 pb-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
           {/* Contact Cards */}

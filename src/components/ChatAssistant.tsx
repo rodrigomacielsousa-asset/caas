@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Minus, Bot, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { getGeminiResponse } from '../lib/gemini';
 import { cn } from '../lib/utils';
 
 interface Message {
@@ -13,7 +12,7 @@ export const ChatAssistant = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Olá! Sou o assistente da MicroCaaS. Como posso ajudar você hoje com nossas soluções contábeis?' }
+    { role: 'assistant', content: 'Olá! Sou o CaaS AI, o assistente da MicroCaaS. Como posso ajudar você hoje com nossas soluções contábeis?' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -37,13 +36,23 @@ export const ChatAssistant = () => {
 
     try {
       const history = messages.map(m => ({ 
-        role: m.role === 'assistant' ? 'assistant' : 'user', 
+        role: m.role, 
         content: m.content 
       }));
       
-      const response = await getGeminiResponse(userMessage, history);
-      setMessages(prev => [...prev, { role: 'assistant', content: response }]);
+      const response = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: userMessage, history })
+      });
+      
+      const data = await response.json();
+      
+      if (data.error) throw new Error(data.error);
+      
+      setMessages(prev => [...prev, { role: 'assistant', content: data.response || 'Não consegui processar sua mensagem.' }]);
     } catch (error) {
+      console.error("Chat error:", error);
       setMessages(prev => [...prev, { role: 'assistant', content: 'Desculpe, tive um problema técnico. Pode tentar novamente?' }]);
     } finally {
       setIsLoading(false);
@@ -72,7 +81,7 @@ export const ChatAssistant = () => {
                   <Bot className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm leading-tight text-white">André (MicroCaaS AI)</h3>
+                  <h3 className="font-bold text-sm leading-tight text-white">CaaS AI</h3>
                   <div className="flex items-center gap-1">
                     <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
                     <span className="text-[10px] text-white/70 uppercase font-black">Online</span>

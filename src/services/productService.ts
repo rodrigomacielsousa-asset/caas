@@ -16,12 +16,7 @@ export const productService = {
       const allProducts = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Product));
       
       const filterFn = (p: Product) => {
-        const name = p.name?.toLowerCase() || '';
-        const subtitle = p.subtitle?.toLowerCase() || '';
-        const slug = p.slug?.toLowerCase() || '';
-        return !name.includes('nexus') && !name.includes('sibre') && 
-               !subtitle.includes('nexus') && !subtitle.includes('sibre') &&
-               !slug.includes('nexus') && !slug.includes('sibre');
+        return true;
       };
 
       // If DB is empty or contains invalid data, fallback to canonical
@@ -37,12 +32,7 @@ export const productService = {
       console.warn("Product collection issue, falling back to static data", error);
       // Log for platform but don't crash the fallback
       const filterFn = (p: Product) => {
-        const name = p.name?.toLowerCase() || '';
-        const subtitle = p.subtitle?.toLowerCase() || '';
-        const slug = p.slug?.toLowerCase() || '';
-        return !name.includes('nexus') && !name.includes('sibre') && 
-               !subtitle.includes('nexus') && !subtitle.includes('sibre') &&
-               !slug.includes('nexus') && !slug.includes('sibre');
+        return true;
       };
       try { handleFirestoreError(error, OperationType.LIST, PRODUCTS_COLLECTION); } catch(e) {}
       return canonicalProducts.filter(filterFn);

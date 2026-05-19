@@ -20,7 +20,7 @@ export const getGeminiResponse = async (prompt: string, history: { role: 'user' 
   try {
     const ai = getAI();
     
-    const systemInstruction = `Você é o André, o Assistente Virtual da MicroCaaS (microcaas.com.br).
+    const systemInstruction = `Você é o CaaS AI, o Assistente Virtual da MicroCaaS (microcaas.com.br).
       Seu objetivo é ajudar contadores e empresas a entenderem o ecossistema MicroCaaS.
       
       O que é a MicroCaaS:

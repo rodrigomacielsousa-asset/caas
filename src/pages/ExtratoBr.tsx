@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   BarChart3, 
   Upload, 
@@ -96,7 +96,9 @@ interface UserProfile {
 }
 
 export default function ExtratoBr() {
-  const { addItem } = useCart();
+  const { cart, addToCart } = useCart();
+  const navigate = useNavigate();
+  const { items } = cart;
   const [user] = useAuthState(auth);
   const [file, setFile] = useState<File | null>(null);
   const [bank, setBank] = useState('Outros');
@@ -216,7 +218,8 @@ export default function ExtratoBr() {
   };
 
   const handleUpload = async () => {
-    if (!file || !user || !profile) return;
+    // if (!file || !user || !profile) return;
+    if (!file) return;
 
     setIsProcessing(true);
     setError(null);
@@ -265,11 +268,13 @@ export default function ExtratoBr() {
       }
 
       // Update Stats
-      const userRef = doc(db, 'users', user.uid);
-      await setDoc(userRef, {
-        usedThisMonth: profile.usedThisMonth + 1,
-        lastExtraction: serverTimestamp()
-      }, { merge: true });
+      if (user && profile) {
+        const userRef = doc(db, 'users', user.uid);
+        await setDoc(userRef, {
+          usedThisMonth: profile.usedThisMonth + 1,
+          lastExtraction: serverTimestamp()
+        }, { merge: true });
+      }
 
     } catch (err: any) {
       setError(err.message || "Erro no processamento. Verifique se o arquivo é válido.");
@@ -357,17 +362,14 @@ export default function ExtratoBr() {
                   </div>
                </div>
                <button 
-                 onClick={() => {
-                    addItem({
-                      id: 'extratobr',
-                      name: 'Extrato.BR',
-                      slug: 'extrato-br',
+                 onClick={async () => {
+                    await addToCart({
+                      sku: 'extrato-br',
+                      title: 'Extrato.BR',
                       price: 59.90,
-                      priceLabel: 'R$ 59,90/mês',
-                      pricingModel: 'subscription',
-                      type: 'individual'
-                    });
-                    alert('Adicionado ao carrinho!');
+                      metadata: { type: 'individual' }
+                    }, {}, false);
+                    navigate('/checkout');
                  }}
                  className="bg-blue-600 hover:bg-slate-900 px-6 py-3 rounded-2xl text-[11px] font-black uppercase text-white tracking-widest transition-all shadow-xl shadow-blue-100 flex items-center gap-2"
                >
@@ -718,17 +720,14 @@ export default function ExtratoBr() {
                   </div>
                   <div className="space-y-4">
                      <button 
-                        onClick={() => {
-                          addItem({
-                            id: 'extratobr',
-                            name: 'Extrato.BR',
-                            slug: 'extrato-br',
+                        onClick={async () => {
+                          await addToCart({
+                            sku: 'extrato-br',
+                            title: 'Extrato.BR',
                             price: 59.90,
-                            priceLabel: 'R$ 59,90/mês',
-                            pricingModel: 'subscription',
-                            type: 'individual'
-                          });
-                          window.location.href = '/carrinho';
+                            metadata: { type: 'individual' }
+                          }, {}, false);
+                          navigate('/checkout');
                         }}
                         className="w-full py-6 bg-blue-600 text-white rounded-[32px] font-black text-xl tracking-tighter uppercase shadow-2xl shadow-blue-200"
                      >
